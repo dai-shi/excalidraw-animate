@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "gh-pages": "^2.2.0"
+  },
+  "private": true,
+  "scripts": {
+    "deploy": "gh-pages -d public"
+  }
+}
