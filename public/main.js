@@ -3,12 +3,10 @@ const EXCALIDRAW_NS = "https://excalidraw.com/svg";
 let currentMs = 0;
 
 const animatePath = (svg, ele, ms) => {
-  console.log(ele);
   const dTo = ele.getAttribute("d");
   const mCount = dTo.match(/M/g).length;
   const cCount = dTo.match(/C/g).length;
   const repeat = cCount / mCount;
-  console.log({ repeat });
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
     const dFrom = dTo.replace(new RegExp([
@@ -101,6 +99,7 @@ async function importFromBackend(
   try {
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
+      { mode: "cors" }, // ADDED
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
