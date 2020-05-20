@@ -62,7 +62,7 @@ const patchSvg = (svg) => {
 
 let restore;
 const main = async () => {
-  const [, id, key] = /json=([0-9]+),?(\w*)/.exec(location.hash);
+  const [, id, key] = /json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(location.hash);
   let elements;
   restore = (e) => { elements = e };
   await importFromBackend(id, key);
@@ -583,7 +583,7 @@ function renderElementToSvg(
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
       svgRoot.appendChild(node);
       break;
     }
@@ -666,7 +666,7 @@ function renderElementToSvg(
           text.setAttribute("style", "white-space: pre;");
           node.appendChild(text);
         }
-        group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
         svgRoot.appendChild(node);
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
@@ -1028,5 +1028,22 @@ function drawElementOnCanvas(
     }
   }
   context.globalAlpha = 1;
+}
+
+function isPathALoop(points) {
+  if (points.length >= 3) {
+    const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
+    return (
+      distance2d(firstPoint[0], firstPoint[1], lastPoint[0], lastPoint[1]) <=
+      LINE_CONFIRM_THRESHOLD
+    );
+  }
+  return false;
+}
+
+function isTextElement(
+  element,
+) {
+  return element != null && element.type === "text";
 }
 
