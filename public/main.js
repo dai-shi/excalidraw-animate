@@ -50,7 +50,7 @@ const patchSvgArrow = (svg, ele) => {
 const patchSvg = (svg) => {
   const walk = (ele) => {
     const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
-    if (type === "line") {
+    if (type === "line" || type === "draw") {
       patchSvgLine(svg, ele);
     } else if (type === "arrow") {
       patchSvgArrow(svg, ele);
