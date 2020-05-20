@@ -1047,3 +1047,10 @@ function isTextElement(
   return element != null && element.type === "text";
 }
 
+function distance2d(x1, y1, x2, y2) {
+  const xd = x2 - x1;
+  const yd = y2 - y1;
+  return Math.hypot(xd, yd);
+}
+
+const LINE_CONFIRM_THRESHOLD = 10; // 10px
