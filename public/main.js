@@ -38,6 +38,9 @@ const animatePath = (svg, ele, ms) => {
 }
 
 const patchSvgLine = (svg, ele) => {
+  if (ele.childNodes[0].getAttribute("fill-rule")) {
+    animatePath(svg, ele.childNodes[0].childNodes[1], 1000);
+  }
   animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
 };
 
