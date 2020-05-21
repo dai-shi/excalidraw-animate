@@ -1,5 +1,14 @@
 const EXCALIDRAW_NS = "https://excalidraw.com/svg";
 
+const findNode = (ele, name) => {
+  for (let i = 0; i < ele.childNodes.length; ++i) {
+    if (ele.childNodes[i].tagName === name) {
+      return ele.childNodes[i];
+    }
+  }
+  return null;
+};
+
 let currentMs = 0;
 
 const animatePath = (svg, ele, ms) => {
@@ -35,9 +44,37 @@ const animatePath = (svg, ele, ms) => {
     dLast = dFrom;
   }
   currentMs += ms;
-}
+};
+
+let pathForTextIndex = 0;
+
+const animateText = (svg, width, ele, i, repeat, ms) => {
+  const x = ele.getAttribute("x");
+  const y = ele.getAttribute("y");
+  pathForTextIndex += 1;
+  const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
+  path.setAttribute("id", "pathForText" + pathForTextIndex);
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "d");
+  animate.setAttribute("from", `M${x},${y} h0`);
+  animate.setAttribute("to", `M${x},${y} h${width}`);
+  animate.setAttribute("begin", `${currentMs + i * (ms / repeat)}ms`);
+  animate.setAttribute("dur", `${ms / repeat}ms`);
+  animate.setAttribute("fill", "freeze");
+  path.appendChild(animate);
+  const textPath = svg.ownerDocument.createElementNS(SVG_NS, "textPath");
+  textPath.setAttribute("href", "#pathForText" + pathForTextIndex);
+  textPath.textContent = ele.textContent;
+  ele.textContent = null;
+  findNode(svg, "defs").appendChild(path);
+  ele.appendChild(textPath);
+  currentMs += ms;
+};
 
 const patchSvgLine = (svg, ele) => {
+  if (ele.childNodes[0].getAttribute("fill-rule")) {
+    animatePath(svg, ele.childNodes[0].childNodes[1], 1000);
+  }
   animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
 };
 
@@ -47,6 +84,13 @@ const patchSvgArrow = (svg, ele) => {
   animatePath(svg, ele.childNodes[2].childNodes[0], 200);
 };
 
+const patchSvgText = (svg, ele, width) => {
+  const len = ele.childNodes.length;
+  ele.childNodes.forEach((child, index) => {
+    animateText(svg, width, child, index, len, 500);
+  });
+};
+
 const patchSvg = (svg) => {
   const walk = (ele) => {
     const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
@@ -54,6 +98,9 @@ const patchSvg = (svg) => {
       patchSvgLine(svg, ele);
     } else if (type === "arrow") {
       patchSvgArrow(svg, ele);
+    } else if (type === "text") {
+      const width = ele.getAttributeNS(EXCALIDRAW_NS, "element-width");
+      patchSvgText(svg, ele, width);
     }
     ele.childNodes.forEach(walk);
   };
@@ -667,6 +714,7 @@ function renderElementToSvg(
           node.appendChild(text);
         }
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
         svgRoot.appendChild(node);
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
@@ -674,6 +722,9 @@ function renderElementToSvg(
     }
   }
 }
+
+const DASHARRAY_DASHED = [12, 8];
+const DASHARRAY_DOTTED = [3, 6];
 
 function generateElement(
   element,
