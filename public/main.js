@@ -136,7 +136,7 @@ const animateText = (svg, width, ele, i, repeat, ms) => {
 const patchSvgLine = (svg, ele) => {
   if (ele.childNodes[0].getAttribute("fill-rule")) {
     animatePath(svg, ele.childNodes[0].childNodes[1], 1000);
-    animateFillPath(svg, ele.childNodes[0].childNodes[0], 1000);
+    animateFillPath(svg, ele.childNodes[0].childNodes[0], 500);
   } else {
     animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
   }
@@ -151,7 +151,7 @@ const patchSvgArrow = (svg, ele) => {
 const patchSvgRectangle = (svg, ele) => {
   if (ele.childNodes[1]) {
     animateRect(svg, ele.childNodes[1], 1000);
-    animateFillPath(svg, ele.childNodes[0], 1000);
+    animateFillPath(svg, ele.childNodes[0], 500);
   } else {
     animateRect(svg, ele.childNodes[0], 1000);
   }
@@ -160,7 +160,7 @@ const patchSvgRectangle = (svg, ele) => {
 const patchSvgEllipse = (svg, ele) => {
   if (ele.childNodes[1]) {
     animatePath(svg, ele.childNodes[1], 1000);
-    animateFillPath(svg, ele.childNodes[0], 1000);
+    animateFillPath(svg, ele.childNodes[0], 500);
   } else {
     animatePath(svg, ele.childNodes[0], 1000);
   }
@@ -169,7 +169,7 @@ const patchSvgEllipse = (svg, ele) => {
 const patchSvgText = (svg, ele, width) => {
   const len = ele.childNodes.length;
   ele.childNodes.forEach((child, index) => {
-    animateText(svg, width, child, index, len, 500);
+    animateText(svg, width, child, index, len, 1000);
   });
 };
 
