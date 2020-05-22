@@ -46,6 +46,30 @@ const animatePath = (svg, ele, ms) => {
   currentMs += ms;
 };
 
+const animateFillPath = (svg, ele, ms) => {
+  const dTo = ele.getAttribute("d");
+  if (dTo.includes("C")) {
+    animatePath(svg, ele, ms);
+    return;
+  }
+  const dFrom = dTo.replace(new RegExp([
+    "M(\\S+) (\\S+)",
+    "((?: L\\S+ \\S+){1,})",
+  ].join("")), (...a) => {
+    return `M${a[1]} ${a[2]}` + a[3].replace(/L\S+ \S+/g, `L${a[1]} ${a[2]}`);
+  });
+  ele.setAttribute("d", dFrom);
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "d");
+  animate.setAttribute("from", dFrom);
+  animate.setAttribute("to", dTo);
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${ms}ms`);
+  animate.setAttribute("fill", "freeze");
+  ele.appendChild(animate);
+  currentMs += ms;
+};
+
 const animateRect = (svg, ele, ms) => {
   const dTo = ele.getAttribute("d");
   const mCount = dTo.match(/M/g).length;
@@ -112,8 +136,10 @@ const animateText = (svg, width, ele, i, repeat, ms) => {
 const patchSvgLine = (svg, ele) => {
   if (ele.childNodes[0].getAttribute("fill-rule")) {
     animatePath(svg, ele.childNodes[0].childNodes[1], 1000);
+    animateFillPath(svg, ele.childNodes[0].childNodes[0], 1000);
+  } else {
+    animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
   }
-  animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
 };
 
 const patchSvgArrow = (svg, ele) => {
@@ -125,7 +151,7 @@ const patchSvgArrow = (svg, ele) => {
 const patchSvgRectangle = (svg, ele) => {
   if (ele.childNodes[1]) {
     animateRect(svg, ele.childNodes[1], 1000);
-    animatePath(svg, ele.childNodes[0], 1000);
+    animateFillPath(svg, ele.childNodes[0], 1000);
   } else {
     animateRect(svg, ele.childNodes[0], 1000);
   }
@@ -134,8 +160,10 @@ const patchSvgRectangle = (svg, ele) => {
 const patchSvgEllipse = (svg, ele) => {
   if (ele.childNodes[1]) {
     animatePath(svg, ele.childNodes[1], 1000);
+    animateFillPath(svg, ele.childNodes[0], 1000);
+  } else {
+    animatePath(svg, ele.childNodes[0], 1000);
   }
-  animatePath(svg, ele.childNodes[0], 1000);
 };
 
 const patchSvgText = (svg, ele, width) => {
