@@ -84,6 +84,13 @@ const patchSvgArrow = (svg, ele) => {
   animatePath(svg, ele.childNodes[2].childNodes[0], 200);
 };
 
+const patchSvgEllipse = (svg, ele) => {
+  if (ele.childNodes[1]) {
+    animatePath(svg, ele.childNodes[1], 1000);
+  }
+  animatePath(svg, ele.childNodes[0], 1000);
+};
+
 const patchSvgText = (svg, ele, width) => {
   const len = ele.childNodes.length;
   ele.childNodes.forEach((child, index) => {
@@ -98,6 +105,8 @@ const patchSvg = (svg) => {
       patchSvgLine(svg, ele);
     } else if (type === "arrow") {
       patchSvgArrow(svg, ele);
+    } else if (type === "ellipse") {
+      patchSvgEllipse(svg, ele);
     } else if (type === "text") {
       const width = ele.getAttributeNS(EXCALIDRAW_NS, "element-width");
       patchSvgText(svg, ele, width);
