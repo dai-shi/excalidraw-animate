@@ -46,6 +46,68 @@ const animatePath = (svg, ele, ms) => {
   currentMs += ms;
 };
 
+const animateFillPath = (svg, ele, ms) => {
+  const dTo = ele.getAttribute("d");
+  if (dTo.includes("C")) {
+    animatePath(svg, ele, ms);
+    return;
+  }
+  const dFrom = dTo.replace(new RegExp([
+    "M(\\S+) (\\S+)",
+    "((?: L\\S+ \\S+){1,})",
+  ].join("")), (...a) => {
+    return `M${a[1]} ${a[2]}` + a[3].replace(/L\S+ \S+/g, `L${a[1]} ${a[2]}`);
+  });
+  ele.setAttribute("d", dFrom);
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "d");
+  animate.setAttribute("from", dFrom);
+  animate.setAttribute("to", dTo);
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${ms}ms`);
+  animate.setAttribute("fill", "freeze");
+  ele.appendChild(animate);
+  currentMs += ms;
+};
+
+const animateRect = (svg, ele, ms) => {
+  const dTo = ele.getAttribute("d");
+  const mCount = dTo.match(/M/g).length;
+  const cCount = dTo.match(/C/g).length;
+  if (mCount !== cCount) throw new Error("unexpected m/c counts");
+  const repeat = mCount / 2;
+  let dLast = dTo;
+  for (let i = repeat - 1; i >= 0; i -= 1) {
+    const dFrom = dTo.replace(new RegExp([
+      "((?:",
+      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
+      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
+      "){",
+      `${i}`, // skip count
+      "})",
+      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
+      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
+      ".*",
+    ].join("")), (...a) => {
+      const [x1, y1, x2, y2] = a.slice(6);
+      return `${a[1]}` + `M${x1} ${y1} C${x1} ${y1}, ${x1} ${y1}, ${x1} ${y1} M${x2} ${y2} C${x2} ${y2}, ${x2} ${y2}, ${x2} ${y2} `.repeat(repeat - i);
+    });
+    if (i === 0) {
+      ele.setAttribute("d", dFrom);
+    }
+    const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+    animate.setAttribute("attributeName", "d");
+    animate.setAttribute("from", dFrom);
+    animate.setAttribute("to", dLast);
+    animate.setAttribute("begin", `${currentMs + i * (ms / repeat)}ms`);
+    animate.setAttribute("dur", `${ms / repeat}ms`);
+    animate.setAttribute("fill", "freeze");
+    ele.appendChild(animate);
+    dLast = dFrom;
+  }
+  currentMs += ms;
+};
+
 let pathForTextIndex = 0;
 
 const animateText = (svg, width, ele, i, repeat, ms) => {
@@ -74,14 +136,34 @@ const animateText = (svg, width, ele, i, repeat, ms) => {
 const patchSvgLine = (svg, ele) => {
   if (ele.childNodes[0].getAttribute("fill-rule")) {
     animatePath(svg, ele.childNodes[0].childNodes[1], 1000);
+    animateFillPath(svg, ele.childNodes[0].childNodes[0], 1000);
+  } else {
+    animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
   }
-  animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
 };
 
 const patchSvgArrow = (svg, ele) => {
   animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
   animatePath(svg, ele.childNodes[1].childNodes[0], 200);
   animatePath(svg, ele.childNodes[2].childNodes[0], 200);
+};
+
+const patchSvgRectangle = (svg, ele) => {
+  if (ele.childNodes[1]) {
+    animateRect(svg, ele.childNodes[1], 1000);
+    animateFillPath(svg, ele.childNodes[0], 1000);
+  } else {
+    animateRect(svg, ele.childNodes[0], 1000);
+  }
+};
+
+const patchSvgEllipse = (svg, ele) => {
+  if (ele.childNodes[1]) {
+    animatePath(svg, ele.childNodes[1], 1000);
+    animateFillPath(svg, ele.childNodes[0], 1000);
+  } else {
+    animatePath(svg, ele.childNodes[0], 1000);
+  }
 };
 
 const patchSvgText = (svg, ele, width) => {
@@ -98,6 +180,10 @@ const patchSvg = (svg) => {
       patchSvgLine(svg, ele);
     } else if (type === "arrow") {
       patchSvgArrow(svg, ele);
+    } else if (type === "rectangle" || type === "diamond") {
+      patchSvgRectangle(svg, ele);
+    } else if (type === "ellipse") {
+      patchSvgEllipse(svg, ele);
     } else if (type === "text") {
       const width = ele.getAttributeNS(EXCALIDRAW_NS, "element-width");
       patchSvgText(svg, ele, width);
