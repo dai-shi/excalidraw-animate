@@ -204,7 +204,7 @@ const patchSvg = (svg) => {
       found.children.push({ ele, type, bounds });
       return;
     }
-    if (!canBeRoot) {
+    if (!canBeRoot || individuals.some((item) => containBounds(item.bounds, bounds))) {
       individuals.push({ ele, type, bounds });
       return;
     }
@@ -229,7 +229,7 @@ const patchSvg = (svg) => {
   const walk = (ele) => {
     const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
     const transform = ele.getAttribute && ele.getAttribute("transform");
-    const notRotated = / rotate\(0/.test(transform);
+    const notRotated = / rotate\(0 /.test(transform);
     const canBeRoot = type === "rectangle" && notRotated;
     if (type) {
       const bounds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-bounds"));
