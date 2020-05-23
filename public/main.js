@@ -340,6 +340,21 @@ const generateImagesFromSvg = (fps) => new Promise((resolve, reject) => {
 
 window.addEventListener("load", main);
 
+window.pauseResumeAnimations = (event) => {
+  const svgEle = document.getElementsByTagName('svg')[0];
+  if (svgEle.animationsPaused()) {
+    event.target.innerHTML = "Pause";
+    svgEle.unpauseAnimations();
+  } else {
+    event.target.innerHTML = "Resume";
+    svgEle.pauseAnimations();
+  }
+};
+
+window.resetAnimations = (event) => {
+  document.getElementsByTagName('svg')[0].setCurrentTime(0);
+};
+
 window.exportToSvgFile = async (event) => {
   if (!svg) {
     alert("svg not ready");
