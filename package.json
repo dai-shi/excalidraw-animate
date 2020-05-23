@@ -6,6 +6,6 @@
   "private": true,
   "scripts": {
     "start": "serve public",
-    "deploy": "gh-pages -d public -s '**/*.+(js|html|css)'"
+    "deploy": "gh-pages -d public -s '**/*.+(js|mjs|html|css)'"
   }
 }
