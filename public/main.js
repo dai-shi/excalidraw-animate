@@ -75,22 +75,23 @@ const animateRect = (svg, ele, ms) => {
   const mCount = dTo.match(/M/g).length;
   const cCount = dTo.match(/C/g).length;
   if (mCount !== cCount) throw new Error("unexpected m/c counts");
-  const repeat = mCount / 2;
+  const repeat = 4;
+  const dups = mCount / repeat;
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
     const dFrom = dTo.replace(new RegExp([
       "((?:",
-      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
-      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
+      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
       "){",
       `${i}`, // skip count
       "})",
-      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
-      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?",
+      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
       ".*",
     ].join("")), (...a) => {
-      const [x1, y1, x2, y2] = a.slice(6);
-      return `${a[1]}` + `M${x1} ${y1} C${x1} ${y1}, ${x1} ${y1}, ${x1} ${y1} M${x2} ${y2} C${x2} ${y2}, ${x2} ${y2}, ${x2} ${y2} `.repeat(repeat - i);
+      return `${a[1]}` + [...Array(dups).keys()].map((d) => {
+        const [x, y] = a.slice(2 + dups * 2 + d * 2);
+        return `M${x} ${y} C${x} ${y}, ${x} ${y}, ${x} ${y} `;
+      }).join("").repeat(repeat - i);
     });
     if (i === 0) {
       ele.setAttribute("d", dFrom);
