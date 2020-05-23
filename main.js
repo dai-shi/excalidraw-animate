@@ -111,15 +111,14 @@ const animateRect = (svg, ele, ms) => {
 let pathForTextIndex = 0;
 
 const animateText = (svg, width, ele, i, repeat, ms) => {
-  const x = ele.getAttribute("x");
   const y = ele.getAttribute("y");
   pathForTextIndex += 1;
   const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
   path.setAttribute("id", "pathForText" + pathForTextIndex);
   const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
   animate.setAttribute("attributeName", "d");
-  animate.setAttribute("from", `M${x},${y} h0`);
-  animate.setAttribute("to", `M${x},${y} h${width}`);
+  animate.setAttribute("from", `m0,${y} h0`);
+  animate.setAttribute("to", `m0,${y} h${width}`);
   animate.setAttribute("begin", `${currentMs + i * (ms / repeat)}ms`);
   animate.setAttribute("dur", `${ms / repeat}ms`);
   animate.setAttribute("fill", "freeze");
@@ -185,8 +184,9 @@ const patchSvg = (svg) => {
     } else if (type === "ellipse") {
       patchSvgEllipse(svg, ele);
     } else if (type === "text") {
-      const width = ele.getAttributeNS(EXCALIDRAW_NS, "element-width");
-      patchSvgText(svg, ele, width);
+      const x1 = ele.getAttributeNS(EXCALIDRAW_NS, "element-x1");
+      const x2 = ele.getAttributeNS(EXCALIDRAW_NS, "element-x2");
+      patchSvgText(svg, ele, x2 - x1);
     }
     ele.childNodes.forEach(walk);
   };
@@ -717,6 +717,10 @@ function renderElementToSvg(
         }) rotate(${degree} ${cx} ${cy})`,
       );
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x1", x1); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y1", y1); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x2", x2); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y2", y2); // ADDED
       svgRoot.appendChild(node);
       break;
     }
@@ -748,6 +752,10 @@ function renderElementToSvg(
         group.appendChild(node);
       });
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x1", x1); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y1", y1); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x2", x2); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y2", y2); // ADDED
       svgRoot.appendChild(group);
       break;
     }
@@ -800,7 +808,10 @@ function renderElementToSvg(
           node.appendChild(text);
         }
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x1", x1); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y1", y1); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x2", x2); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y2", y2); // ADDED
         svgRoot.appendChild(node);
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
