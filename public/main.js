@@ -279,11 +279,11 @@ const main = async () => {
     shouldAddWatermark: false,
   });
   patchSvg(svg);
-  document.body.appendChild(svg);
+  document.getElementById("container").appendChild(svg);
   console.log(svg);
 };
 
-window.addEventListener('load', main);
+window.addEventListener("load", main);
 
 const t = x => x;
 
