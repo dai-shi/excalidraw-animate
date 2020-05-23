@@ -7,5 +7,10 @@
     <script src="main.js"></script>
   </head>
   <body>
+    <button type="button" onclick="document.getElementsByTagName('svg')[0].pauseAnimations()">Pause</button>
+    <button type="button" onclick="document.getElementsByTagName('svg')[0].unpauseAnimations()">Resume</button>
+    <button type="button" onclick="document.getElementsByTagName('svg')[0].setCurrentTime(0)">Reset</button>
+    <div id="container">
+    </div>
   </body>
 </html>
