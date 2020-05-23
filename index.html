@@ -5,11 +5,14 @@
     <title>Excalidraw Animate</title>
     <script src="https://unpkg.com/roughjs@latest/bundled/rough.js"></script>
     <script src="main.js"></script>
+    <script src="script.mjs" type="module"></script>
   </head>
   <body>
     <button type="button" onclick="document.getElementsByTagName('svg')[0].pauseAnimations()">Pause</button>
     <button type="button" onclick="document.getElementsByTagName('svg')[0].unpauseAnimations()">Resume</button>
     <button type="button" onclick="document.getElementsByTagName('svg')[0].setCurrentTime(0)">Reset</button>
+    <button type="button" onclick="exportToSvgFile(event)">Export to Svg</button>
+    <button type="button" onclick="exportToWebmFile(event)">Export to WebM</button>
     <div id="container">
     </div>
   </body>

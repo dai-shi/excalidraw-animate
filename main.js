@@ -1,5 +1,32 @@
 const EXCALIDRAW_NS = "https://excalidraw.com/svg";
 
+const resourceCache = new Map();
+
+const embedUrlResources = async (text) => {
+  const urls = text.match(/url\(".*?"\);/g);
+  const resources = await Promise.all(urls.map((url) => new Promise((resolve, reject) => {
+    url = url.slice(5, -3);
+    if (resourceCache.has(url)) {
+      resolve(resourceCache.get(url));
+      return;
+    }
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const resource = `url(${reader.result});`;
+          resourceCache.set(url, resource);
+          resolve(resource);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      })
+      .catch(reject);
+  })));
+  return text.replace(/url\(".*?"\);/g, () => resources.shift());
+};
+
 const findNode = (ele, name) => {
   for (let i = 0; i < ele.childNodes.length; ++i) {
     if (ele.childNodes[i].tagName === name) {
@@ -195,6 +222,8 @@ const containBounds = (parent, child) => (
   parent[3] >= child[3]
 );
 
+let finishedMs;
+
 const patchSvg = (svg) => {
   const individuals = [];
   const rootRects = [];
@@ -245,7 +274,7 @@ const patchSvg = (svg) => {
     a.x1 > b.y1 ? 1 :
     0
   ));
-  let current = 0;
+  let current = 1000; // 1 sec margin
   const rootDur = 1000;
   const childrenDur = 4000;
   const individualDur = 500;
@@ -264,18 +293,20 @@ const patchSvg = (svg) => {
     patchSvgEle(svg, item.ele, item.type, current, individualDur);
     current += individualDur;
   });
+  finishedMs = current + 1000; // 1 sec margin
 };
 
 let restore;
+let svg;
 const main = async () => {
   const [, id, key] = /json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(location.hash);
   let elements;
   restore = (e) => { elements = e };
   await importFromBackend(id, key);
-  const svg = exportToSvg(elements, {
-    exportBackground: false,
+  svg = exportToSvg(elements, {
+    exportBackground: true,
     exportPadding: 30,
-    viewBackgroundColor: "lightgreen",
+    viewBackgroundColor: "white",
     shouldAddWatermark: false,
   });
   patchSvg(svg);
@@ -283,7 +314,79 @@ const main = async () => {
   console.log(svg);
 };
 
+const generateImagesFromSvg = (fps) => new Promise((resolve, reject) => {
+  const container = document.getElementById("container");
+  const svgEle = container.getElementsByTagName("svg")[0];
+  svgEle.pauseAnimations();
+  const images = [];
+  const loop = async (t) => {
+    if (t > finishedMs) {
+      svgEle.unpauseAnimations();
+      resolve(images);
+      return;
+    }
+    svgEle.setCurrentTime(t / 1000);
+    const html = await embedUrlResources(container.innerHTML);
+    const img = new Image();
+    img.src = "data:image/svg+xml;base64," + btoa(html);
+    img.onload = () => {
+      images.push(img);
+      loop(t + 1000 / fps);
+    };
+    img.onerror = reject;
+  }
+  loop(0);
+});
+
 window.addEventListener("load", main);
+
+window.exportToSvgFile = async (event) => {
+  if (!svg) {
+    alert("svg not ready");
+    return;
+  }
+  const svgStr = (new XMLSerializer()).serializeToString(svg);
+  await fileSave(new Blob([svgStr], { type: "svg" }), {
+    fileName: "excalidraw-animate.svg",
+  });
+};
+
+window.exportToWebmFile = async (event) => {
+  if (!svg) {
+    alert("svg not ready");
+    return;
+  }
+  const origHtml = event.target.innerHTML;
+  event.target.innerHTML = `${origHtml} (Processing...)`;
+  event.target.disabled = true;
+  const images = await generateImagesFromSvg(60);
+  const [, width, height] = svg.getAttribute("viewBox").match(/0 0 (\S+) (\S+)/);
+  const canvas = document.createElement("canvas");
+  canvas.setAttribute("width", `${width}px`);
+  canvas.setAttribute("height", `${height}px`);
+  const ctx = canvas.getContext("2d");
+  const stream = canvas.captureStream();
+  const recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = async (e) => {
+    await fileSave(new Blob([e.data], { type: e.data.type }), {
+      fileName: "excalidraw-animate.webm",
+    });
+    event.target.innerHTML = origHtml;
+    event.target.disabled = false;
+  };
+  recorder.start();
+  let index = 0;
+  const drawSvg = () => {
+    if (index >= images.length) {
+      recorder.stop();
+      return;
+    }
+    ctx.drawImage(images[index], 0, 0);
+    index += 1;
+    setTimeout(drawSvg, 1000 / 60);
+  };
+  drawSvg();
+};
 
 const t = x => x;
 
