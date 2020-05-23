@@ -12,7 +12,7 @@ First, you need to create a shareable link in Excalidraw.
 
 ![Shareable link image](https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small)
 
-Second, modify the part of url. Replace `excalidraw.com` with `dai-shi.github.io/excalidraw-animate`.
+Second, modify part of the link; replace `excalidraw.com` with `dai-shi.github.io/excalidraw-animate`.
 
 For example:
 - Before: `https://excalidraw.com/#json=5173841697439744,SwJFLIYa2VQVKcyhcy0b_w`
