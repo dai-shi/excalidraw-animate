@@ -9,9 +9,7 @@ const findNode = (ele, name) => {
   return null;
 };
 
-let currentMs = 0;
-
-const animatePath = (svg, ele, ms) => {
+const animatePath = (svg, ele, currentMs, durationMs) => {
   const dTo = ele.getAttribute("d");
   const mCount = dTo.match(/M/g).length;
   const cCount = dTo.match(/C/g).length;
@@ -37,19 +35,18 @@ const animatePath = (svg, ele, ms) => {
     animate.setAttribute("attributeName", "d");
     animate.setAttribute("from", dFrom);
     animate.setAttribute("to", dLast);
-    animate.setAttribute("begin", `${currentMs + i * (ms / repeat)}ms`);
-    animate.setAttribute("dur", `${ms / repeat}ms`);
+    animate.setAttribute("begin", `${currentMs + i * (durationMs / repeat)}ms`);
+    animate.setAttribute("dur", `${durationMs / repeat}ms`);
     animate.setAttribute("fill", "freeze");
     ele.appendChild(animate);
     dLast = dFrom;
   }
-  currentMs += ms;
 };
 
-const animateFillPath = (svg, ele, ms) => {
+const animateFillPath = (svg, ele, currentMs, durationMs) => {
   const dTo = ele.getAttribute("d");
   if (dTo.includes("C")) {
-    animatePath(svg, ele, ms);
+    animatePath(svg, ele, currentMs, durationMs);
     return;
   }
   const dFrom = dTo.replace(new RegExp([
@@ -64,13 +61,12 @@ const animateFillPath = (svg, ele, ms) => {
   animate.setAttribute("from", dFrom);
   animate.setAttribute("to", dTo);
   animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${ms}ms`);
+  animate.setAttribute("dur", `${durationMs}ms`);
   animate.setAttribute("fill", "freeze");
   ele.appendChild(animate);
-  currentMs += ms;
 };
 
-const animateRect = (svg, ele, ms) => {
+const animateRect = (svg, ele, currentMs, durationMs) => {
   const dTo = ele.getAttribute("d");
   const mCount = dTo.match(/M/g).length;
   const cCount = dTo.match(/C/g).length;
@@ -100,18 +96,17 @@ const animateRect = (svg, ele, ms) => {
     animate.setAttribute("attributeName", "d");
     animate.setAttribute("from", dFrom);
     animate.setAttribute("to", dLast);
-    animate.setAttribute("begin", `${currentMs + i * (ms / repeat)}ms`);
-    animate.setAttribute("dur", `${ms / repeat}ms`);
+    animate.setAttribute("begin", `${currentMs + i * (durationMs / repeat)}ms`);
+    animate.setAttribute("dur", `${durationMs / repeat}ms`);
     animate.setAttribute("fill", "freeze");
     ele.appendChild(animate);
     dLast = dFrom;
   }
-  currentMs += ms;
 };
 
 let pathForTextIndex = 0;
 
-const animateText = (svg, width, ele, i, repeat, ms) => {
+const animateText = (svg, width, ele, currentMs, durationMs) => {
   const y = ele.getAttribute("y");
   pathForTextIndex += 1;
   const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
@@ -120,8 +115,8 @@ const animateText = (svg, width, ele, i, repeat, ms) => {
   animate.setAttribute("attributeName", "d");
   animate.setAttribute("from", `m0,${y} h0`);
   animate.setAttribute("to", `m0,${y} h${width}`);
-  animate.setAttribute("begin", `${currentMs + i * (ms / repeat)}ms`);
-  animate.setAttribute("dur", `${ms / repeat}ms`);
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${durationMs}ms`);
   animate.setAttribute("fill", "freeze");
   path.appendChild(animate);
   const textPath = svg.ownerDocument.createElementNS(SVG_NS, "textPath");
@@ -130,68 +125,145 @@ const animateText = (svg, width, ele, i, repeat, ms) => {
   ele.textContent = null;
   findNode(svg, "defs").appendChild(path);
   ele.appendChild(textPath);
-  currentMs += ms;
 };
 
-const patchSvgLine = (svg, ele) => {
+const patchSvgLine = (svg, ele, currentMs, durationMs) => {
   if (ele.childNodes[0].getAttribute("fill-rule")) {
-    animatePath(svg, ele.childNodes[0].childNodes[1], 1000);
-    animateFillPath(svg, ele.childNodes[0].childNodes[0], 500);
+    animatePath(svg, ele.childNodes[0].childNodes[1], currentMs, durationMs * 0.75);
+    currentMs += durationMs * 0.75;
+    animateFillPath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs * 0.25);
   } else {
-    animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
+    animatePath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs);
   }
 };
 
-const patchSvgArrow = (svg, ele) => {
-  animatePath(svg, ele.childNodes[0].childNodes[0], 1000);
-  animatePath(svg, ele.childNodes[1].childNodes[0], 200);
-  animatePath(svg, ele.childNodes[2].childNodes[0], 200);
+const patchSvgArrow = (svg, ele, currentMs, durationMs) => {
+  animatePath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs * 0.8);
+  currentMs += durationMs * 0.8;
+  animatePath(svg, ele.childNodes[1].childNodes[0], currentMs, durationMs * 0.1);
+  currentMs += durationMs * 0.1;
+  animatePath(svg, ele.childNodes[2].childNodes[0], currentMs, durationMs * 0.1);
 };
 
-const patchSvgRectangle = (svg, ele) => {
+const patchSvgRectangle = (svg, ele, currentMs, durationMs) => {
   if (ele.childNodes[1]) {
-    animateRect(svg, ele.childNodes[1], 1000);
-    animateFillPath(svg, ele.childNodes[0], 500);
+    animateRect(svg, ele.childNodes[1], currentMs, durationMs * 0.75);
+    currentMs += durationMs * 0.75;
+    animateFillPath(svg, ele.childNodes[0], currentMs, durationMs * 0.25);
   } else {
-    animateRect(svg, ele.childNodes[0], 1000);
+    animateRect(svg, ele.childNodes[0], currentMs, durationMs);
   }
 };
 
-const patchSvgEllipse = (svg, ele) => {
+const patchSvgEllipse = (svg, ele, currentMs, durationMs) => {
   if (ele.childNodes[1]) {
-    animatePath(svg, ele.childNodes[1], 1000);
-    animateFillPath(svg, ele.childNodes[0], 500);
+    animatePath(svg, ele.childNodes[1], currentMs, durationMs * 0.75);
+    currentMs += durationMs * 0.75;
+    animateFillPath(svg, ele.childNodes[0], currentMs, durationMs * 0.25);
   } else {
-    animatePath(svg, ele.childNodes[0], 1000);
+    animatePath(svg, ele.childNodes[0], currentMs, durationMs);
   }
 };
 
-const patchSvgText = (svg, ele, width) => {
+const patchSvgText = (svg, ele, width, currentMs, durationMs) => {
   const len = ele.childNodes.length;
   ele.childNodes.forEach((child, index) => {
-    animateText(svg, width, child, index, len, 1000);
+    animateText(svg, width, child, currentMs, durationMs / len);
+    currentMs += durationMs / len;
   });
 };
 
+const patchSvgEle = (svg, ele, type, currentMs, durationMs) => {
+  if (type === "line" || type === "draw") {
+    patchSvgLine(svg, ele, currentMs, durationMs);
+  } else if (type === "arrow") {
+    patchSvgArrow(svg, ele, currentMs, durationMs);
+  } else if (type === "rectangle" || type === "diamond") {
+    patchSvgRectangle(svg, ele, currentMs, durationMs);
+  } else if (type === "ellipse") {
+    patchSvgEllipse(svg, ele, currentMs, durationMs);
+  } else if (type === "text") {
+    const width = ele.getAttributeNS(EXCALIDRAW_NS, "element-width");
+    patchSvgText(svg, ele, width, currentMs, durationMs);
+  }
+};
+
+const containBounds = (parent, child) => (
+  parent[0] <= child[0] &&
+  parent[1] <= child[1] &&
+  parent[2] >= child[2] &&
+  parent[3] >= child[3]
+);
+
 const patchSvg = (svg) => {
+  const individuals = [];
+  const rootRects = [];
+  const add = (canBeRoot, ele, type, bounds) => {
+    const found = rootRects.find((item) => containBounds(item.bounds, bounds));
+    if (found) {
+      found.children.push({ ele, type, bounds });
+      return;
+    }
+    if (!canBeRoot) {
+      individuals.push({ ele, type, bounds });
+      return;
+    }
+    const index = rootRects.findIndex((item) => containBounds(bounds, item.bounds));
+    if (index >= 0) {
+      const [old] = rootRects.splice(index, 1);
+      const { children, ...rest } = old;
+      children.unshift(rest);
+      rootRects.push({ ele, type, bounds, children });
+    } else {
+      const children = [];
+      for (let i = individuals.length - 1; i >= 0; i -= 1) {
+        const item = individuals[i];
+        if (containBounds(bounds, item.bounds)) {
+          individuals.splice(i, 1);
+          children.unshift(item);
+        }
+      }
+      rootRects.push({ ele, type, bounds, children });
+    }
+  };
   const walk = (ele) => {
     const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
-    if (type === "line" || type === "draw") {
-      patchSvgLine(svg, ele);
-    } else if (type === "arrow") {
-      patchSvgArrow(svg, ele);
-    } else if (type === "rectangle" || type === "diamond") {
-      patchSvgRectangle(svg, ele);
-    } else if (type === "ellipse") {
-      patchSvgEllipse(svg, ele);
-    } else if (type === "text") {
-      const x1 = ele.getAttributeNS(EXCALIDRAW_NS, "element-x1");
-      const x2 = ele.getAttributeNS(EXCALIDRAW_NS, "element-x2");
-      patchSvgText(svg, ele, x2 - x1);
+    const transform = ele.getAttribute && ele.getAttribute("transform");
+    const notRotated = / rotate\(0/.test(transform);
+    const canBeRoot = type === "rectangle" && notRotated;
+    if (type) {
+      const bounds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-bounds"));
+      add(canBeRoot, ele, type, bounds);
     }
     ele.childNodes.forEach(walk);
   };
   walk(svg);
+  rootRects.sort((a, b) => (
+    a.y1 < b.y1 ? -1 :
+    a.y1 > b.y1 ? 1 :
+    a.x1 < b.x1 ? -1 :
+    a.x1 > b.y1 ? 1 :
+    0
+  ));
+  let current = 0;
+  const rootDur = 1000;
+  const childrenDur = 4000;
+  const individualDur = 500;
+  rootRects.forEach((item, index) => {
+    patchSvgEle(svg, item.ele, item.type, current, rootDur);
+    current += rootDur;
+    if (item.children.length) {
+      const dur = childrenDur / item.children.length;
+      item.children.forEach((child, i) => {
+        patchSvgEle(svg, child.ele, child.type, current, dur);
+        current += dur;
+      });
+    }
+  });
+  individuals.forEach((item, i) => {
+    patchSvgEle(svg, item.ele, item.type, current, individualDur);
+    current += individualDur;
+  });
 };
 
 let restore;
@@ -718,10 +790,9 @@ function renderElementToSvg(
         }) rotate(${degree} ${cx} ${cy})`,
       );
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x1", x1); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y1", y1); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x2", x2); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y2", y2); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-bounds", JSON.stringify(getElementBounds(element))); // ADDED
       svgRoot.appendChild(node);
       break;
     }
@@ -753,10 +824,9 @@ function renderElementToSvg(
         group.appendChild(node);
       });
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x1", x1); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y1", y1); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x2", x2); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y2", y2); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-bounds", JSON.stringify(getElementBounds(element))); // ADDED
       svgRoot.appendChild(group);
       break;
     }
@@ -809,10 +879,9 @@ function renderElementToSvg(
           node.appendChild(text);
         }
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x1", x1); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y1", y1); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-x2", x2); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-y2", y2); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-bounds", JSON.stringify(getElementBounds(element))); // ADDED
         svgRoot.appendChild(node);
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
