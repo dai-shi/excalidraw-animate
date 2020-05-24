@@ -8,11 +8,18 @@
     <script src="script.mjs" type="module"></script>
   </head>
   <body>
+    <form onsubmit="loadLink(event)">
+      <label>Excalidraw shareable link:
+        <input name="link" />
+      </label>
+      <button type="submit">Animate!</button>
+    </form>
     <button type="button" onclick="pauseResumeAnimations(event)">Pause</button>
     <button type="button" onclick="resetAnimations(event)">Reset</button>
     <button type="button" onclick="exportToSvgFile(event)">Export to Svg</button>
     <button type="button" onclick="exportToWebmFile(event)">Export to WebM</button>
     <div id="container">
+      Loading...
     </div>
   </body>
 </html>

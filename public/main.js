@@ -299,7 +299,13 @@ const patchSvg = (svg) => {
 let restore;
 let svg;
 const main = async () => {
-  const [, id, key] = /json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(location.hash);
+  const container = document.getElementById("container");
+  const match = /json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(location.hash);
+  if (!match) {
+    container.removeChild(container.firstChild);
+    return;
+  }
+  const [, id, key] = match;
   let elements;
   restore = (e) => { elements = e };
   await importFromBackend(id, key);
@@ -310,7 +316,8 @@ const main = async () => {
     shouldAddWatermark: false,
   });
   patchSvg(svg);
-  document.getElementById("container").appendChild(svg);
+  container.removeChild(container.firstChild);
+  container.appendChild(svg);
   console.log(svg);
 };
 
@@ -339,6 +346,17 @@ const generateImagesFromSvg = (fps) => new Promise((resolve, reject) => {
 });
 
 window.addEventListener("load", main);
+
+window.loadLink = (event) => {
+  event.preventDefault();
+  const match = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(event.target.link.value);
+  if (!match) {
+    window.alert("Invalid link");
+    return;
+  }
+  window.location.hash = match[0];
+  window.location.reload();
+};
 
 window.pauseResumeAnimations = (event) => {
   const svgEle = document.getElementsByTagName('svg')[0];
