@@ -301,6 +301,12 @@ const main = async () => {
   container.removeChild(container.firstChild);
   container.appendChild(svg);
   console.log(svg);
+  if (searchParams.get("autoplay") === "no") {
+    svg.setCurrentTime(finishedMs);
+    container.addEventListener("click", () => {
+      svg.setCurrentTime(0);
+    });
+  }
 };
 
 const generateImagesFromSvg = (fps) => new Promise((resolve, reject) => {
