@@ -29,3 +29,5 @@ For example:
 - [Real example with better timing](https://twitter.com/dai_shi/status/1264056453880377345)
 - [Pause and resume](https://twitter.com/dai_shi/status/1264105261800669184)
 - [Export svg and webm](https://twitter.com/dai_shi/status/1264194079165779970)
+- [Adding text field](https://twitter.com/dai_shi/status/1264695085871947776)
+- [Grouping support](https://twitter.com/dai_shi/status/1265441085641256960)
