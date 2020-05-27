@@ -905,7 +905,7 @@ function renderElementToSvg(
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds)); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
       svgRoot.appendChild(node);
       break;
     }
@@ -939,7 +939,7 @@ function renderElementToSvg(
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds)); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
       svgRoot.appendChild(group);
       break;
     }
@@ -994,7 +994,7 @@ function renderElementToSvg(
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds)); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
         svgRoot.appendChild(node);
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
