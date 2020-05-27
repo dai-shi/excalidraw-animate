@@ -1192,7 +1192,7 @@ function generateElement(
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom &&
-    !sceneState?.shouldCacheIgnoreZoom;
+    !(sceneState && sceneState.shouldCacheIgnoreZoom);
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
     elementWithCanvasCache.set(element, elementWithCanvas);
