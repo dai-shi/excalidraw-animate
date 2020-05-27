@@ -215,84 +215,61 @@ const patchSvgEle = (svg, ele, type, currentMs, durationMs) => {
   }
 };
 
-const containBounds = (parent, child) => (
-  parent[0] <= child[0] &&
-  parent[1] <= child[1] &&
-  parent[2] >= child[2] &&
-  parent[3] >= child[3]
-);
-
-let finishedMs;
-
-const patchSvg = (svg) => {
-  const individuals = [];
-  const rootRects = [];
-  const add = (canBeRoot, ele, type, bounds) => {
-    const found = rootRects.find((item) => containBounds(item.bounds, bounds));
-    if (found) {
-      found.children.push({ ele, type, bounds });
-      return;
-    }
-    if (!canBeRoot || individuals.some((item) => containBounds(item.bounds, bounds))) {
-      individuals.push({ ele, type, bounds });
-      return;
-    }
-    const index = rootRects.findIndex((item) => containBounds(bounds, item.bounds));
-    if (index >= 0) {
-      const [old] = rootRects.splice(index, 1);
-      const { children, ...rest } = old;
-      children.unshift(rest);
-      rootRects.push({ ele, type, bounds, children });
-    } else {
-      const children = [];
-      for (let i = individuals.length - 1; i >= 0; i -= 1) {
-        const item = individuals[i];
-        if (containBounds(bounds, item.bounds)) {
-          individuals.splice(i, 1);
-          children.unshift(item);
-        }
-      }
-      rootRects.push({ ele, type, bounds, children });
-    }
-  };
+const createGroups = (svg) => {
+  const groups = {};
   const walk = (ele) => {
     const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
-    const transform = ele.getAttribute && ele.getAttribute("transform");
-    const notRotated = / rotate\(0 /.test(transform);
-    const canBeRoot = type === "rectangle" && notRotated;
     if (type) {
-      const bounds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-bounds"));
-      add(canBeRoot, ele, type, bounds);
+      const groupIds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-groupIds"));
+      if (groupIds.length >= 1) {
+        const groupId = groupIds[0];
+        groups[groupId] = groups[groupId] || [];
+        groups[groupId].push(ele);
+      }
     }
     ele.childNodes.forEach(walk);
   };
   walk(svg);
-  rootRects.sort((a, b) => (
-    a.y1 < b.y1 ? -1 :
-    a.y1 > b.y1 ? 1 :
-    a.x1 < b.x1 ? -1 :
-    a.x1 > b.y1 ? 1 :
-    0
-  ));
+  return groups;
+};
+
+let finishedMs;
+
+const patchSvg = (svg) => {
+  const groups = createGroups(svg);
+  const finished = new Map();
   let current = 1000; // 1 sec margin
-  const rootDur = 1000;
-  const childrenDur = 4000;
+  const groupDur = 5000;
   const individualDur = 500;
-  rootRects.forEach((item, index) => {
-    patchSvgEle(svg, item.ele, item.type, current, rootDur);
-    current += rootDur;
-    if (item.children.length) {
-      const dur = childrenDur / item.children.length;
-      item.children.forEach((child, i) => {
-        patchSvgEle(svg, child.ele, child.type, current, dur);
+  const walk = (ele) => {
+    const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
+    if (type && !finished.has(ele)) {
+      const groupIds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-groupIds"));
+      if (groupIds.length >= 1) {
+        const groupId = groupIds[0];
+        const group = groups[groupId];
+        const dur = groupDur / (group.length + 1);
+        patchSvgEle(svg, ele, type, current, dur);
         current += dur;
-      });
+        finished.set(ele, true);
+        group.forEach((childEle) => {
+          if (!finished.has(childEle)) {
+            const childType = childEle.getAttributeNS && childEle.getAttributeNS(EXCALIDRAW_NS, "element-type");
+            patchSvgEle(svg, childEle, childType, current, dur);
+            current += dur;
+            finished.set(childEle, true);
+          }
+        });
+        delete groups[groupId];
+      } else {
+        patchSvgEle(svg, ele, type, current, individualDur);
+        current += individualDur;
+        finished.set(ele, true);
+      }
     }
-  });
-  individuals.forEach((item, i) => {
-    patchSvgEle(svg, item.ele, item.type, current, individualDur);
-    current += individualDur;
-  });
+    ele.childNodes.forEach(walk);
+  };
+  walk(svg);
   finishedMs = current + 1000; // 1 sec margin
 };
 
@@ -928,7 +905,7 @@ function renderElementToSvg(
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
       node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-bounds", JSON.stringify(getElementBounds(element))); // ADDED
+      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds)); // ADDED
       svgRoot.appendChild(node);
       break;
     }
@@ -962,7 +939,7 @@ function renderElementToSvg(
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
       group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-bounds", JSON.stringify(getElementBounds(element))); // ADDED
+      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds)); // ADDED
       svgRoot.appendChild(group);
       break;
     }
@@ -1017,7 +994,7 @@ function renderElementToSvg(
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-bounds", JSON.stringify(getElementBounds(element))); // ADDED
+        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds)); // ADDED
         svgRoot.appendChild(node);
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
