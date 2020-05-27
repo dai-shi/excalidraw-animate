@@ -273,7 +273,6 @@ const patchSvg = (svg) => {
   finishedMs = current + 1000; // 1 sec margin
 };
 
-let restore;
 let svg;
 const main = async () => {
   const container = document.getElementById("container");
@@ -288,9 +287,7 @@ const main = async () => {
     return;
   }
   const [, id, key] = match;
-  let elements;
-  restore = (e) => { elements = e };
-  await importFromBackend(id, key);
+  const { elements } = await importFromBackend(id, key);
   svg = exportToSvg(elements, {
     exportBackground: true,
     exportPadding: 30,
@@ -879,13 +876,13 @@ function renderSceneToSvg(
   });
 }
 
-function renderElementToSvg(
+const renderElementToSvg = (
   element,
   rsvg,
   svgRoot,
   offsetX,
   offsetY,
-) {
+) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
@@ -977,13 +974,6 @@ function renderElementToSvg(
             : element.textAlign === "right"
             ? element.width
             : 0;
-        const fontSplit = element.font.split(" ").filter((d) => !!d.trim());
-        let fontFamily = fontSplit[0];
-        let fontSize = "20px";
-        if (fontSplit.length > 1) {
-          fontFamily = fontSplit[1];
-          fontSize = fontSplit[0];
-        }
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
@@ -995,8 +985,8 @@ function renderElementToSvg(
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
-          text.setAttribute("font-family", fontFamily);
-          text.setAttribute("font-size", fontSize);
+          text.setAttribute("font-family", getFontFamilyString(element));
+          text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
@@ -1008,11 +998,12 @@ function renderElementToSvg(
         node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
         svgRoot.appendChild(node);
       } else {
+        // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);
       }
     }
   }
-}
+};
 
 const DASHARRAY_DASHED = [12, 8];
 const DASHARRAY_DOTTED = [3, 6];
@@ -1396,3 +1387,181 @@ function distance2d(x1, y1, x2, y2) {
 }
 
 const LINE_CONFIRM_THRESHOLD = 10; // 10px
+
+const getFontFamilyString = ({
+  fontFamily,
+}) => {
+  return FONT_FAMILY[fontFamily];
+};
+
+const FONT_FAMILY = {
+  1: "Virgil",
+  2: "Helvetica",
+  3: "Cascadia",
+};
+
+const restore = (
+  // we're making the elements mutable for this API because we want to
+  //  efficiently remove/tweak properties on them (to migrate old scenes)
+  savedElements,
+  savedState,
+  opts,
+) => {
+  const elements = savedElements
+    .filter((el) => {
+      // filtering out selection, which is legacy, no longer kept in elements,
+      //  and causing issues if retained
+      return el.type !== "selection" && !isInvisiblySmallElement(el);
+    })
+    .map((element) => {
+      let points = [];
+      if (element.type === "arrow") {
+        if (Array.isArray(element.points)) {
+          // if point array is empty, add one point to the arrow
+          // this is used as fail safe to convert incoming data to a valid
+          // arrow. In the new arrow, width and height are not being usde
+          points = element.points.length > 0 ? element.points : [[0, 0]];
+        } else {
+          // convert old arrow type to a new one
+          // old arrow spec used width and height
+          // to determine the endpoints
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        }
+        element.points = points;
+      } else if (element.type === "line" || element.type === "draw") {
+        // old spec, pre-arrows
+        // old spec, post-arrows
+        if (!Array.isArray(element.points) || element.points.length === 0) {
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        } else {
+          points = element.points;
+        }
+        element.points = points;
+      } else {
+        if (isTextElement(element)) {
+          if ("font" in element) {
+            const [fontPx, fontFamily] = element.font.split(" ");
+            element.fontSize = parseInt(
+              fontPx,
+              10,
+            );
+            element.fontFamily = getFontFamilyByName(fontFamily);
+            delete element.font;
+          }
+          if (!element.textAlign) {
+            element.textAlign = DEFAULT_TEXT_ALIGN;
+          }
+        }
+
+        normalizeDimensions(element);
+        // old spec, where non-linear elements used to have empty points arrays
+        if ("points" in element) {
+          delete element.points;
+        }
+      }
+
+      return {
+        ...element,
+        // all elements must have version > 0 so getDrawingVersion() will pick
+        //  up newly added elements
+        version: element.version || 1,
+        id: element.id || randomId(),
+        isDeleted: false,
+        fillStyle: element.fillStyle || "hachure",
+        strokeWidth: element.strokeWidth || 1,
+        strokeStyle: element.strokeStyle ?? "solid",
+        roughness: element.roughness ?? 1,
+        opacity:
+          element.opacity === null || element.opacity === undefined
+            ? 100
+            : element.opacity,
+        angle: element.angle ?? 0,
+        groupIds: element.groupIds || [],
+      };
+    });
+
+  if (opts?.scrollToContent && savedState) {
+    savedState = { ...savedState, ...calculateScrollCenter(elements) };
+  }
+
+  return {
+    elements: elements,
+    appState: savedState,
+  };
+};
+
+const isInvisiblySmallElement = (
+  element,
+) => {
+  if (isLinearElement(element)) {
+    return element.points.length < 2;
+  }
+  return element.width === 0 && element.height === 0;
+};
+
+const getFontFamilyByName = (fontFamilyName) => {
+  for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
+    if (fontFamilyString.includes(fontFamilyName)) {
+      return parseInt(id);
+    }
+  }
+  return DEFAULT_FONT_FAMILY;
+};
+
+const DEFAULT_FONT_FAMILY = 1;
+
+const normalizeDimensions = (
+  element,
+) => {
+  if (!element || (element.width >= 0 && element.height >= 0)) {
+    return false;
+  }
+
+  if (element.width < 0) {
+    const nextWidth = Math.abs(element.width);
+    mutateElement(element, {
+      width: nextWidth,
+      x: element.x - nextWidth,
+    });
+  }
+
+  if (element.height < 0) {
+    const nextHeight = Math.abs(element.height);
+    mutateElement(element, {
+      height: nextHeight,
+      y: element.y - nextHeight,
+    });
+  }
+
+  return true;
+};
+
+const normalizeScroll = (pos) =>
+  Math.floor(pos);
+
+const calculateScrollCenter = (
+  elements,
+) => {
+  if (!elements.length) {
+    return {
+      scrollX: normalizeScroll(0),
+      scrollY: normalizeScroll(0),
+    };
+  }
+
+  const [x1, y1, x2, y2] = getCommonBounds(elements);
+
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
+
+  return {
+    scrollX: normalizeScroll(window.innerWidth / 2 - centerX),
+    scrollY: normalizeScroll(window.innerHeight / 2 - centerY),
+  };
+};
