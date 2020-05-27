@@ -277,7 +277,12 @@ let restore;
 let svg;
 const main = async () => {
   const container = document.getElementById("container");
-  const match = /json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(location.hash);
+  const hash = window.location.hash.slice(1);
+  const searchParams = new URLSearchParams(hash);
+  if (searchParams.get("toolbar") !== "no") {
+    document.getElementById("toolbar").style.display = "block";
+  }
+  const match = /([0-9]+),?([a-zA-Z0-9_-]*)/.exec(searchParams.get("json"));
   if (!match) {
     container.removeChild(container.firstChild);
     return;
@@ -296,6 +301,12 @@ const main = async () => {
   container.removeChild(container.firstChild);
   container.appendChild(svg);
   console.log(svg);
+  if (searchParams.get("autoplay") === "no") {
+    svg.setCurrentTime(finishedMs);
+    container.addEventListener("click", () => {
+      svg.setCurrentTime(0);
+    });
+  }
 };
 
 const generateImagesFromSvg = (fps) => new Promise((resolve, reject) => {
