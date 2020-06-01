@@ -344,7 +344,8 @@ window.loadLink = (event) => {
 };
 
 window.pauseResumeAnimations = (event) => {
-  const svgEle = document.getElementsByTagName('svg')[0];
+  const container = document.getElementById("container");
+  const svgEle = container.getElementsByTagName('svg')[0];
   if (svgEle.animationsPaused()) {
     event.target.innerHTML = "Pause";
     svgEle.unpauseAnimations();
@@ -355,7 +356,8 @@ window.pauseResumeAnimations = (event) => {
 };
 
 window.resetAnimations = (event) => {
-  document.getElementsByTagName('svg')[0].setCurrentTime(0);
+  const container = document.getElementById("container");
+  container.getElementsByTagName('svg')[0].setCurrentTime(0);
 };
 
 window.exportToSvgFile = async (event) => {
