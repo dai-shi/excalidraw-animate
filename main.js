@@ -165,11 +165,11 @@ const patchSvgLine = (svg, ele, currentMs, durationMs) => {
 };
 
 const patchSvgArrow = (svg, ele, currentMs, durationMs) => {
-  animatePath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs * 0.8);
-  currentMs += durationMs * 0.8;
-  animatePath(svg, ele.childNodes[1].childNodes[0], currentMs, durationMs * 0.1);
-  currentMs += durationMs * 0.1;
-  animatePath(svg, ele.childNodes[2].childNodes[0], currentMs, durationMs * 0.1);
+  animatePath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs * 0.6);
+  currentMs += durationMs * 0.6;
+  animatePath(svg, ele.childNodes[1].childNodes[0], currentMs, durationMs * 0.2);
+  currentMs += durationMs * 0.2;
+  animatePath(svg, ele.childNodes[2].childNodes[0], currentMs, durationMs * 0.2);
 };
 
 const patchSvgRectangle = (svg, ele, currentMs, durationMs) => {
@@ -365,7 +365,10 @@ window.exportToSvgFile = async (event) => {
     alert("svg not ready");
     return;
   }
+  const savedMs = svg.getCurrentTime();
+  svg.setCurrentTime(0);
   const svgStr = (new XMLSerializer()).serializeToString(svg);
+  svg.setCurrentTime(savedMs);
   await fileSave(new Blob([svgStr], { type: "svg" }), {
     fileName: "excalidraw-animate.svg",
   });
