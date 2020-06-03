@@ -1,5 +1,7 @@
 # excalidraw-animate
 
+![excalidraw-animate](https://user-images.githubusercontent.com/490574/83698750-332ca080-a63d-11ea-9845-d2442e9b4305.gif)
+
 ## What is this
 
 This is an experimental tool to convert an
@@ -17,6 +19,10 @@ Second, modify part of the link; replace `excalidraw.com` with `dai-shi.github.i
 For example:
 - Before: `https://excalidraw.com/#json=5173841697439744,SwJFLIYa2VQVKcyhcy0b_w`
 - After: `https://dai-shi.github.io/excalidraw-animate/#json=5173841697439744,SwJFLIYa2VQVKcyhcy0b_w`
+
+You can also enter the link in the field and click "Animate!"
+
+![Text field image](https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900)
 
 ## Tweets
 
