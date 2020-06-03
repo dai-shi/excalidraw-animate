@@ -1,7 +1,7 @@
 # excalidraw-animate
 
 <table><tr><td>
-<img alt="excalidraw-animate" src="https://user-images.githubusercontent.com/490574/83698750-332ca080-a63d-11ea-9845-d2442e9b4305.gif" width="50%" height="50%" />
+<img alt="excalidraw-animate" src="https://user-images.githubusercontent.com/490574/83698750-332ca080-a63d-11ea-9845-d2442e9b4305.gif" width="50%" />
 </td></tr></table>
 
 ## What is this
@@ -15,7 +15,7 @@ into animation.
 First, you need to create a shareable link in Excalidraw.
 
 <table><tr><td>
-<img alt="Shareable link image" src="https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small" width="50%" height="50%" />
+<img alt="Shareable link image" src="https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small" width="50%" />
 </td></tr></table>
 
 Second, modify part of the link; replace `excalidraw.com` with `dai-shi.github.io/excalidraw-animate`.
@@ -27,7 +27,7 @@ For example:
 You can also enter the link in the field and click "Animate!"
 
 <table><tr><td>
-<img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" height="50%" />
+<img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" />
 </td></tr></table>
 
 ## Tweets
