@@ -1,6 +1,8 @@
 # excalidraw-animate
 
-![excalidraw-animate](https://user-images.githubusercontent.com/490574/83698750-332ca080-a63d-11ea-9845-d2442e9b4305.gif)
+<kbd>
+<img alt="excalidraw-animate" src="https://user-images.githubusercontent.com/490574/83698750-332ca080-a63d-11ea-9845-d2442e9b4305.gif" width="50%" height="50%" />
+</kbd>
 
 ## What is this
 
@@ -12,7 +14,9 @@ into animation.
 
 First, you need to create a shareable link in Excalidraw.
 
-![Shareable link image](https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small)
+<kbd>
+<img alt="Shareable link image" src="https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small" width="50%" height="50%" />
+</kbd>
 
 Second, modify part of the link; replace `excalidraw.com` with `dai-shi.github.io/excalidraw-animate`.
 
@@ -22,7 +26,9 @@ For example:
 
 You can also enter the link in the field and click "Animate!"
 
-![Text field image](https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900)
+<kbd>
+<img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" height="50%" />
+</kbd>
 
 ## Tweets
 
