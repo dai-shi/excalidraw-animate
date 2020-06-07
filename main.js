@@ -431,7 +431,7 @@ async function importFromBackend(
   try {
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
-      { mode: "cors" }, // ADDED
+      // { mode: "cors" }, // ADDED
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
