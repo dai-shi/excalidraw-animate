@@ -1,5 +1,3 @@
-const EXCALIDRAW_NS = "https://excalidraw.com/svg";
-
 const resourceCache = new Map();
 
 const embedUrlResources = async (text) => {
@@ -200,7 +198,7 @@ const patchSvgText = (svg, ele, width, currentMs, durationMs) => {
   });
 };
 
-const patchSvgEle = (svg, ele, type, currentMs, durationMs) => {
+const patchSvgEle = (svg, ele, type, width, currentMs, durationMs) => {
   if (type === "line" || type === "draw") {
     patchSvgLine(svg, ele, currentMs, durationMs);
   } else if (type === "arrow") {
@@ -210,66 +208,65 @@ const patchSvgEle = (svg, ele, type, currentMs, durationMs) => {
   } else if (type === "ellipse") {
     patchSvgEllipse(svg, ele, currentMs, durationMs);
   } else if (type === "text") {
-    const width = ele.getAttributeNS(EXCALIDRAW_NS, "element-width");
     patchSvgText(svg, ele, width, currentMs, durationMs);
   }
 };
 
-const createGroups = (svg) => {
+const createGroups = (svg, elements) => {
   const groups = {};
-  const walk = (ele) => {
-    const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
-    if (type) {
-      const groupIds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-groupIds"));
+  let index = 0;
+  svg.childNodes.forEach((ele) => {
+    if (ele.tagName === "g") {
+      const { groupIds } = elements[index];
       if (groupIds.length >= 1) {
         const groupId = groupIds[0];
         groups[groupId] = groups[groupId] || [];
-        groups[groupId].push(ele);
+        groups[groupId].push([ele, index]);
       }
+      index += 1;
     }
-    ele.childNodes.forEach(walk);
-  };
-  walk(svg);
+  });
   return groups;
 };
 
 let finishedMs;
 
-const patchSvg = (svg) => {
-  const groups = createGroups(svg);
+const patchSvg = (svg, elements) => {
+  const groups = createGroups(svg, elements);
   const finished = new Map();
   let current = 1000; // 1 sec margin
   const groupDur = 5000;
   const individualDur = 500;
-  const walk = (ele) => {
-    const type = ele.getAttributeNS && ele.getAttributeNS(EXCALIDRAW_NS, "element-type");
-    if (type && !finished.has(ele)) {
-      const groupIds = JSON.parse(ele.getAttributeNS(EXCALIDRAW_NS, "element-groupIds"));
-      if (groupIds.length >= 1) {
-        const groupId = groupIds[0];
-        const group = groups[groupId];
-        const dur = groupDur / (group.length + 1);
-        patchSvgEle(svg, ele, type, current, dur);
-        current += dur;
-        finished.set(ele, true);
-        group.forEach((childEle) => {
-          if (!finished.has(childEle)) {
-            const childType = childEle.getAttributeNS && childEle.getAttributeNS(EXCALIDRAW_NS, "element-type");
-            patchSvgEle(svg, childEle, childType, current, dur);
-            current += dur;
-            finished.set(childEle, true);
-          }
-        });
-        delete groups[groupId];
-      } else {
-        patchSvgEle(svg, ele, type, current, individualDur);
-        current += individualDur;
-        finished.set(ele, true);
+  let index = 0;
+  svg.childNodes.forEach((ele) => {
+    if (ele.tagName === "g") {
+      const { type, width, groupIds } = elements[index];
+      if (!finished.has(ele)) {
+        if (groupIds.length >= 1) {
+          const groupId = groupIds[0];
+          const group = groups[groupId];
+          const dur = groupDur / (group.length + 1);
+          patchSvgEle(svg, ele, type, width, current, dur);
+          current += dur;
+          finished.set(ele, true);
+          group.forEach(([childEle, childIndex]) => {
+            const { type: childType, width: childWidth } = elements[childIndex];
+            if (!finished.has(childEle)) {
+              patchSvgEle(svg, childEle, childType, childWidth, current, dur);
+              current += dur;
+              finished.set(childEle, true);
+            }
+          });
+          delete groups[groupId];
+        } else {
+          patchSvgEle(svg, ele, type, width, current, individualDur);
+          current += individualDur;
+          finished.set(ele, true);
+        }
       }
+      index += 1;
     }
-    ele.childNodes.forEach(walk);
-  };
-  walk(svg);
+  });
   finishedMs = current + 1000; // 1 sec margin
 };
 
@@ -294,7 +291,7 @@ const main = async () => {
     viewBackgroundColor: "white",
     shouldAddWatermark: false,
   });
-  patchSvg(svg);
+  patchSvg(svg, elements);
   container.removeChild(container.firstChild);
   container.appendChild(svg);
   console.log(svg);
@@ -414,7 +411,7 @@ window.exportToWebmFile = async (event) => {
 const t = x => x;
 
 // --------------------------------------
-// copied code from core (See: ADDED)
+// copied code from core
 // --------------------------------------
 
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
@@ -431,7 +428,6 @@ async function importFromBackend(
   try {
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
-      // { mode: "cors" }, // ADDED
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
@@ -545,7 +541,6 @@ function exportToSvg(
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
-  svgRoot.setAttribute("xmlns:excalidraw", EXCALIDRAW_NS); // ADDED
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
   svgRoot.innerHTML = `
@@ -915,10 +910,6 @@ const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-      node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
       svgRoot.appendChild(node);
       break;
     }
@@ -949,10 +940,6 @@ const renderElementToSvg = (
         }
         group.appendChild(node);
       });
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-      group.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
       svgRoot.appendChild(group);
       break;
     }
@@ -997,10 +984,6 @@ const renderElementToSvg = (
           text.setAttribute("style", "white-space: pre;");
           node.appendChild(text);
         }
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-type", element.type); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-width", element.width); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-height", element.height); // ADDED
-        node.setAttributeNS(EXCALIDRAW_NS, "excalidraw:element-groupIds", JSON.stringify(element.groupIds || [])); // ADDED
         svgRoot.appendChild(node);
       } else {
         // @ts-ignore
