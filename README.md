@@ -43,3 +43,4 @@ You can also enter the link in the field and click "Animate!"
 - [Export svg and webm](https://twitter.com/dai_shi/status/1264194079165779970)
 - [Adding text field](https://twitter.com/dai_shi/status/1264695085871947776)
 - [Grouping support](https://twitter.com/dai_shi/status/1265441085641256960)
+- [Embedding example](https://twitter.com/dai_shi/status/1269787031892160512)
