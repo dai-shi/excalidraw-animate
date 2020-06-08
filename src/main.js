@@ -285,6 +285,7 @@ const main = async () => {
   const hash = window.location.hash.slice(1);
   const searchParams = new URLSearchParams(hash);
   if (searchParams.get("toolbar") !== "no") {
+    // @ts-ignore
     document.getElementById("toolbar").style.display = "block";
   }
   const match = /([0-9]+),?([a-zA-Z0-9_-]*)/.exec(searchParams.get("json"));
