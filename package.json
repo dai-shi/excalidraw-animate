@@ -41,7 +41,7 @@
     "test:all": "yarn run test:type && yarn run test:lint && yarn run test:format && yarn run test:app --watchAll=false",
     "test:type": "tsc",
     "test:lint": "eslint --max-warnings=0 --ignore-path .gitignore  --ext .js,.ts,.tsx .",
-    "test:format": "prettier src/**/*.* --list-different",
+    "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "preinstall": "git submodule update --init --recursive"
   },

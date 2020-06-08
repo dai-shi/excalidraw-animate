@@ -11,26 +11,31 @@ const resourceCache = new Map();
 
 const embedUrlResources = async (text) => {
   const urls = text.match(/url\(".*?"\);/g);
-  const resources = await Promise.all(urls.map((url) => new Promise((resolve, reject) => {
-    url = url.slice(5, -3);
-    if (resourceCache.has(url)) {
-      resolve(resourceCache.get(url));
-      return;
-    }
-    fetch(url)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const resource = `url(${reader.result});`;
-          resourceCache.set(url, resource);
-          resolve(resource);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      })
-      .catch(reject);
-  })));
+  const resources = await Promise.all(
+    urls.map(
+      (url) =>
+        new Promise((resolve, reject) => {
+          url = url.slice(5, -3);
+          if (resourceCache.has(url)) {
+            resolve(resourceCache.get(url));
+            return;
+          }
+          fetch(url)
+            .then((response) => response.blob())
+            .then((blob) => {
+              const reader = new FileReader();
+              reader.onload = () => {
+                const resource = `url(${reader.result});`;
+                resourceCache.set(url, resource);
+                resolve(resource);
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            })
+            .catch(reject);
+        })
+    )
+  );
   return text.replace(/url\(".*?"\);/g, () => resources.shift());
 };
 
@@ -50,18 +55,27 @@ const animatePath = (svg, ele, currentMs, durationMs) => {
   const repeat = cCount / mCount;
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
-    const dFrom = dTo.replace(new RegExp([
-      "M(\\S+) (\\S+)",
-      "((?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){",
-      `${i}`, // skip count
-      "})",
-      "(?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){1,}",
-    ].join(""), "g"), (...a) => {
-      const [x, y] = a[3]
-        ? a[3].match(/.* (\S+) (\S+)$/).slice(1, 3)
-        : [a[1], a[2]];
-      return `M${a[1]} ${a[2]}${a[3]}` + ` C${x} ${y}, ${x} ${y}, ${x} ${y}`.repeat(repeat - i);
-    });
+    const dFrom = dTo.replace(
+      new RegExp(
+        [
+          "M(\\S+) (\\S+)",
+          "((?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){",
+          `${i}`, // skip count
+          "})",
+          "(?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){1,}",
+        ].join(""),
+        "g"
+      ),
+      (...a) => {
+        const [x, y] = a[3]
+          ? a[3].match(/.* (\S+) (\S+)$/).slice(1, 3)
+          : [a[1], a[2]];
+        return (
+          `M${a[1]} ${a[2]}${a[3]}` +
+          ` C${x} ${y}, ${x} ${y}, ${x} ${y}`.repeat(repeat - i)
+        );
+      }
+    );
     if (i === 0) {
       ele.setAttribute("d", dFrom);
     }
@@ -83,12 +97,12 @@ const animateFillPath = (svg, ele, currentMs, durationMs) => {
     animatePath(svg, ele, currentMs, durationMs);
     return;
   }
-  const dFrom = dTo.replace(new RegExp([
-    "M(\\S+) (\\S+)",
-    "((?: L\\S+ \\S+){1,})",
-  ].join("")), (...a) => {
-    return `M${a[1]} ${a[2]}` + a[3].replace(/L\S+ \S+/g, `L${a[1]} ${a[2]}`);
-  });
+  const dFrom = dTo.replace(
+    new RegExp(["M(\\S+) (\\S+)", "((?: L\\S+ \\S+){1,})"].join("")),
+    (...a) => {
+      return `M${a[1]} ${a[2]}` + a[3].replace(/L\S+ \S+/g, `L${a[1]} ${a[2]}`);
+    }
+  );
   ele.setAttribute("d", dFrom);
   const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
   animate.setAttribute("attributeName", "d");
@@ -109,20 +123,31 @@ const animateRect = (svg, ele, currentMs, durationMs) => {
   const dups = mCount / repeat;
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
-    const dFrom = dTo.replace(new RegExp([
-      "((?:",
-      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
-      "){",
-      `${i}`, // skip count
-      "})",
-      "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
-      ".*",
-    ].join("")), (...a) => {
-      return `${a[1]}` + [...Array(dups).keys()].map((d) => {
-        const [x, y] = a.slice(2 + dups * 2 + d * 2);
-        return `M${x} ${y} C${x} ${y}, ${x} ${y}, ${x} ${y} `;
-      }).join("").repeat(repeat - i);
-    });
+    const dFrom = dTo.replace(
+      new RegExp(
+        [
+          "((?:",
+          "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
+          "){",
+          `${i}`, // skip count
+          "})",
+          "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
+          ".*",
+        ].join("")
+      ),
+      (...a) => {
+        return (
+          `${a[1]}` +
+          [...Array(dups).keys()]
+            .map((d) => {
+              const [x, y] = a.slice(2 + dups * 2 + d * 2);
+              return `M${x} ${y} C${x} ${y}, ${x} ${y}, ${x} ${y} `;
+            })
+            .join("")
+            .repeat(repeat - i)
+        );
+      }
+    );
     if (i === 0) {
       ele.setAttribute("d", dFrom);
     }
@@ -163,20 +188,45 @@ const animateText = (svg, width, ele, currentMs, durationMs) => {
 
 const patchSvgLine = (svg, ele, currentMs, durationMs) => {
   if (ele.childNodes[0].getAttribute("fill-rule")) {
-    animatePath(svg, ele.childNodes[0].childNodes[1], currentMs, durationMs * 0.75);
+    animatePath(
+      svg,
+      ele.childNodes[0].childNodes[1],
+      currentMs,
+      durationMs * 0.75
+    );
     currentMs += durationMs * 0.75;
-    animateFillPath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs * 0.25);
+    animateFillPath(
+      svg,
+      ele.childNodes[0].childNodes[0],
+      currentMs,
+      durationMs * 0.25
+    );
   } else {
     animatePath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs);
   }
 };
 
 const patchSvgArrow = (svg, ele, currentMs, durationMs) => {
-  animatePath(svg, ele.childNodes[0].childNodes[0], currentMs, durationMs * 0.6);
+  animatePath(
+    svg,
+    ele.childNodes[0].childNodes[0],
+    currentMs,
+    durationMs * 0.6
+  );
   currentMs += durationMs * 0.6;
-  animatePath(svg, ele.childNodes[1].childNodes[0], currentMs, durationMs * 0.2);
+  animatePath(
+    svg,
+    ele.childNodes[1].childNodes[0],
+    currentMs,
+    durationMs * 0.2
+  );
   currentMs += durationMs * 0.2;
-  animatePath(svg, ele.childNodes[2].childNodes[0], currentMs, durationMs * 0.2);
+  animatePath(
+    svg,
+    ele.childNodes[2].childNodes[0],
+    currentMs,
+    durationMs * 0.2
+  );
 };
 
 const patchSvgRectangle = (svg, ele, currentMs, durationMs) => {
@@ -285,12 +335,19 @@ const main = async () => {
   const hash = window.location.hash.slice(1);
   const searchParams = new URLSearchParams(hash);
   if (searchParams.get("toolbar") !== "no") {
-    // @ts-ignore
-    document.getElementById("toolbar").style.display = "block";
+    try {
+      document.getElementById("toolbar").style.display = "block";
+    } catch (e) {
+      // ignore
+    }
   }
   const match = /([0-9]+),?([a-zA-Z0-9_-]*)/.exec(searchParams.get("json"));
   if (!match) {
-    container.removeChild(container.firstChild);
+    try {
+      container.removeChild(container.firstChild);
+    } catch (e) {
+      // ignore
+    }
     return;
   }
   const [, id, key] = match;
@@ -313,35 +370,38 @@ const main = async () => {
   }
 };
 
-const generateImagesFromSvg = (fps) => new Promise((resolve, reject) => {
-  const container = document.getElementById("container");
-  const svgEle = container.getElementsByTagName("svg")[0];
-  svgEle.pauseAnimations();
-  const images = [];
-  const loop = async (t) => {
-    if (t > finishedMs) {
-      svgEle.unpauseAnimations();
-      resolve(images);
-      return;
-    }
-    svgEle.setCurrentTime(t / 1000);
-    const html = await embedUrlResources(container.innerHTML);
-    const img = new Image();
-    img.src = "data:image/svg+xml;base64," + btoa(html);
-    img.onload = () => {
-      images.push(img);
-      loop(t + 1000 / fps);
+const generateImagesFromSvg = (fps) =>
+  new Promise((resolve, reject) => {
+    const container = document.getElementById("container");
+    const svgEle = container.getElementsByTagName("svg")[0];
+    svgEle.pauseAnimations();
+    const images = [];
+    const loop = async (t) => {
+      if (t > finishedMs) {
+        svgEle.unpauseAnimations();
+        resolve(images);
+        return;
+      }
+      svgEle.setCurrentTime(t / 1000);
+      const html = await embedUrlResources(container.innerHTML);
+      const img = new Image();
+      img.src = "data:image/svg+xml;base64," + btoa(html);
+      img.onload = () => {
+        images.push(img);
+        loop(t + 1000 / fps);
+      };
+      img.onerror = reject;
     };
-    img.onerror = reject;
-  }
-  loop(0);
-});
+    loop(0);
+  });
 
 window.addEventListener("load", main);
 
 window.loadLink = (event) => {
   event.preventDefault();
-  const match = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(event.target.link.value);
+  const match = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(
+    event.target.link.value
+  );
   if (!match) {
     window.alert("Invalid link");
     return;
@@ -352,7 +412,7 @@ window.loadLink = (event) => {
 
 window.pauseResumeAnimations = (event) => {
   const container = document.getElementById("container");
-  const svgEle = container.getElementsByTagName('svg')[0];
+  const svgEle = container.getElementsByTagName("svg")[0];
   if (svgEle.animationsPaused()) {
     event.target.innerHTML = "Pause";
     svgEle.unpauseAnimations();
@@ -364,7 +424,7 @@ window.pauseResumeAnimations = (event) => {
 
 window.resetAnimations = (event) => {
   const container = document.getElementById("container");
-  container.getElementsByTagName('svg')[0].setCurrentTime(0);
+  container.getElementsByTagName("svg")[0].setCurrentTime(0);
 };
 
 window.exportToSvgFile = async (event) => {
@@ -374,7 +434,7 @@ window.exportToSvgFile = async (event) => {
   }
   const savedMs = svg.getCurrentTime();
   svg.setCurrentTime(0);
-  const svgStr = (new XMLSerializer()).serializeToString(svg);
+  const svgStr = new XMLSerializer().serializeToString(svg);
   svg.setCurrentTime(savedMs);
   await fileSave(new Blob([svgStr], { type: "svg" }), {
     fileName: "excalidraw-animate.svg",
@@ -390,7 +450,9 @@ window.exportToWebmFile = async (event) => {
   event.target.innerHTML = `${origHtml} (Processing...)`;
   event.target.disabled = true;
   const images = await generateImagesFromSvg(60);
-  const [, width, height] = svg.getAttribute("viewBox").match(/0 0 (\S+) (\S+)/);
+  const [, width, height] = svg
+    .getAttribute("viewBox")
+    .match(/0 0 (\S+) (\S+)/);
   const canvas = document.createElement("canvas");
   canvas.setAttribute("width", `${width}px`);
   canvas.setAttribute("height", `${height}px`);
