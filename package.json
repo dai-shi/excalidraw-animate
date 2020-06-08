@@ -1,11 +1,68 @@
 {
-  "devDependencies": {
-    "gh-pages": "^2.2.0",
-    "serve": "^11.3.0"
-  },
+  "name": "excalidraw-animate",
+  "version": "1.0.0",
   "private": true,
+  "homepage": "./",
+  "dependencies": {
+    "@sentry/browser": "^5.15.5",
+    "@sentry/integrations": "^5.15.5",
+    "@testing-library/jest-dom": "^5.9.0",
+    "@testing-library/react": "^10.0.5",
+    "@types/jest": "^24.0.0",
+    "@types/lodash.throttle": "^4.1.6",
+    "@types/nanoid": "^2.1.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "@types/socket.io-client": "^1.4.33",
+    "browser-nativefs": "^0.7.3",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "i18next-browser-languagedetector": "^4.2.0",
+    "jest-canvas-mock": "^2.2.0",
+    "lodash.throttle": "^4.1.1",
+    "nanoid": "^2.1.11",
+    "node-sass": "^4.14.1",
+    "open-color": "^1.7.0",
+    "pepjs": "^0.5.2",
+    "points-on-curve": "^0.2.0",
+    "prettier": "^2.0.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1",
+    "roughjs": "^4.3.1",
+    "socket.io-client": "^2.3.0",
+    "typescript": "^3.9.3"
+  },
   "scripts": {
-    "start": "serve public",
-    "deploy": "gh-pages -d public -s '**/*.+(js|mjs|html|css)'"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "yarn run test:all",
+    "test:all": "yarn run test:type && yarn run test:lint && yarn run test:format && yarn run test:app --watchAll=false",
+    "test:type": "tsc",
+    "test:lint": "eslint --max-warnings=0 --ignore-path .gitignore  --ext .js,.ts,.tsx .",
+    "test:format": "prettier src/**/*.* --list-different",
+    "test:app": "react-scripts test --env=jsdom --passWithNoTests",
+    "preinstall": "git submodule update --init --recursive"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

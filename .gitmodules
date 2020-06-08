@@ -1,0 +1,3 @@
+[submodule "src/excalidraw"]
+	path = src/excalidraw
+	url = https://github.com/excalidraw/excalidraw.git
