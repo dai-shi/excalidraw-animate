@@ -1,0 +1,14 @@
+.Toolbar {
+}
+
+.Toolbar form {
+  margin: 3px;
+}
+
+.Toolbar input {
+  margin-left: 3px;
+}
+
+.Toolbar button {
+  margin-left: 3px;
+}
