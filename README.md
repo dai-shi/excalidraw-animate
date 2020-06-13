@@ -44,8 +44,10 @@ You can also enter the link in the field and click "Animate!"
 - [Adding text field](https://twitter.com/dai_shi/status/1264695085871947776)
 - [Grouping support](https://twitter.com/dai_shi/status/1265441085641256960)
 - [Embedding example](https://twitter.com/dai_shi/status/1269787031892160512)
+- [Load local file](https://twitter.com/dai_shi/status/1271802345106489345)
 
 ## Other projects with Excalidraw
 
 - [Excalidraw Gallery](https://github.com/dai-shi/excalidraw-gallery)
 - [Excalidraw Claymate](https://github.com/dai-shi/excalidraw-claymate)
+- [Excalidraw Layers](https://github.com/dai-shi/excalidraw-layers)
