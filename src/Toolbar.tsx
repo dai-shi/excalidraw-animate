@@ -35,6 +35,12 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
     const searchParams = new URLSearchParams(hash);
     if (searchParams.get("toolbar") !== "no") {
       setShowToolbar(true);
+    } else {
+      const eleList = document.getElementsByClassName("github-corner");
+      const ele = eleList[0] as HTMLElement | undefined;
+      if (ele) {
+        ele.style.display = "none";
+      }
     }
   }, []);
 
