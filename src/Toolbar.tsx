@@ -2,15 +2,18 @@ import React, { useEffect, useState } from "react";
 
 import "./Toolbar.css";
 import { exportToSvgFile, exportToWebmFile } from "./export";
+import { ExcalidrawElement } from "./excalidraw/src/element/types";
+import { loadFromJSON } from "./excalidraw/src/data/json";
 
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
 
 type Props = {
   svg?: SVGSVGElement;
   finishedMs?: number;
+  loadData: (data: { elements: readonly ExcalidrawElement[] }) => void;
 };
 
-const Toolbar: React.FC<Props> = ({ svg, finishedMs }) => {
+const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -38,6 +41,11 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs }) => {
   if (!showToolbar) {
     return null;
   }
+
+  const loadFile = async () => {
+    const data = await loadFromJSON();
+    loadData(data);
+  };
 
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,25 +96,38 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs }) => {
 
   return (
     <div className="Toolbar">
-      <form onSubmit={loadLink}>
-        <label>
-          Excalidraw shareable link:
-          <input value={link} onChange={(e) => setLink(e.target.value)} />
-        </label>
-        <button type="submit" disabled={!linkRegex.test(link)}>Animate!</button>
-      </form>
-      <button type="button" onClick={pauseResumeAnimations}>
-        {paused ? "Resume" : "Pause"}
-      </button>
-      <button type="button" onClick={resetAnimations}>
-        Reset
-      </button>
-      <button type="button" onClick={exportToSvg}>
-        Export to SVG
-      </button>
-      <button type="button" onClick={exportToWebm} disabled={processing}>
-        Export to WebM {processing && "(Processing...)"}
-      </button>
+      <div className="Toolbar-loader">
+        <button type="button" onClick={loadFile}>
+          Load File
+        </button>
+        <span>OR</span>
+        <form onSubmit={loadLink}>
+          <input
+            placeholder="Enter shareable link..."
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+          />
+          <button type="submit" disabled={!linkRegex.test(link)}>
+            Animate!
+          </button>
+        </form>
+      </div>
+      {svg && (
+        <div className="Toolbar-controller">
+          <button type="button" onClick={pauseResumeAnimations}>
+            {paused ? "Resume" : "Pause"}
+          </button>
+          <button type="button" onClick={resetAnimations}>
+            Reset
+          </button>
+          <button type="button" onClick={exportToSvg}>
+            Export to SVG
+          </button>
+          <button type="button" onClick={exportToWebm} disabled={processing}>
+            Export to WebM {processing && "(Processing...)"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
