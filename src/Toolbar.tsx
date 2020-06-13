@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import "./Toolbar.css";
 import { exportToSvgFile, exportToWebmFile } from "./export";
 
+const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
+
 type Props = {
   svg?: SVGSVGElement;
   finishedMs?: number;
@@ -12,6 +14,7 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs }) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [link, setLink] = useState("");
 
   useEffect(() => {
     if (!svg) {
@@ -38,9 +41,7 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs }) => {
 
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const match = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(
-      (event.target as any).link.value /* FIXME no-any */
-    );
+    const match = linkRegex.exec(link);
     if (!match) {
       window.alert("Invalid link");
       return;
@@ -90,9 +91,9 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs }) => {
       <form onSubmit={loadLink}>
         <label>
           Excalidraw shareable link:
-          <input name="link" />
+          <input value={link} onChange={(e) => setLink(e.target.value)} />
         </label>
-        <button type="submit">Animate!</button>
+        <button type="submit" disabled={!linkRegex.test(link)}>Animate!</button>
       </form>
       <button type="button" onClick={pauseResumeAnimations}>
         {paused ? "Resume" : "Pause"}
