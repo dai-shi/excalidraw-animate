@@ -12,20 +12,23 @@ export const useLoadSvg = () => {
   const [loadedSvg, setLoadedSvg] = useState<SVGSVGElement>();
   const [finishedMs, setFinishedMs] = useState<number>();
 
-  const loadData = useCallback((data: { elements: readonly ExcalidrawElement[] }) => {
-    const elements = getNonDeletedElements(data.elements);
-    const svg = exportToSvg(elements, {
-      exportBackground: true,
-      exportPadding: 30,
-      viewBackgroundColor: "white",
-      shouldAddWatermark: false,
-    });
-    const result = animateSvg(svg, elements);
-    console.log(svg);
-    setLoadedSvg(svg);
-    setFinishedMs(result.finishedMs);
-    return { svg, finishedMs: result.finishedMs };
-  }, []);
+  const loadData = useCallback(
+    (data: { elements: readonly ExcalidrawElement[] }) => {
+      const elements = getNonDeletedElements(data.elements);
+      const svg = exportToSvg(elements, {
+        exportBackground: true,
+        exportPadding: 30,
+        viewBackgroundColor: "white",
+        shouldAddWatermark: false,
+      });
+      const result = animateSvg(svg, elements);
+      console.log(svg);
+      setLoadedSvg(svg);
+      setFinishedMs(result.finishedMs);
+      return { svg, finishedMs: result.finishedMs };
+    },
+    []
+  );
 
   useEffect(() => {
     (async () => {
