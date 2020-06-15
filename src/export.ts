@@ -55,7 +55,10 @@ const generateImagesFromSvg = (
         images.push(img);
         loop(t + 1000 / fps);
       };
-      img.onerror = reject;
+      img.onerror = (err) => {
+        window.alert("Unexpected error while preparing images");
+        reject(err);
+      };
     };
     loop(0);
   });
