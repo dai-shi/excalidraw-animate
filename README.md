@@ -12,19 +12,20 @@ into animation.
 
 ## How to use it
 
-First, you need to create a shareable link in Excalidraw.
+### Using a local file
+
+1. Save as a file in Excalidraw
+2. Load the file in Excalidraw Animate
+
+### Using a shareable link
+
+1. Create a shareable link in Excalidraw
 
 <table><tr><td>
 <img alt="Shareable link image" src="https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small" width="50%" />
 </td></tr></table>
 
-Second, modify part of the link; replace `excalidraw.com` with `dai-shi.github.io/excalidraw-animate`.
-
-For example:
-- Before: `https://excalidraw.com/#json=5173841697439744,SwJFLIYa2VQVKcyhcy0b_w`
-- After: `https://dai-shi.github.io/excalidraw-animate/#json=5173841697439744,SwJFLIYa2VQVKcyhcy0b_w`
-
-You can also enter the link in the field and click "Animate!"
+2. Enter the link in the field and click "Animate!"
 
 <table><tr><td>
 <img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" />
