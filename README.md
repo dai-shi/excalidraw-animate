@@ -15,7 +15,16 @@ into animation.
 ### Using a local file
 
 1. Save as a file in Excalidraw
+
+<table><tr><td>
+<img alt="Save icon image" src="https://user-images.githubusercontent.com/490574/85708882-9f239580-b71f-11ea-8faa-4aed086fd490.png" width="50%" />
+</td></tr></table>
+
 2. Load the file in Excalidraw Animate
+
+<table><tr><td>
+<img alt="Load icon image" src="https://user-images.githubusercontent.com/490574/85709345-1fe29180-b720-11ea-84dc-aca7267f3a98.png" width="50%" />
+</td></tr></table>
 
 ### Using a shareable link
 
