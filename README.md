@@ -12,6 +12,8 @@ into animation.
 
 ## How to use it
 
+Visit: <https://dai-shi.github.io/excalidraw-animate>
+
 ### Using a local file
 
 1. Save as a file in Excalidraw
