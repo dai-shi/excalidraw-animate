@@ -16,7 +16,6 @@ const Viewer: React.FC<Props> = ({ svg }) => {
         svg.remove();
       };
     }
-    return undefined;
   }, [svg]);
 
   useEffect(() => {
@@ -34,7 +33,6 @@ const Viewer: React.FC<Props> = ({ svg }) => {
         };
       }
     }
-    return undefined;
   }, [svg]);
 
   return <div className="Viewer" ref={ref}></div>;
