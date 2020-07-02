@@ -6,7 +6,7 @@
 
 ## What is this
 
-This is an experimental tool to convert an
+This is an external tool to convert an
 [Excalidraw](https://excalidraw.com) drawing
 into animation.
 
@@ -41,6 +41,10 @@ Visit: <https://dai-shi.github.io/excalidraw-animate>
 <table><tr><td>
 <img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" />
 </td></tr></table>
+
+## Known issues
+
+- A big drawing with many elements can't be exported to WebM. Please use screen capture to convert to videos in that case.
 
 ## Tweets
 
