@@ -43,7 +43,7 @@
     "test:type": "tsc",
     "test:lint": "eslint --max-warnings=0 --ignore-path .gitignore  --ext .js,.ts,.tsx .",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
-    "test:app": "react-scripts test --env=jsdom --passWithNoTests",
+    "test:app": "react-scripts test --env=jsdom --passWithNoTests --testPathIgnorePatterns=src/excalidraw",
     "preinstall": "git submodule update --init --recursive"
   },
   "eslintConfig": {
