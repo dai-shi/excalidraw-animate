@@ -1,0 +1,2 @@
+(this["webpackJsonpexcalidraw-animate"]=this["webpackJsonpexcalidraw-animate"]||[]).push([[30],{68:function(a,e,i){a.exports=i.p+"static/media/README.ebec7061.md"}}]);
+//# sourceMappingURL=30.c71dff40.chunk.js.map
