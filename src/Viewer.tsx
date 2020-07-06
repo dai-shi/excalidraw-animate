@@ -26,6 +26,7 @@ const Viewer: React.FC<Props> = ({ svg }) => {
         const ele = ref.current;
         const callback = () => {
           svg.setCurrentTime(0);
+          svg.unpauseAnimations();
         };
         ele.addEventListener("click", callback);
         return () => {

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import "./Toolbar.css";
+import GitHubCorner from "./GitHubCorner";
 import { exportToSvgFile, exportToWebmFile } from "./export";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
 import { loadFromJSON } from "./excalidraw/src/data/json";
@@ -14,7 +15,7 @@ type Props = {
 };
 
 const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
-  const [showToolbar, setShowToolbar] = useState(false);
+  const [showToolbar, setShowToolbar] = useState<boolean | "never">(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [link, setLink] = useState("");
@@ -23,12 +24,12 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
     if (!svg) {
       return;
     }
-    if (svg.animationsPaused()) {
-      setPaused(true);
+    if (paused) {
+      svg.pauseAnimations();
     } else {
-      setPaused(false);
+      svg.unpauseAnimations();
     }
-  }, [svg]);
+  }, [svg, paused]);
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -36,17 +37,9 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
     if (searchParams.get("toolbar") !== "no") {
       setShowToolbar(true);
     } else {
-      const eleList = document.getElementsByClassName("github-corner");
-      const ele = eleList[0] as HTMLElement | undefined;
-      if (ele) {
-        ele.style.display = "none";
-      }
+      setShowToolbar("never");
     }
   }, []);
-
-  if (!showToolbar) {
-    return null;
-  }
 
   const loadFile = async () => {
     const data = await loadFromJSON();
@@ -64,24 +57,42 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
     window.location.reload();
   };
 
-  const pauseResumeAnimations = () => {
+  const togglePausedAnimations = useCallback(() => {
     if (!svg) {
       return;
     }
-    if (paused) {
-      svg.unpauseAnimations();
-      setPaused(false);
-    } else {
-      svg.pauseAnimations();
-      setPaused(true);
-    }
-  };
+    setPaused((p) => !p);
+  }, [svg]);
 
-  const resetAnimations = () => {
+  const resetAnimations = useCallback(() => {
     if (!svg) {
       return;
     }
     svg.setCurrentTime(0);
+  }, [svg]);
+
+  useEffect(() => {
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "p") {
+        togglePausedAnimations();
+      } else if (e.key.toLowerCase() === "r") {
+        resetAnimations();
+      } else if (e.key.toLowerCase() === "q") {
+        // toggle toolbar
+        setShowToolbar((s) => (typeof s === "boolean" ? !s : s));
+      } else {
+        // show toolbar otherwise
+        setShowToolbar((s) => (typeof s === "boolean" ? true : s));
+      }
+    };
+    document.addEventListener("keydown", onKeydown);
+    return () => {
+      document.removeEventListener("keydown", onKeydown);
+    };
+  }, [togglePausedAnimations, resetAnimations]);
+
+  const hideToolbar = () => {
+    setShowToolbar((s) => (typeof s === "boolean" ? false : s));
   };
 
   const exportToSvg = () => {
@@ -99,6 +110,10 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
     await exportToWebmFile(svg, finishedMs);
     setProcessing(false);
   };
+
+  if (showToolbar !== true) {
+    return null;
+  }
 
   return (
     <div className="Toolbar">
@@ -120,11 +135,14 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
       </div>
       {svg && (
         <div className="Toolbar-controller">
-          <button type="button" onClick={pauseResumeAnimations}>
-            {paused ? "Resume" : "Pause"}
+          <button type="button" onClick={togglePausedAnimations}>
+            {paused ? "Play (P)" : "Pause (P)"}
           </button>
           <button type="button" onClick={resetAnimations}>
-            Reset
+            Reset (R)
+          </button>
+          <button type="button" onClick={hideToolbar}>
+            Hide Toolbar (Q)
           </button>
           <button type="button" onClick={exportToSvg}>
             Export to SVG
@@ -134,6 +152,10 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
           </button>
         </div>
       )}
+      <GitHubCorner
+        link="https://github.com/dai-shi/excalidraw-animate"
+        size={40}
+      />
     </div>
   );
 };
