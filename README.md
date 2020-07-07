@@ -61,6 +61,7 @@ Visit: <https://dai-shi.github.io/excalidraw-animate>
 - [Grouping support](https://twitter.com/dai_shi/status/1265441085641256960)
 - [Embedding example](https://twitter.com/dai_shi/status/1269787031892160512)
 - [Load local file](https://twitter.com/dai_shi/status/1271802345106489345)
+- [Keyboard shortcut](https://twitter.com/dai_shi/status/1280118714470330368)
 
 ## Other projects with Excalidraw
 
