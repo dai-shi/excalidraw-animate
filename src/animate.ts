@@ -165,7 +165,7 @@ const animateText = (
   const textPath = svg.ownerDocument.createElementNS(SVG_NS, "textPath");
   textPath.setAttribute("href", "#pathForText" + pathForTextIndex);
   textPath.textContent = ele.textContent;
-  ele.textContent = null;
+  ele.textContent = " "; // HACK for Firebox as `null` does not work
   findNode(svg, "defs")?.appendChild(path);
   ele.appendChild(textPath);
 };
