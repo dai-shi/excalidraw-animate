@@ -5,6 +5,7 @@ import GitHubCorner from "./GitHubCorner";
 import { exportToSvgFile, exportToWebmFile } from "./export";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
 import { loadFromJSON } from "./excalidraw/src/data/json";
+import { AppState } from "./excalidraw/src/types";
 
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
 
@@ -42,7 +43,7 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
   }, []);
 
   const loadFile = async () => {
-    const data = await loadFromJSON();
+    const data = await loadFromJSON((undefined as unknown) as AppState);
     loadData(data);
   };
 
