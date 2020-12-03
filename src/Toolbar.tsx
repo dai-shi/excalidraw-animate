@@ -1,13 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { fileOpen } from "browser-nativefs";
 
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
 import { exportToSvgFile, exportToWebmFile } from "./export";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
 import { loadFromJSON } from "./excalidraw/src/data/json";
+import { loadLibraryFromBlob } from "./excalidraw/src/data/blob";
+import { getNonDeletedElements } from "./excalidraw/src/element";
+import { restoreElements } from "./excalidraw/src/data/restore";
 import { AppState } from "./excalidraw/src/types";
 
-const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
+const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 
 type Props = {
   svgList: {
@@ -48,6 +52,23 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     loadDataList([data]);
   };
 
+  const loadLibrary = async () => {
+    const blob = await fileOpen({
+      description: "Excalidraw library files",
+      extensions: [".json", ".excalidrawlib"],
+      mimeTypes: ["application/json"],
+    });
+    const libraryFile = await loadLibraryFromBlob(blob);
+    if (!libraryFile || !libraryFile.library) {
+      window.alert("Unable to load library");
+      return;
+    }
+    const dataList = libraryFile.library.map((libraryItem) =>
+      getNonDeletedElements(restoreElements(libraryItem))
+    );
+    loadDataList(dataList.map((elements) => ({ elements })));
+  };
+
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const match = linkRegex.exec(link);
@@ -55,7 +76,11 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
       window.alert("Invalid link");
       return;
     }
-    window.location.hash = match[0];
+    if (match[1]) {
+      window.location.hash = match[0];
+    } else {
+      window.location.hash = `library=${match[0]}`;
+    }
     window.location.reload();
   };
 
@@ -128,9 +153,13 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
           Load File
         </button>
         <span>OR</span>
+        <button type="button" onClick={loadLibrary}>
+          Load Library
+        </button>
+        <span>OR</span>
         <form onSubmit={loadLink}>
           <input
-            placeholder="Enter shareable link..."
+            placeholder="Enter link..."
             value={link}
             onChange={(e) => setLink(e.target.value)}
           />
