@@ -4,36 +4,45 @@
   "private": true,
   "homepage": "./",
   "dependencies": {
-    "@sentry/browser": "^5.15.5",
-    "@sentry/integrations": "^5.15.5",
-    "@testing-library/jest-dom": "^5.9.0",
-    "@testing-library/react": "^10.0.5",
-    "@types/dom-mediacapture-record": "^1.0.6",
-    "@types/jest": "^24.0.0",
-    "@types/lodash.throttle": "^4.1.6",
-    "@types/nanoid": "^2.1.0",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.35",
-    "@types/react-dom": "^16.9.8",
-    "@types/socket.io-client": "^1.4.33",
-    "browser-nativefs": "^0.7.3",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.3",
-    "i18next-browser-languagedetector": "^4.2.0",
-    "jest-canvas-mock": "^2.2.0",
-    "lodash.throttle": "^4.1.1",
-    "nanoid": "^2.1.11",
-    "node-sass": "^4.14.1",
-    "open-color": "^1.7.0",
-    "pepjs": "^0.5.2",
-    "points-on-curve": "^0.2.0",
-    "prettier": "^2.0.5",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
-    "roughjs": "^4.3.1",
-    "socket.io-client": "^2.3.0",
-    "typescript": "^3.9.3"
+    "@sentry/browser": "5.27.6",
+    "@sentry/integrations": "5.27.6",
+    "browser-nativefs": "0.11.1",
+    "clsx": "1.1.1",
+    "firebase": "8.1.1",
+    "i18next-browser-languagedetector": "6.0.1",
+    "lodash.throttle": "4.1.1",
+    "nanoid": "2.1.11",
+    "node-sass": "4.14.1",
+    "open-color": "1.7.0",
+    "pako": "1.0.11",
+    "png-chunk-text": "1.0.0",
+    "png-chunks-encode": "1.0.0",
+    "png-chunks-extract": "1.0.0",
+    "points-on-curve": "0.2.0",
+    "pwacompat": "2.0.17",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-scripts": "4.0.1",
+    "roughjs": "4.3.1",
+    "socket.io-client": "2.3.1",
+    "typescript": "4.0.5"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "5.11.6",
+    "@testing-library/react": "11.2.2",
+    "@types/dom-mediacapture-record": "1.0.7",
+    "@types/jest": "26.0.15",
+    "@types/lodash.throttle": "4.1.6",
+    "@types/nanoid": "2.1.0",
+    "@types/pako": "1.0.1",
+    "@types/react": "17.0.0",
+    "@types/react-dom": "17.0.0",
+    "@types/socket.io-client": "1.4.34",
+    "eslint-config-prettier": "6.15.0",
+    "eslint-plugin-prettier": "3.1.4",
+    "jest-canvas-mock": "2.3.0",
+    "pepjs": "0.5.2",
+    "prettier": "2.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,13 +50,21 @@
     "test": "yarn run test:all",
     "test:all": "yarn run test:type && yarn run test:lint && yarn run test:format && yarn run test:app --watchAll=false",
     "test:type": "tsc",
-    "test:lint": "eslint --max-warnings=0 --ignore-path .gitignore  --ext .js,.ts,.tsx .",
+    "test:lint": "eslint --max-warnings=40 --ignore-path .gitignore  --ext .js,.ts,.tsx .",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests --testPathIgnorePatterns=src/excalidraw",
     "preinstall": "git submodule update --init --recursive"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "overrides": [
+      {
+        "files": ["src/excalidraw/**/*"],
+        "rules": {
+          "no-unused-vars": "off"
+        }
+      }
+    ]
   },
   "jest": {
     "transformIgnorePatterns": [

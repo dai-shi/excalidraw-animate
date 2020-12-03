@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { importFromBackend } from "./excalidraw/src/data";
+import { loadScene } from "./excalidraw/src/data";
 import { exportToSvg } from "./excalidraw/src/scene/export";
 import { getNonDeletedElements } from "./excalidraw/src/element";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
@@ -45,7 +45,7 @@ export const useLoadSvg = () => {
       );
       if (match) {
         const [, id, key] = match;
-        const data = await importFromBackend(id, key);
+        const data = await loadScene(id, key, null);
         const [{ svg, finishedMs }] = loadDataList([data]);
         if (searchParams.get("autoplay") === "no") {
           svg.setCurrentTime(finishedMs);
