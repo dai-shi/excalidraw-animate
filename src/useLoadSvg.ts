@@ -9,23 +9,29 @@ import { animateSvg } from "./animate";
 
 export const useLoadSvg = () => {
   const [loading, setLoading] = useState(true);
-  const [loadedSvg, setLoadedSvg] = useState<SVGSVGElement>();
-  const [finishedMs, setFinishedMs] = useState<number>();
+  const [loadedSvgList, setLoadedSvgList] = useState<
+    {
+      svg: SVGSVGElement;
+      finishedMs: number;
+    }[]
+  >([]);
 
-  const loadData = useCallback(
-    (data: { elements: readonly ExcalidrawElement[] }) => {
-      const elements = getNonDeletedElements(data.elements);
-      const svg = exportToSvg(elements, {
-        exportBackground: true,
-        exportPadding: 30,
-        viewBackgroundColor: "white",
-        shouldAddWatermark: false,
+  const loadDataList = useCallback(
+    (dataList: { elements: readonly ExcalidrawElement[] }[]) => {
+      const svgList = dataList.map((data) => {
+        const elements = getNonDeletedElements(data.elements);
+        const svg = exportToSvg(elements, {
+          exportBackground: true,
+          exportPadding: 30,
+          viewBackgroundColor: "white",
+          shouldAddWatermark: false,
+        });
+        const result = animateSvg(svg, elements);
+        console.log(svg);
+        return { svg, finishedMs: result.finishedMs };
       });
-      const result = animateSvg(svg, elements);
-      console.log(svg);
-      setLoadedSvg(svg);
-      setFinishedMs(result.finishedMs);
-      return { svg, finishedMs: result.finishedMs };
+      setLoadedSvgList(svgList);
+      return svgList;
     },
     []
   );
@@ -40,14 +46,14 @@ export const useLoadSvg = () => {
       if (match) {
         const [, id, key] = match;
         const data = await importFromBackend(id, key);
-        const { svg, finishedMs } = loadData(data);
+        const [{ svg, finishedMs }] = loadDataList([data]);
         if (searchParams.get("autoplay") === "no") {
           svg.setCurrentTime(finishedMs);
         }
       }
       setLoading(false);
     })();
-  }, [loadData]);
+  }, [loadDataList]);
 
-  return { loading, loadedSvg, finishedMs, loadData };
+  return { loading, loadedSvgList, loadDataList };
 };

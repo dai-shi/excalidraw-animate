@@ -3,20 +3,27 @@ import React, { useEffect, useRef } from "react";
 import "./Viewer.css";
 
 type Props = {
-  svg: SVGSVGElement;
+  svgList: {
+    svg: SVGSVGElement;
+    finishedMs: number;
+  }[];
 };
 
-const Viewer: React.FC<Props> = ({ svg }) => {
+const Viewer: React.FC<Props> = ({ svgList }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.appendChild(svg);
-      return () => {
+    svgList.forEach(({ svg }) => {
+      if (ref.current) {
+        ref.current.appendChild(svg);
+      }
+    });
+    return () => {
+      svgList.forEach(({ svg }) => {
         svg.remove();
-      };
-    }
-  }, [svg]);
+      });
+    };
+  }, [svgList]);
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -25,8 +32,10 @@ const Viewer: React.FC<Props> = ({ svg }) => {
       if (ref.current) {
         const ele = ref.current;
         const callback = () => {
-          svg.setCurrentTime(0);
-          svg.unpauseAnimations();
+          svgList.forEach(({ svg }) => {
+            svg.setCurrentTime(0);
+            svg.unpauseAnimations();
+          });
         };
         ele.addEventListener("click", callback);
         return () => {
@@ -34,7 +43,7 @@ const Viewer: React.FC<Props> = ({ svg }) => {
         };
       }
     }
-  }, [svg]);
+  }, [svgList]);
 
   return <div className="Viewer" ref={ref}></div>;
 };

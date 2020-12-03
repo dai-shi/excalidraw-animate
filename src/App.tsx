@@ -6,14 +6,14 @@ import Viewer from "./Viewer";
 import { useLoadSvg } from "./useLoadSvg";
 
 const App: React.FC = () => {
-  const { loading, loadedSvg, finishedMs, loadData } = useLoadSvg();
+  const { loading, loadedSvgList, loadDataList } = useLoadSvg();
   if (loading) {
     return <div>Loading...</div>;
   }
   return (
     <div className="App">
-      <Toolbar svg={loadedSvg} finishedMs={finishedMs} loadData={loadData} />
-      {loadedSvg && <Viewer svg={loadedSvg} />}
+      <Toolbar svgList={loadedSvgList} loadDataList={loadDataList} />
+      {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
     </div>
   );
 };

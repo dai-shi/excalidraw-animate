@@ -10,27 +10,28 @@ import { AppState } from "./excalidraw/src/types";
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
 
 type Props = {
-  svg?: SVGSVGElement;
-  finishedMs?: number;
-  loadData: (data: { elements: readonly ExcalidrawElement[] }) => void;
+  svgList: {
+    svg: SVGSVGElement;
+    finishedMs: number;
+  }[];
+  loadDataList: (data: { elements: readonly ExcalidrawElement[] }[]) => void;
 };
 
-const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
+const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
   const [showToolbar, setShowToolbar] = useState<boolean | "never">(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [link, setLink] = useState("");
 
   useEffect(() => {
-    if (!svg) {
-      return;
-    }
-    if (paused) {
-      svg.pauseAnimations();
-    } else {
-      svg.unpauseAnimations();
-    }
-  }, [svg, paused]);
+    svgList.forEach(({ svg }) => {
+      if (paused) {
+        svg.pauseAnimations();
+      } else {
+        svg.unpauseAnimations();
+      }
+    });
+  }, [svgList, paused]);
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -44,7 +45,7 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
 
   const loadFile = async () => {
     const data = await loadFromJSON((undefined as unknown) as AppState);
-    loadData(data);
+    loadDataList([data]);
   };
 
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
@@ -59,18 +60,17 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
   };
 
   const togglePausedAnimations = useCallback(() => {
-    if (!svg) {
+    if (!svgList.length) {
       return;
     }
     setPaused((p) => !p);
-  }, [svg]);
+  }, [svgList]);
 
   const resetAnimations = useCallback(() => {
-    if (!svg) {
-      return;
-    }
-    svg.setCurrentTime(0);
-  }, [svg]);
+    svgList.forEach(({ svg }) => {
+      svg.setCurrentTime(0);
+    });
+  }, [svgList]);
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
@@ -97,18 +97,23 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
   };
 
   const exportToSvg = () => {
-    if (!svg) {
+    if (!svgList.length) {
       return;
     }
-    exportToSvgFile(svg);
+    svgList.forEach(({ svg }) => {
+      exportToSvgFile(svg);
+    });
   };
 
   const exportToWebm = async () => {
-    if (!svg || !finishedMs) {
+    if (!svgList.length) {
       return;
     }
     setProcessing(true);
-    await exportToWebmFile(svg, finishedMs);
+    await svgList.reduce(async (promise, { svg, finishedMs }) => {
+      await promise;
+      await exportToWebmFile(svg, finishedMs);
+    }, Promise.resolve());
     setProcessing(false);
   };
 
@@ -134,7 +139,7 @@ const Toolbar: React.FC<Props> = ({ svg, finishedMs, loadData }) => {
           </button>
         </form>
       </div>
-      {svg && (
+      {!!svgList.length && (
         <div className="Toolbar-controller">
           <button type="button" onClick={togglePausedAnimations}>
             {paused ? "Play (P)" : "Pause (P)"}
