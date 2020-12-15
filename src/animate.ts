@@ -87,7 +87,7 @@ const animateFillPath = (
   ele.appendChild(animate);
 };
 
-const animateRect = (
+const animatePolygon = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
@@ -97,8 +97,8 @@ const animateRect = (
   const mCount = dTo.match(/M/g)?.length || 0;
   const cCount = dTo.match(/C/g)?.length || 0;
   if (mCount !== cCount) throw new Error("unexpected m/c counts");
-  const repeat = 4;
-  const dups = mCount / repeat;
+  const dups = 2;
+  const repeat = mCount / dups;
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
     const dFrom = dTo.replace(
@@ -173,12 +173,15 @@ const animateText = (
 const patchSvgLine = (
   svg: SVGSVGElement,
   ele: SVGElement,
+  strokeSharpness: string,
   currentMs: number,
   durationMs: number
 ) => {
+  const animateLine =
+    strokeSharpness !== "sharp" ? animatePath : animatePolygon;
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
   if (childNodes[0].getAttribute("fill-rule")) {
-    animatePath(
+    animateLine(
       svg,
       childNodes[0].childNodes[1] as SVGElement,
       currentMs,
@@ -192,7 +195,7 @@ const patchSvgLine = (
       durationMs * 0.25
     );
   } else {
-    animatePath(
+    animateLine(
       svg,
       childNodes[0].childNodes[0] as SVGElement,
       currentMs,
@@ -204,10 +207,13 @@ const patchSvgLine = (
 const patchSvgArrow = (
   svg: SVGSVGElement,
   ele: SVGElement,
+  strokeSharpness: string,
   currentMs: number,
   durationMs: number
 ) => {
-  animatePath(
+  const animateLine =
+    strokeSharpness !== "sharp" ? animatePath : animatePolygon;
+  animateLine(
     svg,
     ele.childNodes[0].childNodes[0] as SVGElement,
     currentMs,
@@ -236,7 +242,7 @@ const patchSvgRectangle = (
   durationMs: number
 ) => {
   if (ele.childNodes[1]) {
-    animateRect(
+    animatePolygon(
       svg,
       ele.childNodes[1] as SVGElement,
       currentMs,
@@ -250,7 +256,7 @@ const patchSvgRectangle = (
       durationMs * 0.25
     );
   } else {
-    animateRect(svg, ele.childNodes[0] as SVGElement, currentMs, durationMs);
+    animatePolygon(svg, ele.childNodes[0] as SVGElement, currentMs, durationMs);
   }
 };
 
@@ -298,14 +304,17 @@ const patchSvgEle = (
   svg: SVGSVGElement,
   ele: SVGElement,
   type: string,
+  strokeSharpness: string,
   width: number,
   currentMs: number,
   durationMs: number
 ) => {
-  if (type === "line" || type === "draw") {
-    patchSvgLine(svg, ele, currentMs, durationMs);
+  if (type === "line") {
+    patchSvgLine(svg, ele, strokeSharpness, currentMs, durationMs);
+  } else if (type === "draw") {
+    patchSvgLine(svg, ele, "round", currentMs, durationMs);
   } else if (type === "arrow") {
-    patchSvgArrow(svg, ele, currentMs, durationMs);
+    patchSvgArrow(svg, ele, strokeSharpness, currentMs, durationMs);
   } else if (type === "rectangle" || type === "diamond") {
     patchSvgRectangle(svg, ele, currentMs, durationMs);
   } else if (type === "ellipse") {
@@ -349,26 +358,46 @@ export const animateSvg = (
   let index = 0;
   (svg.childNodes as NodeListOf<SVGElement>).forEach((ele) => {
     if (ele.tagName === "g") {
-      const { type, width, groupIds } = elements[index];
+      const { type, strokeSharpness, width, groupIds } = elements[index];
       if (!finished.has(ele)) {
         if (groupIds.length >= 1) {
           const groupId = groupIds[0];
           const group = groups[groupId];
           const dur = groupDur / (group.length + 1);
-          patchSvgEle(svg, ele, type, width, current, dur);
+          patchSvgEle(svg, ele, type, strokeSharpness, width, current, dur);
           current += dur;
           finished.set(ele, true);
           group.forEach(([childEle, childIndex]) => {
-            const { type: childType, width: childWidth } = elements[childIndex];
+            const {
+              type: childType,
+              strokeSharpness: chileStrokeSharpness,
+              width: childWidth,
+            } = elements[childIndex];
             if (!finished.has(childEle)) {
-              patchSvgEle(svg, childEle, childType, childWidth, current, dur);
+              patchSvgEle(
+                svg,
+                childEle,
+                childType,
+                chileStrokeSharpness,
+                childWidth,
+                current,
+                dur
+              );
               current += dur;
               finished.set(childEle, true);
             }
           });
           delete groups[groupId];
         } else {
-          patchSvgEle(svg, ele, type, width, current, individualDur);
+          patchSvgEle(
+            svg,
+            ele,
+            type,
+            strokeSharpness,
+            width,
+            current,
+            individualDur
+          );
           current += individualDur;
           finished.set(ele, true);
         }
