@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { loadScene } from "./excalidraw/src/data";
+import { loadScene } from "./excalidraw/src/excalidraw-app/data";
 import { isValidLibrary } from "./excalidraw/src/data/json";
 import { loadLibraryFromBlob } from "./excalidraw/src/data/blob";
 import { restoreElements } from "./excalidraw/src/data/restore";

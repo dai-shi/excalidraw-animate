@@ -10,7 +10,7 @@ const embedUrlResources = async (text: string) => {
         new Promise((resolve, reject) => {
           url = url.slice(5, -3);
           if (resourceCache.has(url)) {
-            resolve(resourceCache.get(url));
+            resolve(resourceCache.get(url) as string);
             return;
           }
           fetch(url)
@@ -74,7 +74,7 @@ export const exportToSvgFile = async (svg: SVGSVGElement) => {
 };
 
 export const exportToWebmFile = (svg: SVGSVGElement, finishedMs: number) =>
-  new Promise(async (resolve) => {
+  new Promise<void>(async (resolve) => {
     // This parentNode is not nice.
     // We would like to export it off screen.
     const container = svg.parentNode;
