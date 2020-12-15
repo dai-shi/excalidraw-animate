@@ -93,9 +93,15 @@ const animatePolygon = (
   currentMs: number,
   durationMs: number
 ) => {
-  const dTo = ele.getAttribute("d") || "";
-  const mCount = dTo.match(/M/g)?.length || 0;
-  const cCount = dTo.match(/C/g)?.length || 0;
+  let dTo = ele.getAttribute("d") || "";
+  let mCount = dTo.match(/M/g)?.length || 0;
+  let cCount = dTo.match(/C/g)?.length || 0;
+  if (mCount === cCount + 1) {
+    // workaround for round rect
+    dTo = dTo.replace(/^M\S+ \S+ M/, "M");
+    mCount = dTo.match(/M/g)?.length || 0;
+    cCount = dTo.match(/C/g)?.length || 0;
+  }
   if (mCount !== cCount) throw new Error("unexpected m/c counts");
   const dups = 2;
   const repeat = mCount / dups;
