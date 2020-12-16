@@ -156,14 +156,30 @@ const animateText = (
   currentMs: number,
   durationMs: number
 ) => {
-  const y = ele.getAttribute("y");
+  const anchor = ele.getAttribute("text-anchor") || "start";
+  if (anchor !== "start") {
+    // Not sure how to support it, fallback with opacity
+    const toOpacity = ele.getAttribute("opacity") || "1.0";
+    const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+    animate.setAttribute("attributeName", "opacity");
+    animate.setAttribute("from", "0.0");
+    animate.setAttribute("to", toOpacity);
+    animate.setAttribute("begin", `${currentMs}ms`);
+    animate.setAttribute("dur", `${durationMs}ms`);
+    animate.setAttribute("fill", "freeze");
+    ele.appendChild(animate);
+    ele.setAttribute("opacity", "0.0");
+    return;
+  }
+  const x = Number(ele.getAttribute("x") || 0);
+  const y = Number(ele.getAttribute("y") || 0);
   pathForTextIndex += 1;
   const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
   path.setAttribute("id", "pathForText" + pathForTextIndex);
   const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
   animate.setAttribute("attributeName", "d");
-  animate.setAttribute("from", `m0,${y} h0`);
-  animate.setAttribute("to", `m0,${y} h${width}`);
+  animate.setAttribute("from", `m${x} ${y} h0`);
+  animate.setAttribute("to", `m${x} ${y} h${width}`);
   animate.setAttribute("begin", `${currentMs}ms`);
   animate.setAttribute("dur", `${durationMs}ms`);
   animate.setAttribute("fill", "freeze");

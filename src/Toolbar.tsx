@@ -28,7 +28,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
   const [link, setLink] = useState("");
   const [webmData, setWebmData] = useState<Blob>();
   useEffect(() => {
-    setWebmData(undefined)
+    setWebmData(undefined);
   }, [svgList]);
 
   useEffect(() => {
