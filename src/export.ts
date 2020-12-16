@@ -102,10 +102,10 @@ export const prepareWebmData = (svg: SVGSVGElement, finishedMs: number) =>
     const canvas = document.createElement("canvas");
     canvas.setAttribute("width", `${width}px`);
     canvas.setAttribute("height", `${height}px`);
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     const stream = (canvas as any).captureStream();
     const recorder = new MediaRecorder(stream);
-    recorder.ondataavailable = async (e) => {
+    recorder.ondataavailable = (e) => {
       resolve(e.data);
     };
     recorder.start();
@@ -115,7 +115,7 @@ export const prepareWebmData = (svg: SVGSVGElement, finishedMs: number) =>
         recorder.stop();
         return;
       }
-      ctx?.drawImage(images[index], 0, 0);
+      ctx.drawImage(images[index], 0, 0);
       index += 1;
       setTimeout(drawSvg, 1000 / 60);
     };
