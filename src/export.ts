@@ -68,19 +68,27 @@ export const exportToSvgFile = async (svg: SVGSVGElement) => {
   svg.setCurrentTime(0);
   const svgStr = new XMLSerializer().serializeToString(svg);
   svg.setCurrentTime(savedMs);
-  await fileSave(new Blob([svgStr], { type: "svg" }), {
+  await fileSave(new Blob([svgStr], { type: "image/svg+xml" }), {
     fileName: "excalidraw-animate.svg",
+    extensions: [".svg"],
   });
 };
 
-export const exportToWebmFile = (svg: SVGSVGElement, finishedMs: number) =>
-  new Promise<void>(async (resolve) => {
+export const exportToWebmFile = async (data: Blob) => {
+  await fileSave(new Blob([data], { type: "video/webm" }), {
+    fileName: "excalidraw-animate.webm",
+    extensions: [".webm"],
+  });
+};
+
+export const prepareWebmData = (svg: SVGSVGElement, finishedMs: number) =>
+  new Promise<Blob>(async (resolve, reject) => {
     // This parentNode is not nice.
     // We would like to export it off screen.
     const container = svg.parentNode;
     if (!container) {
       window.alert("svg is not displayed");
-      resolve();
+      reject();
       return;
     }
     const images = await generateImagesFromSvg(
@@ -98,16 +106,13 @@ export const exportToWebmFile = (svg: SVGSVGElement, finishedMs: number) =>
     const stream = (canvas as any).captureStream();
     const recorder = new MediaRecorder(stream);
     recorder.ondataavailable = async (e) => {
-      await fileSave(new Blob([e.data], { type: e.data.type }), {
-        fileName: "excalidraw-animate.webm",
-      });
+      resolve(e.data);
     };
     recorder.start();
     let index = 0;
     const drawSvg = () => {
       if (index >= images.length) {
         recorder.stop();
-        resolve();
         return;
       }
       ctx?.drawImage(images[index], 0, 0);

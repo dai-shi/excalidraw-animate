@@ -3,7 +3,7 @@ import { fileOpen } from "browser-nativefs";
 
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
-import { exportToSvgFile, exportToWebmFile } from "./export";
+import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
 import { loadFromJSON } from "./excalidraw/src/data/json";
 import { loadLibraryFromBlob } from "./excalidraw/src/data/blob";
@@ -26,6 +26,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [link, setLink] = useState("");
+  const [webmData, setWebmData] = useState<Blob>();
 
   useEffect(() => {
     svgList.forEach(({ svg }) => {
@@ -134,11 +135,14 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     if (!svgList.length) {
       return;
     }
+    if (webmData) {
+      await exportToWebmFile(webmData);
+      return;
+    }
     setProcessing(true);
-    await svgList.reduce(async (promise, { svg, finishedMs }) => {
-      await promise;
-      await exportToWebmFile(svg, finishedMs);
-    }, Promise.resolve());
+    // XXX exporting is implemented only for the first item
+    const data = await prepareWebmData(svgList[0].svg, svgList[0].finishedMs);
+    setWebmData(data);
     setProcessing(false);
   };
 
@@ -183,7 +187,11 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
             Export to SVG
           </button>
           <button type="button" onClick={exportToWebm} disabled={processing}>
-            Export to WebM {processing && "(Processing...)"}
+            {processing
+              ? "Processing..."
+              : webmData
+              ? "Export to WebM"
+              : "Prepare WebM"}
           </button>
         </div>
       )}
