@@ -7,6 +7,7 @@ import { restoreElements } from "./excalidraw/src/data/restore";
 import { exportToSvg } from "./excalidraw/src/scene/export";
 import { getNonDeletedElements } from "./excalidraw/src/element";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
+import { AppState } from "./excalidraw/src/types";
 
 import { animateSvg } from "./animate";
 
@@ -41,15 +42,23 @@ export const useLoadSvg = () => {
   >([]);
 
   const loadDataList = useCallback(
-    (dataList: { elements: readonly ExcalidrawElement[] }[]) => {
+    (
+      dataList: {
+        elements: readonly ExcalidrawElement[];
+        appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+      }[]
+    ) => {
       const svgList = dataList.map((data) => {
         const elements = getNonDeletedElements(data.elements);
-        const svg = exportToSvg(elements, {
-          exportBackground: true,
-          exportPadding: 30,
-          viewBackgroundColor: "white",
-          shouldAddWatermark: false,
-        });
+        const svg = exportToSvg(
+          elements,
+          data?.appState || {
+            exportBackground: true,
+            exportPadding: 30,
+            viewBackgroundColor: "white",
+            shouldAddWatermark: false,
+          }
+        );
         const result = animateSvg(svg, elements);
         console.log(svg);
         return { svg, finishedMs: result.finishedMs };
