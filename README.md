@@ -64,6 +64,7 @@ Visit: <https://dai-shi.github.io/excalidraw-animate>
 - [Keyboard shortcut](https://twitter.com/dai_shi/status/1280118714470330368)
 - [Support for libraries](https://twitter.com/dai_shi/status/1334851951339528202)
 - [Support round rectangles](https://twitter.com/dai_shi/status/1338830468817461249)
+- [Support background color](https://twitter.com/dai_shi/status/1343324961650343937)
 
 ## Other projects with Excalidraw
 
