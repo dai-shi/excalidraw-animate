@@ -143,9 +143,14 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
       return;
     }
     setProcessing(true);
-    // XXX exporting is implemented only for the first item
-    const data = await prepareWebmData(svgList[0].svg, svgList[0].finishedMs);
-    setWebmData(data);
+    setShowToolbar(false);
+    try {
+      const data = await prepareWebmData(svgList);
+      setWebmData(data);
+    } catch (e) {
+      console.log(e);
+    }
+    setShowToolbar(true);
     setProcessing(false);
   };
 
