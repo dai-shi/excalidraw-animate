@@ -39,10 +39,13 @@ export const prepareWebmData = (
       let maxFinishedMs = 0;
       svgList.forEach(({ svg, finishedMs }) => {
         maxFinishedMs = Math.max(maxFinishedMs, finishedMs);
+        svg.pauseAnimations();
         svg.setCurrentTime(0);
-        svg.unpauseAnimations();
       });
       recorder.start();
+      svgList.forEach(({ svg }) => {
+        svg.unpauseAnimations();
+      });
       setTimeout(() => {
         recorder.stop();
         stream.getVideoTracks()[0].stop();
