@@ -42,9 +42,11 @@ Visit: <https://dai-shi.github.io/excalidraw-animate>
 <img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" />
 </td></tr></table>
 
+This also works for Excalidraw Library links.
+
 ## Known issues
 
-- A big drawing with many elements can't be exported to WebM. Please use screen capture to convert to videos in that case.
+- Exporting WebM feature is not perfect. Please use screen capture if that doesn't work as expected.
 
 ## Tweets
 
@@ -65,6 +67,7 @@ Visit: <https://dai-shi.github.io/excalidraw-animate>
 - [Support for libraries](https://twitter.com/dai_shi/status/1334851951339528202)
 - [Support round rectangles](https://twitter.com/dai_shi/status/1338830468817461249)
 - [Support background color](https://twitter.com/dai_shi/status/1343324961650343937)
+- [Improved WebM export](https://twitter.com/dai_shi/status/1344935241668988930)
 
 ## Other projects with Excalidraw
 
