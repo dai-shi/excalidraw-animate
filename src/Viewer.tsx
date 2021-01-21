@@ -45,7 +45,19 @@ const Viewer: React.FC<Props> = ({ svgList }) => {
     }
   }, [svgList]);
 
-  return <div className="Viewer" ref={ref}></div>;
+  const repeat = Math.ceil(Math.sqrt(svgList.length));
+  const grids = `repeat(${repeat}, ${100 / repeat}%)`;
+
+  return (
+    <div
+      className="Viewer"
+      style={{
+        gridTemplateColumns: grids,
+        gridTemplateRows: grids,
+      }}
+      ref={ref}
+    ></div>
+  );
 };
 
 export default Viewer;

@@ -1,9 +1,9 @@
 .Viewer {
-  display: flex;
-  flex-direction: row;
+  height: 100vh;
+  display: grid;
 }
 
 .Viewer svg {
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
