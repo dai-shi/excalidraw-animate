@@ -369,12 +369,13 @@ const createGroups = (
 
 export const animateSvg = (
   svg: SVGSVGElement,
-  elements: readonly NonDeletedExcalidrawElement[]
+  elements: readonly NonDeletedExcalidrawElement[],
+  startMs?: number,
 ) => {
   let finishedMs;
   const groups = createGroups(svg, elements);
   const finished = new Map();
-  let current = 1000; // 1 sec margin
+  let current = startMs ?? 1000; // 1 sec margin
   const groupDur = 5000;
   const individualDur = 500;
   let index = 0;

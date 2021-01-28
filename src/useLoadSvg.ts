@@ -48,6 +48,7 @@ export const useLoadSvg = () => {
         appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
       }[]
     ) => {
+      let startMs: number | undefined;
       const svgList = dataList.map((data) => {
         const elements = getNonDeletedElements(data.elements);
         const svg = exportToSvg(
@@ -59,8 +60,9 @@ export const useLoadSvg = () => {
             shouldAddWatermark: false,
           }
         );
-        const result = animateSvg(svg, elements);
+        const result = animateSvg(svg, elements, startMs);
         console.log(svg);
+        startMs = result.finishedMs;
         return { svg, finishedMs: result.finishedMs };
       });
       setLoadedSvgList(svgList);
