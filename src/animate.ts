@@ -370,7 +370,7 @@ const createGroups = (
 export const animateSvg = (
   svg: SVGSVGElement,
   elements: readonly NonDeletedExcalidrawElement[],
-  startMs?: number,
+  startMs?: number
 ) => {
   let finishedMs;
   const groups = createGroups(svg, elements);
