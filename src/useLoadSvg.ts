@@ -46,7 +46,8 @@ export const useLoadSvg = () => {
       dataList: {
         elements: readonly ExcalidrawElement[];
         appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
-      }[]
+      }[],
+      inSequence?: boolean
     ) => {
       let startMs: number | undefined;
       const svgList = dataList.map((data) => {
@@ -62,7 +63,9 @@ export const useLoadSvg = () => {
         );
         const result = animateSvg(svg, elements, startMs);
         console.log(svg);
-        startMs = result.finishedMs;
+        if (inSequence) {
+          startMs = result.finishedMs;
+        }
         return { svg, finishedMs: result.finishedMs };
       });
       setLoadedSvgList(svgList);
@@ -93,7 +96,8 @@ export const useLoadSvg = () => {
         const [, url] = matchLibrary;
         const dataList = await importLibraryFromUrl(url);
         const svgList = loadDataList(
-          dataList.map((elements) => ({ elements }))
+          dataList.map((elements) => ({ elements })),
+          searchParams.has("sequence")
         );
         if (searchParams.get("autoplay") === "no") {
           svgList.forEach(({ svg, finishedMs }) => {
