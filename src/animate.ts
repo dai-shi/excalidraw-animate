@@ -103,7 +103,7 @@ const animatePolygon = (
     cCount = dTo.match(/C/g)?.length || 0;
   }
   if (mCount !== cCount) throw new Error("unexpected m/c counts");
-  const dups = 2;
+  const dups = Math.min(2, mCount);
   const repeat = mCount / dups;
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
