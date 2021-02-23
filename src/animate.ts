@@ -235,26 +235,26 @@ const patchSvgArrow = (
 ) => {
   const animateLine =
     strokeSharpness !== "sharp" ? animatePath : animatePolygon;
+  const numParts = ele.childNodes.length;
   animateLine(
     svg,
     ele.childNodes[0].childNodes[0] as SVGElement,
     currentMs,
-    durationMs * 0.6
+    (durationMs / (numParts + 2)) * 3
   );
-  currentMs += durationMs * 0.6;
-  animatePath(
-    svg,
-    ele.childNodes[1].childNodes[0] as SVGElement,
-    currentMs,
-    durationMs * 0.2
-  );
-  currentMs += durationMs * 0.2;
-  animatePath(
-    svg,
-    ele.childNodes[2].childNodes[0] as SVGElement,
-    currentMs,
-    durationMs * 0.2
-  );
+  currentMs += (durationMs / (numParts + 2)) * 3;
+  for (let i = 1; i < numParts; i += 1) {
+    const numChildren = ele.childNodes[i].childNodes.length;
+    for (let j = 0; j < numChildren; j += 1) {
+      animatePath(
+        svg,
+        ele.childNodes[i].childNodes[j] as SVGElement,
+        currentMs,
+        durationMs / (numParts + 2) / numChildren
+      );
+      currentMs += durationMs / (numParts + 2) / numChildren;
+    }
+  }
 };
 
 const patchSvgRectangle = (
