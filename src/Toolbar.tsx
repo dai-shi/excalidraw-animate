@@ -15,15 +15,12 @@ import { AppState } from "./excalidraw/src/types";
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 
 const getCombinedBeginTimeList = (svgList: Props["svgList"]) => {
-  let beginTimeList = ([] as number[]).concat(
+  const beginTimeList = ([] as number[]).concat(
     ...svgList.map(({ svg }) =>
       getBeginTimeList(svg).map((n) => Math.floor(n * 100) / 100)
     )
   );
-  if (svgList.length > 1) {
-    beginTimeList = [...new Set(beginTimeList)].sort((a, b) => a - b);
-  }
-  return beginTimeList;
+  return [...new Set(beginTimeList)].sort((a, b) => a - b);
 };
 
 type Props = {

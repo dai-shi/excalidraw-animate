@@ -453,6 +453,14 @@ export const getBeginTimeList = (svg: SVGSVGElement) => {
         beginTimeList.push(Math.min(...tmpTimeList));
         tmpTimeList.splice(0);
       }
+    } else if (ele.tagName === "defs") {
+      (ele.childNodes as NodeListOf<SVGElement>).forEach((ele) => {
+        findAnimate(ele);
+        if (tmpTimeList.length) {
+          beginTimeList.push(Math.min(...tmpTimeList));
+          tmpTimeList.splice(0);
+        }
+      });
     }
   });
   return beginTimeList;
