@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fileOpen } from "browser-nativefs";
 
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
+import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
 import { ExcalidrawElement } from "./excalidraw/src/element/types";
 import { loadFromJSON } from "./excalidraw/src/data/json";
@@ -12,6 +13,18 @@ import { restoreElements } from "./excalidraw/src/data/restore";
 import { AppState } from "./excalidraw/src/types";
 
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
+
+const getCombinedBeginTimeList = (svgList: Props["svgList"]) => {
+  let beginTimeList = ([] as number[]).concat(
+    ...svgList.map(({ svg }) =>
+      getBeginTimeList(svg).map((n) => Math.floor(n * 100) / 100)
+    )
+  );
+  if (svgList.length > 1) {
+    beginTimeList = [...new Set(beginTimeList)].sort((a, b) => a - b);
+  }
+  return beginTimeList;
+};
 
 type Props = {
   svgList: {
@@ -95,6 +108,30 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     setPaused((p) => !p);
   }, [svgList]);
 
+  const timer = useRef<NodeJS.Timeout>();
+  const stepForwardAnimations = useCallback(() => {
+    if (!svgList.length) {
+      return;
+    }
+    const beginTimeList = getCombinedBeginTimeList(svgList);
+    const currentTime = svgList[0].svg.getCurrentTime() * 1000;
+    let nextTime = beginTimeList.find((t) => t >= currentTime + 100);
+    if (!nextTime) {
+      nextTime = currentTime + 500;
+    }
+    clearTimeout(timer.current as NodeJS.Timeout);
+    svgList.forEach(({ svg }) => {
+      svg.unpauseAnimations();
+    });
+    timer.current = setTimeout(() => {
+      svgList.forEach(({ svg }) => {
+        svg.pauseAnimations();
+        svg.setCurrentTime((nextTime as number) / 1000);
+      });
+      setPaused(true);
+    }, nextTime - currentTime);
+  }, [svgList]);
+
   const resetAnimations = useCallback(() => {
     svgList.forEach(({ svg }) => {
       svg.setCurrentTime(0);
@@ -105,6 +142,8 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     const onKeydown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "p") {
         togglePausedAnimations();
+      } else if (e.key.toLowerCase() === "s") {
+        stepForwardAnimations();
       } else if (e.key.toLowerCase() === "r") {
         resetAnimations();
       } else if (e.key.toLowerCase() === "q") {
@@ -119,7 +158,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [togglePausedAnimations, resetAnimations]);
+  }, [togglePausedAnimations, stepForwardAnimations, resetAnimations]);
 
   const hideToolbar = () => {
     setShowToolbar((s) => (typeof s === "boolean" ? false : s));
@@ -184,6 +223,9 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
         <div className="Toolbar-controller">
           <button type="button" onClick={togglePausedAnimations}>
             {paused ? "Play (P)" : "Pause (P)"}
+          </button>
+          <button type="button" onClick={stepForwardAnimations}>
+            Step (S)
           </button>
           <button type="button" onClick={resetAnimations}>
             Reset (R)
