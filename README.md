@@ -70,6 +70,7 @@ This also works for Excalidraw Library links.
 - [Improved WebM export](https://twitter.com/dai_shi/status/1344935241668988930)
 - [Grid layout for libraries](https://twitter.com/dai_shi/status/1352229139500044296)
 - [Support arrowheads](https://twitter.com/dai_shi/status/1364184618371411971)
+- [Step through animations](https://twitter.com/dai_shi/status/1376930624804560900)
 
 ## Other projects with Excalidraw
 
