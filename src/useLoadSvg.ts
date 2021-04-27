@@ -11,6 +11,11 @@ import { AppState } from "./excalidraw/src/types";
 
 import { animateSvg } from "./animate";
 
+type RestoredAppState = Omit<
+  AppState,
+  "offsetTop" | "offsetLeft" | "width" | "height"
+>;
+
 const importLibraryFromUrl = async (url: string) => {
   try {
     const request = await fetch(url);
@@ -45,7 +50,7 @@ export const useLoadSvg = () => {
     (
       dataList: {
         elements: readonly ExcalidrawElement[];
-        appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+        appState?: RestoredAppState;
       }[],
       inSequence?: boolean
     ) => {

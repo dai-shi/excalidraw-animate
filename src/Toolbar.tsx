@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { fileOpen } from "browser-nativefs";
+import { fileOpen } from "browser-fs-access";
 
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
