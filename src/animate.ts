@@ -11,6 +11,81 @@ const findNode = (ele: SVGElement, name: string) => {
   return null;
 };
 
+const getPointer = () => {
+  const hash = window.location.hash.slice(1);
+  const searchParams = new URLSearchParams(hash);
+  const img = searchParams.get("pointerImg");
+  const width = searchParams.get("pointerWidth");
+  const height = searchParams.get("pointerHeight");
+  if (!img) {
+    return null;
+  }
+  return {
+    img,
+    width,
+    height,
+  };
+};
+
+const pickOnePathItem = (path: string) => {
+  const items = path.match(/(M[^C]*C[^M]*)/g);
+  if (!items) {
+    return path;
+  }
+  if (items.length <= 2) {
+    return items[items.length - 1];
+  }
+  const [longestIndex] = items.reduce(
+    (prev, item, index) => {
+      const [, x1, y1, x2, y2] =
+        item.match(/M([\d.-]+) ([\d.-]+) C([\d.-]+) ([\d.-]+)/) || [];
+      const d = Math.hypot(Number(x2) - Number(x1), Number(y2) - Number(y1));
+      if (d > prev[1]) {
+        return [index, d];
+      }
+      return prev;
+    },
+    [0, 0]
+  );
+  return items[longestIndex];
+};
+
+const animatePointer = (
+  svg: SVGSVGElement,
+  ele: SVGElement,
+  path: string,
+  currentMs: number,
+  durationMs: number
+) => {
+  const pointer = getPointer();
+  if (!pointer) return;
+  const img = svg.ownerDocument.createElementNS(SVG_NS, "image");
+  img.setAttribute("href", pointer.img);
+  if (pointer.width) {
+    img.setAttribute("width", pointer.width);
+  }
+  if (pointer.height) {
+    img.setAttribute("height", pointer.height);
+  }
+  img.setAttribute("opacity", "0");
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "opacity");
+  animate.setAttribute("from", "1");
+  animate.setAttribute("to", "1");
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${durationMs}ms`);
+  img.appendChild(animate);
+  const animateMotion = svg.ownerDocument.createElementNS(
+    SVG_NS,
+    "animateMotion"
+  );
+  animateMotion.setAttribute("path", pickOnePathItem(path));
+  animateMotion.setAttribute("begin", `${currentMs}ms`);
+  animateMotion.setAttribute("dur", `${durationMs}ms`);
+  img.appendChild(animateMotion);
+  ele.parentNode?.appendChild(img);
+};
+
 const animatePath = (
   svg: SVGSVGElement,
   ele: SVGElement,
@@ -57,6 +132,7 @@ const animatePath = (
     ele.appendChild(animate);
     dLast = dFrom;
   }
+  animatePointer(svg, ele, dTo, currentMs, durationMs);
 };
 
 const animateFillPath = (
@@ -144,6 +220,26 @@ const animatePolygon = (
     animate.setAttribute("fill", "freeze");
     ele.appendChild(animate);
     dLast = dFrom;
+    animatePointer(
+      svg,
+      ele,
+      dTo.replace(
+        new RegExp(
+          [
+            "(?:",
+            "M\\S+ \\S+ C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
+            "){",
+            `${i}`, // skip count
+            "}",
+            "(M\\S+ \\S+ C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+) ?".repeat(dups),
+            ".*",
+          ].join("")
+        ),
+        "$1"
+      ),
+      currentMs + i * (durationMs / repeat),
+      durationMs / repeat
+    );
   }
 };
 
@@ -190,6 +286,7 @@ const animateText = (
   ele.textContent = " "; // HACK for Firebox as `null` does not work
   findNode(svg, "defs")?.appendChild(path);
   ele.appendChild(textPath);
+  animatePointer(svg, ele, `m${x} ${y} h${width}`, currentMs, durationMs);
 };
 
 const patchSvgLine = (
