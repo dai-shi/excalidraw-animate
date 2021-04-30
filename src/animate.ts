@@ -464,6 +464,29 @@ const createGroups = (
   return groups;
 };
 
+const filterGroupNodes = (nodes: NodeListOf<SVGElement>) =>
+  [...nodes].filter((node) => node.tagName === "g");
+
+const extractNumberFromElement = (
+  element: NonDeletedExcalidrawElement,
+  key: string
+) => {
+  const match = element.id.match(new RegExp(`${key}:(-?\\d+)`));
+  return (match && Number(match[1])) || 0;
+};
+
+const sortSvgNodes = (
+  nodes: SVGElement[],
+  elements: readonly NonDeletedExcalidrawElement[]
+) =>
+  [...nodes].sort((a, b) => {
+    const aIndex = nodes.indexOf(a);
+    const bIndex = nodes.indexOf(b);
+    const aOrder = extractNumberFromElement(elements[aIndex], "animateOrder");
+    const bOrder = extractNumberFromElement(elements[bIndex], "animateOrder");
+    return aOrder - bOrder;
+  });
+
 export const animateSvg = (
   svg: SVGSVGElement,
   elements: readonly NonDeletedExcalidrawElement[],
@@ -475,54 +498,59 @@ export const animateSvg = (
   let current = startMs ?? 1000; // 1 sec margin
   const groupDur = 5000;
   const individualDur = 500;
-  let index = 0;
-  (svg.childNodes as NodeListOf<SVGElement>).forEach((ele) => {
-    if (ele.tagName === "g") {
-      const { type, strokeSharpness, width, groupIds } = elements[index];
-      if (!finished.has(ele)) {
-        if (groupIds.length >= 1) {
-          const groupId = groupIds[0];
-          const group = groups[groupId];
-          const dur = groupDur / (group.length + 1);
-          patchSvgEle(svg, ele, type, strokeSharpness, width, current, dur);
-          current += dur;
-          finished.set(ele, true);
-          group.forEach(([childEle, childIndex]) => {
-            const {
-              type: childType,
-              strokeSharpness: chileStrokeSharpness,
-              width: childWidth,
-            } = elements[childIndex];
-            if (!finished.has(childEle)) {
-              patchSvgEle(
-                svg,
-                childEle,
-                childType,
-                chileStrokeSharpness,
-                childWidth,
-                current,
-                dur
-              );
-              current += dur;
-              finished.set(childEle, true);
-            }
-          });
-          delete groups[groupId];
-        } else {
-          patchSvgEle(
-            svg,
-            ele,
-            type,
-            strokeSharpness,
-            width,
-            current,
-            individualDur
-          );
-          current += individualDur;
-          finished.set(ele, true);
-        }
+  const groupNodes = filterGroupNodes(svg.childNodes as NodeListOf<SVGElement>);
+  if (groupNodes.length !== elements.length) {
+    throw new Error("element length mismatch");
+  }
+  const groupElement2Element = new Map(
+    groupNodes.map((ele, index) => [ele, elements[index]])
+  );
+  sortSvgNodes(groupNodes, elements).forEach((ele) => {
+    const element = groupElement2Element.get(
+      ele
+    ) as NonDeletedExcalidrawElement;
+    const { type, strokeSharpness, width, groupIds } = element;
+    if (!finished.has(ele)) {
+      if (groupIds.length >= 1) {
+        const groupId = groupIds[0];
+        const group = groups[groupId];
+        const dur =
+          extractNumberFromElement(element, "animateDuration") ||
+          groupDur / (group.length + 1);
+        patchSvgEle(svg, ele, type, strokeSharpness, width, current, dur);
+        current += dur;
+        finished.set(ele, true);
+        group.forEach(([childEle, childIndex]) => {
+          const {
+            type: childType,
+            strokeSharpness: chileStrokeSharpness,
+            width: childWidth,
+          } = elements[childIndex];
+          const dur =
+            extractNumberFromElement(elements[childIndex], "animateDuration") ||
+            groupDur / (group.length + 1);
+          if (!finished.has(childEle)) {
+            patchSvgEle(
+              svg,
+              childEle,
+              childType,
+              chileStrokeSharpness,
+              childWidth,
+              current,
+              dur
+            );
+            current += dur;
+            finished.set(childEle, true);
+          }
+        });
+        delete groups[groupId];
+      } else {
+        const dur =
+          extractNumberFromElement(element, "animateDuration") || individualDur;
+        patchSvgEle(svg, ele, type, strokeSharpness, width, current, dur);
+        current += dur;
+        finished.set(ele, true);
       }
-      index += 1;
     }
   });
   finishedMs = current + 1000; // 1 sec margin
