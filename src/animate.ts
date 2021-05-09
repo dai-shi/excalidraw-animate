@@ -11,6 +11,26 @@ const findNode = (ele: SVGElement, name: string) => {
   return null;
 };
 
+const hideBeforeAnimation = (
+  svg: SVGSVGElement,
+  ele: SVGElement,
+  currentMs: number,
+  durationMs: number,
+  freeze?: boolean,
+) => {
+  ele.setAttribute("opacity", "0");
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "opacity");
+  animate.setAttribute("from", "1");
+  animate.setAttribute("to", "1");
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${durationMs}ms`);
+  if (freeze) {
+    animate.setAttribute("fill", "freeze");
+  }
+  ele.appendChild(animate);
+};
+
 const getPointer = () => {
   const hash = window.location.hash.slice(1);
   const searchParams = new URLSearchParams(hash);
@@ -67,14 +87,7 @@ const animatePointer = (
   if (pointer.height) {
     img.setAttribute("height", pointer.height);
   }
-  img.setAttribute("opacity", "0");
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "opacity");
-  animate.setAttribute("from", "1");
-  animate.setAttribute("to", "1");
-  animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${durationMs}ms`);
-  img.appendChild(animate);
+  hideBeforeAnimation(svg, img, currentMs, durationMs);
   const animateMotion = svg.ownerDocument.createElementNS(
     SVG_NS,
     "animateMotion"
@@ -133,6 +146,7 @@ const animatePath = (
     dLast = dFrom;
   }
   animatePointer(svg, ele, dTo, currentMs, durationMs);
+  hideBeforeAnimation(svg, ele, currentMs, durationMs, true);
 };
 
 const animateFillPath = (
@@ -241,6 +255,7 @@ const animatePolygon = (
       durationMs / repeat
     );
   }
+  hideBeforeAnimation(svg, ele, currentMs, durationMs, true);
 };
 
 let pathForTextIndex = 0;
