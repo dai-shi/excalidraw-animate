@@ -71,6 +71,7 @@ This also works for Excalidraw Library links.
 - [Grid layout for libraries](https://twitter.com/dai_shi/status/1352229139500044296)
 - [Support arrowheads](https://twitter.com/dai_shi/status/1364184618371411971)
 - [Step through animations](https://twitter.com/dai_shi/status/1376930624804560900)
+- [Support freedraw](https://twitter.com/dai_shi/status/1391770531582537734)
 
 ## Other projects with Excalidraw
 
