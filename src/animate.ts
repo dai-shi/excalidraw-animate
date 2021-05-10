@@ -1,5 +1,10 @@
 import { SVG_NS } from "./excalidraw/src/utils";
-import { NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
+import {
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  ExcalidrawFreeDrawElement,
+} from "./excalidraw/src/element/types";
+import { getFreeDrawSvgPath } from "./excalidraw/src/renderer/renderElement";
 
 const findNode = (ele: SVGElement, name: string) => {
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
@@ -16,7 +21,7 @@ const hideBeforeAnimation = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  freeze?: boolean,
+  freeze?: boolean
 ) => {
   ele.setAttribute("opacity", "0");
   const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
@@ -304,6 +309,25 @@ const animateText = (
   animatePointer(svg, ele, `m${x} ${y} h${width}`, currentMs, durationMs);
 };
 
+const animateFromToPath = (
+  svg: SVGSVGElement,
+  ele: SVGElement,
+  dFrom: string,
+  dTo: string,
+  currentMs: number,
+  durationMs: number
+) => {
+  const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "d");
+  animate.setAttribute("from", dFrom);
+  animate.setAttribute("to", dTo);
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${durationMs}ms`);
+  path.appendChild(animate);
+  ele.appendChild(path);
+};
+
 const patchSvgLine = (
   svg: SVGSVGElement,
   ele: SVGElement,
@@ -434,15 +458,56 @@ const patchSvgText = (
   });
 };
 
-const patchSvgEle = (
+const patchSvgFreedraw = (
   svg: SVGSVGElement,
   ele: SVGElement,
-  type: string,
-  strokeSharpness: string,
-  width: number,
+  freeDrawElement: NonDeleted<ExcalidrawFreeDrawElement>,
   currentMs: number,
   durationMs: number
 ) => {
+  const childNode = ele.childNodes[0] as SVGPathElement;
+  childNode.setAttribute("opacity", "0");
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "opacity");
+  animate.setAttribute("from", "0");
+  animate.setAttribute("to", "1");
+  animate.setAttribute("calcMode", "discrete");
+  animate.setAttribute("begin", `${currentMs + durationMs - 1}ms`);
+  animate.setAttribute("dur", `${1}ms`);
+  animate.setAttribute("fill", "freeze");
+  childNode.appendChild(animate);
+
+  // interporation
+  const repeat = freeDrawElement.points.length;
+  let dTo = childNode.getAttribute("d") as string;
+  for (let i = repeat - 1; i >= 0; i -= 1) {
+    const dFrom =
+      i > 0
+        ? getFreeDrawSvgPath({
+            ...freeDrawElement,
+            points: freeDrawElement.points.slice(0, i),
+          })
+        : "M 0 0";
+    animateFromToPath(
+      svg,
+      ele,
+      dFrom,
+      dTo,
+      currentMs + i * (durationMs / repeat),
+      durationMs / repeat
+    );
+    dTo = dFrom;
+  }
+};
+
+const patchSvgEle = (
+  svg: SVGSVGElement,
+  ele: SVGElement,
+  excalidraElement: NonDeletedExcalidrawElement,
+  currentMs: number,
+  durationMs: number
+) => {
+  const { type, strokeSharpness, width } = excalidraElement;
   if (type === "line") {
     patchSvgLine(svg, ele, strokeSharpness, currentMs, durationMs);
   } else if (type === "draw") {
@@ -455,6 +520,8 @@ const patchSvgEle = (
     patchSvgEllipse(svg, ele, currentMs, durationMs);
   } else if (type === "text") {
     patchSvgText(svg, ele, width, currentMs, durationMs);
+  } else if (excalidraElement.type === "freedraw") {
+    patchSvgFreedraw(svg, ele, excalidraElement, currentMs, durationMs);
   }
 };
 
@@ -524,7 +591,7 @@ export const animateSvg = (
     const element = groupElement2Element.get(
       ele
     ) as NonDeletedExcalidrawElement;
-    const { type, strokeSharpness, width, groupIds } = element;
+    const { groupIds } = element;
     if (!finished.has(ele)) {
       if (groupIds.length >= 1) {
         const groupId = groupIds[0];
@@ -532,28 +599,15 @@ export const animateSvg = (
         const dur =
           extractNumberFromElement(element, "animateDuration") ||
           groupDur / (group.length + 1);
-        patchSvgEle(svg, ele, type, strokeSharpness, width, current, dur);
+        patchSvgEle(svg, ele, element, current, dur);
         current += dur;
         finished.set(ele, true);
         group.forEach(([childEle, childIndex]) => {
-          const {
-            type: childType,
-            strokeSharpness: chileStrokeSharpness,
-            width: childWidth,
-          } = elements[childIndex];
           const dur =
             extractNumberFromElement(elements[childIndex], "animateDuration") ||
             groupDur / (group.length + 1);
           if (!finished.has(childEle)) {
-            patchSvgEle(
-              svg,
-              childEle,
-              childType,
-              chileStrokeSharpness,
-              childWidth,
-              current,
-              dur
-            );
+            patchSvgEle(svg, childEle, elements[childIndex], current, dur);
             current += dur;
             finished.set(childEle, true);
           }
@@ -562,7 +616,7 @@ export const animateSvg = (
       } else {
         const dur =
           extractNumberFromElement(element, "animateDuration") || individualDur;
-        patchSvgEle(svg, ele, type, strokeSharpness, width, current, dur);
+        patchSvgEle(svg, ele, element, current, dur);
         current += dur;
         finished.set(ele, true);
       }
