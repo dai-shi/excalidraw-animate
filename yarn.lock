@@ -9525,6 +9525,11 @@ pepjs@0.5.3:
   resolved "https://registry.yarnpkg.com/pepjs/-/pepjs-0.5.3.tgz#dc755f03d965c20e4b1bb65e42a03a97c382cfc7"
   integrity sha512-5yHVB9OHqKd9fr/OIsn8ss0NgThQ9buaqrEuwr9Or5YjPp6h+WTDKWZI+xZLaBGZCtODTnFtlSHNmhFsq67THg==
 
+perfect-freehand@0.4.7:
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-0.4.7.tgz#4d85fd64881ba81b2a4eaa6ac4e8983ccb21dd43"
+  integrity sha512-SSSFL8VzXiOHQdUTyNyOb0JC+btVZRy9bi6jos7Nb7PBTI0PHX5jM6RgCTSrubQ8Ul9qOYWmWgJBrwVGHwyJZQ==
+
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
