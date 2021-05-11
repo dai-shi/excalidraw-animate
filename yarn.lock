@@ -11160,10 +11160,10 @@ rollup@^1.31.1:
     "@types/node" "*"
     acorn "^7.1.0"
 
-roughjs@4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.3.1.tgz#b7af0b205c94bc3b79ee5a7eae1e09d5063bc3fe"
-  integrity sha512-m42+OBaBR7x5UhIKyjBCnWqqkaEkBKLkXvHv4pOWJXPofvMnQY4ZcFEQlqf3coKKyZN2lfWMyx7QXSg2GD7SGA==
+roughjs@4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.4.0.tgz#56ee4b3c8a453af8debc03b81e636dcab9efcdb2"
+  integrity sha512-mDjSVK/RdRwdi4Dw9u5eoMiEsblEr6y2ZpOSyYa5IAAPbpUqplPezWbj4+J2gJlnxKKcRX+ccH26LFDyplhXXQ==
   dependencies:
     path-data-parser "^0.1.0"
     points-on-curve "^0.2.0"

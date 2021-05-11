@@ -510,8 +510,6 @@ const patchSvgEle = (
   const { type, strokeSharpness, width } = excalidraElement;
   if (type === "line") {
     patchSvgLine(svg, ele, strokeSharpness, currentMs, durationMs);
-  } else if (type === "draw") {
-    patchSvgLine(svg, ele, "round", currentMs, durationMs);
   } else if (type === "arrow") {
     patchSvgArrow(svg, ele, strokeSharpness, currentMs, durationMs);
   } else if (type === "rectangle" || type === "diamond") {
