@@ -476,6 +476,16 @@ const patchSvgFreedraw = (
   animate.setAttribute("dur", `${1}ms`);
   animate.setAttribute("fill", "freeze");
   childNode.appendChild(animate);
+  animatePointer(
+    svg,
+    childNode,
+    freeDrawElement.points.reduce(
+      (p, [x, y]) => (p ? p + ` T ${x} ${y}` : `M ${x} ${y}`),
+      ""
+    ),
+    currentMs,
+    durationMs
+  );
 
   // interporation
   const repeat = freeDrawElement.points.length;
