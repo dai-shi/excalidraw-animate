@@ -1,3 +1,0 @@
-/*! For license information please see 48.f8169588.chunk.js.LICENSE.txt */
-(this["webpackJsonpexcalidraw-animate"]=this["webpackJsonpexcalidraw-animate"]||[]).push([[48],{122:function(e,t,n){"use strict";n.r(t);var a=n(3),r=n(5);t.default=function(){var e=Object(r.a)(a.mark((function e(t){var n,r,c=arguments;return a.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:n=c.length>1&&void 0!==c[1]?c[1]:{},(r=document.createElement("a")).download=n.fileName||"Untitled",r.href=URL.createObjectURL(t),r.addEventListener("click",(function(){setTimeout((function(){return URL.revokeObjectURL(r.href)}),3e4)})),r.click();case 3:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}()}}]);
-//# sourceMappingURL=48.f8169588.chunk.js.map
