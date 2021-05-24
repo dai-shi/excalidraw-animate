@@ -1,10 +1,12 @@
-import { SVG_NS } from "./excalidraw/src/utils";
-import {
+import type {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawFreeDrawElement,
-} from "./excalidraw/src/element/types";
-import { getFreeDrawSvgPath } from "./excalidraw/src/renderer/renderElement";
+} from "@excalidraw/excalidraw/types/element/types";
+
+import { getFreeDrawSvgPath } from "./vendor/getFreeDrawSvgPath";
+
+const SVG_NS = "http://www.w3.org/2000/svg";
 
 const findNode = (ele: SVGElement, name: string) => {
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
