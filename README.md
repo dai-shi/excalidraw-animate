@@ -48,6 +48,11 @@ This also works for Excalidraw Library links.
 
 - Exporting WebM feature is not perfect. Please use screen capture if that doesn't work as expected.
 
+## Package
+
+It's also provided as a package:
+<https://www.npmjs.com/package/excalidraw-animate>
+
 ## Tweets
 
 - [The first one with arrows](https://twitter.com/dai_shi/status/1261683775924105218)
