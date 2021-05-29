@@ -1,13 +1,12 @@
 {
   "name": "excalidraw-animate",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.0.0",
   "homepage": "./",
   "source": "./src/library.ts",
   "module": "./dist/library.js",
   "types": "./dist/library.d.ts",
   "dependencies": {
-    "@excalidraw/excalidraw": "^0.8.0",
+    "@excalidraw/excalidraw": "0.8.0",
     "perfect-freehand": "0.4.71"
   },
   "devDependencies": {

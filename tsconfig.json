@@ -20,6 +20,5 @@
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
-  "exclude": ["src/excalidraw/src/tests"]
+  "include": ["src"]
 }
