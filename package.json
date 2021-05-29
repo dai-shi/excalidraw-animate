@@ -4,42 +4,23 @@
   "private": true,
   "homepage": "./",
   "dependencies": {
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
-    "@testing-library/jest-dom": "5.11.10",
-    "@testing-library/react": "11.2.6",
-    "@types/react": "17.0.3",
-    "@types/react-dom": "17.0.3",
-    "@types/socket.io-client": "1.4.36",
-    "browser-fs-access": "0.16.4",
-    "clsx": "1.1.1",
-    "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.0",
-    "lodash.throttle": "4.1.1",
-    "open-color": "1.8.0",
-    "pako": "1.0.11",
-    "perfect-freehand": "0.4.7",
-    "png-chunk-text": "1.0.0",
-    "png-chunks-encode": "1.0.0",
-    "png-chunks-extract": "1.0.0",
+    "@excalidraw/excalidraw": "^0.8.0",
+    "perfect-freehand": "0.4.71"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "5.12.0",
+    "@testing-library/react": "11.2.7",
+    "@types/dom-mediacapture-record": "1.0.7",
+    "@types/react": "17.0.6",
+    "@types/react-dom": "17.0.5",
+    "browser-fs-access": "0.17.2",
+    "crypto": "^1.0.1",
+    "jest-canvas-mock": "2.3.1",
+    "prettier": "2.3.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
-    "roughjs": "4.4.1",
-    "sass": "1.32.10",
-    "socket.io-client": "2.3.1",
     "typescript": "4.2.4"
-  },
-  "devDependencies": {
-    "@excalidraw/eslint-config": "1.0.0",
-    "@excalidraw/prettier-config": "1.0.2",
-    "@types/dom-mediacapture-record": "1.0.7",
-    "@types/lodash.throttle": "4.1.6",
-    "@types/pako": "1.0.1",
-    "eslint-config-prettier": "8.2.0",
-    "eslint-plugin-prettier": "3.3.1",
-    "jest-canvas-mock": "2.3.1",
-    "prettier": "2.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -49,8 +30,7 @@
     "test:type": "tsc",
     "test:lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
-    "test:app": "react-scripts test --env=jsdom --passWithNoTests --testPathIgnorePatterns=src/excalidraw",
-    "preinstall": "git submodule update --init --recursive"
+    "test:app": "react-scripts test --passWithNoTests"
   },
   "eslintConfig": {
     "extends": "react-app"

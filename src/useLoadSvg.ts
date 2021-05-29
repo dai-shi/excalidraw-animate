@@ -1,29 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { loadScene } from "./excalidraw/src/excalidraw-app/data";
-import { isValidLibrary } from "./excalidraw/src/data/json";
-import { loadLibraryFromBlob } from "./excalidraw/src/data/blob";
-import { restoreElements } from "./excalidraw/src/data/restore";
-import { exportToSvg } from "./excalidraw/src/scene/export";
-import { getNonDeletedElements } from "./excalidraw/src/element";
-import { ExcalidrawElement } from "./excalidraw/src/element/types";
-import { AppState } from "./excalidraw/src/types";
+import { exportToSvg, restoreElements } from "@excalidraw/excalidraw";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/excalidraw/types/element/types";
+
+import { loadScene } from "./vendor/loadScene";
+import { loadLibraryFromBlob } from "./vendor/loadLibraryFromBlob";
 
 import { animateSvg } from "./animate";
 
-type RestoredAppState = Omit<
-  AppState,
-  "offsetTop" | "offsetLeft" | "width" | "height"
->;
+export const getNonDeletedElements = (
+  elements: readonly ExcalidrawElement[]
+): NonDeletedExcalidrawElement[] =>
+  elements.filter(
+    (element): element is NonDeletedExcalidrawElement => !element.isDeleted
+  );
 
 const importLibraryFromUrl = async (url: string) => {
   try {
     const request = await fetch(url);
     const blob = await request.blob();
-    const json = JSON.parse(await blob.text());
-    if (!isValidLibrary(json)) {
-      throw new Error();
-    }
     const libraryFile = await loadLibraryFromBlob(blob);
     if (!libraryFile || !libraryFile.library) {
       throw new Error();
@@ -50,22 +49,21 @@ export const useLoadSvg = () => {
     (
       dataList: {
         elements: readonly ExcalidrawElement[];
-        appState?: RestoredAppState;
       }[],
       inSequence?: boolean
     ) => {
       let startMs: number | undefined;
       const svgList = dataList.map((data) => {
         const elements = getNonDeletedElements(data.elements);
-        const svg = exportToSvg(
+        const svg = exportToSvg({
           elements,
-          data?.appState || {
+          appState: {
             exportBackground: true,
-            exportPadding: 30,
             viewBackgroundColor: "white",
             shouldAddWatermark: false,
-          }
-        );
+          },
+          exportPadding: 30,
+        });
         const result = animateSvg(svg, elements, startMs);
         console.log(svg);
         if (inSequence) {

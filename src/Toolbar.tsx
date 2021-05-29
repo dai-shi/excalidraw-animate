@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fileOpen } from "browser-fs-access";
 
+import { restoreElements } from "@excalidraw/excalidraw";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
+
+import { loadLibraryFromBlob } from "./vendor/loadLibraryFromBlob";
+import { loadFromJSON } from "./vendor/loadFromJSON";
+
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
 import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
-import { ExcalidrawElement } from "./excalidraw/src/element/types";
-import { loadFromJSON } from "./excalidraw/src/data/json";
-import { loadLibraryFromBlob } from "./excalidraw/src/data/blob";
-import { getNonDeletedElements } from "./excalidraw/src/element";
-import { restoreElements } from "./excalidraw/src/data/restore";
-import { AppState } from "./excalidraw/src/types";
+import { getNonDeletedElements } from "./useLoadSvg";
 
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 
@@ -62,7 +63,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
   }, []);
 
   const loadFile = async () => {
-    const data = await loadFromJSON((undefined as unknown) as AppState);
+    const data = await loadFromJSON(null);
     loadDataList([data]);
   };
 
