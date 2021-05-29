@@ -3,24 +3,27 @@
   "version": "1.0.0",
   "private": true,
   "homepage": "./",
+  "source": "./src/library.ts",
+  "module": "./dist/library.js",
+  "types": "./dist/library.d.ts",
   "dependencies": {
     "@excalidraw/excalidraw": "^0.8.0",
     "perfect-freehand": "0.4.71"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "5.12.0",
-    "@testing-library/react": "11.2.7",
-    "@types/dom-mediacapture-record": "1.0.7",
-    "@types/react": "17.0.6",
-    "@types/react-dom": "17.0.5",
-    "browser-fs-access": "0.17.2",
+    "@testing-library/jest-dom": "^5.12.0",
+    "@testing-library/react": "^11.2.7",
+    "@types/dom-mediacapture-record": "^1.0.7",
+    "@types/react": "^17.0.8",
+    "@types/react-dom": "^17.0.5",
+    "browser-fs-access": "^0.17.2",
     "crypto": "^1.0.1",
-    "jest-canvas-mock": "2.3.1",
-    "prettier": "2.3.0",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "react-scripts": "4.0.3",
-    "typescript": "4.2.4"
+    "jest-canvas-mock": "^2.3.1",
+    "prettier": "^2.3.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "^4.0.3",
+    "typescript": "^4.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -28,9 +31,10 @@
     "test": "yarn run test:all",
     "test:all": "yarn run test:type && yarn run test:lint && yarn run test:format && yarn run test:app --watchAll=false",
     "test:type": "tsc",
-    "test:lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
+    "test:lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx --ignore-pattern dist.",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
-    "test:app": "react-scripts test --passWithNoTests"
+    "test:app": "react-scripts test --passWithNoTests",
+    "compile": "tsc --noEmit false --declaration --outDir dist"
   },
   "eslintConfig": {
     "extends": "react-app"
