@@ -6,6 +6,13 @@ import type {
 
 import { getFreeDrawSvgPath } from "./vendor/getFreeDrawSvgPath";
 
+type AnimateOptions = {
+  startMs?: number;
+  pointerImg?: string;
+  pointerWidth?: string;
+  pointerHeight?: string;
+};
+
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 const findNode = (ele: SVGElement, name: string) => {
@@ -38,22 +45,6 @@ const hideBeforeAnimation = (
   ele.appendChild(animate);
 };
 
-const getPointer = () => {
-  const hash = window.location.hash.slice(1);
-  const searchParams = new URLSearchParams(hash);
-  const img = searchParams.get("pointerImg");
-  const width = searchParams.get("pointerWidth");
-  const height = searchParams.get("pointerHeight");
-  if (!img) {
-    return null;
-  }
-  return {
-    img,
-    width,
-    height,
-  };
-};
-
 const pickOnePathItem = (path: string) => {
   const items = path.match(/(M[^C]*C[^M]*)/g);
   if (!items) {
@@ -82,17 +73,17 @@ const animatePointer = (
   ele: SVGElement,
   path: string,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
-  const pointer = getPointer();
-  if (!pointer) return;
+  if (!options.pointerImg) return;
   const img = svg.ownerDocument.createElementNS(SVG_NS, "image");
-  img.setAttribute("href", pointer.img);
-  if (pointer.width) {
-    img.setAttribute("width", pointer.width);
+  img.setAttribute("href", options.pointerImg);
+  if (options.pointerWidth) {
+    img.setAttribute("width", options.pointerWidth);
   }
-  if (pointer.height) {
-    img.setAttribute("height", pointer.height);
+  if (options.pointerHeight) {
+    img.setAttribute("height", options.pointerHeight);
   }
   hideBeforeAnimation(svg, img, currentMs, durationMs);
   const animateMotion = svg.ownerDocument.createElementNS(
@@ -110,7 +101,8 @@ const animatePath = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const dTo = ele.getAttribute("d") || "";
   const mCount = dTo.match(/M/g)?.length || 0;
@@ -152,7 +144,7 @@ const animatePath = (
     ele.appendChild(animate);
     dLast = dFrom;
   }
-  animatePointer(svg, ele, dTo, currentMs, durationMs);
+  animatePointer(svg, ele, dTo, currentMs, durationMs, options);
   hideBeforeAnimation(svg, ele, currentMs, durationMs, true);
 };
 
@@ -160,11 +152,12 @@ const animateFillPath = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const dTo = ele.getAttribute("d") || "";
   if (dTo.includes("C")) {
-    animatePath(svg, ele, currentMs, durationMs);
+    animatePath(svg, ele, currentMs, durationMs, options);
     return;
   }
   const dFrom = dTo.replace(
@@ -188,7 +181,8 @@ const animatePolygon = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   let dTo = ele.getAttribute("d") || "";
   let mCount = dTo.match(/M/g)?.length || 0;
@@ -259,7 +253,8 @@ const animatePolygon = (
         "$1"
       ),
       currentMs + i * (durationMs / repeat),
-      durationMs / repeat
+      durationMs / repeat,
+      options
     );
   }
   hideBeforeAnimation(svg, ele, currentMs, durationMs, true);
@@ -272,7 +267,8 @@ const animateText = (
   width: number,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const anchor = ele.getAttribute("text-anchor") || "start";
   if (anchor !== "start") {
@@ -308,7 +304,14 @@ const animateText = (
   ele.textContent = " "; // HACK for Firebox as `null` does not work
   findNode(svg, "defs")?.appendChild(path);
   ele.appendChild(textPath);
-  animatePointer(svg, ele, `m${x} ${y} h${width}`, currentMs, durationMs);
+  animatePointer(
+    svg,
+    ele,
+    `m${x} ${y} h${width}`,
+    currentMs,
+    durationMs,
+    options
+  );
 };
 
 const animateFromToPath = (
@@ -335,7 +338,8 @@ const patchSvgLine = (
   ele: SVGElement,
   strokeSharpness: string,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const animateLine =
     strokeSharpness !== "sharp" ? animatePath : animatePolygon;
@@ -345,21 +349,24 @@ const patchSvgLine = (
       svg,
       childNodes[0].childNodes[1] as SVGElement,
       currentMs,
-      durationMs * 0.75
+      durationMs * 0.75,
+      options
     );
     currentMs += durationMs * 0.75;
     animateFillPath(
       svg,
       childNodes[0].childNodes[0] as SVGElement,
       currentMs,
-      durationMs * 0.25
+      durationMs * 0.25,
+      options
     );
   } else {
     animateLine(
       svg,
       childNodes[0].childNodes[0] as SVGElement,
       currentMs,
-      durationMs
+      durationMs,
+      options
     );
   }
 };
@@ -369,7 +376,8 @@ const patchSvgArrow = (
   ele: SVGElement,
   strokeSharpness: string,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const animateLine =
     strokeSharpness !== "sharp" ? animatePath : animatePolygon;
@@ -378,7 +386,8 @@ const patchSvgArrow = (
     svg,
     ele.childNodes[0].childNodes[0] as SVGElement,
     currentMs,
-    (durationMs / (numParts + 2)) * 3
+    (durationMs / (numParts + 2)) * 3,
+    options
   );
   currentMs += (durationMs / (numParts + 2)) * 3;
   for (let i = 1; i < numParts; i += 1) {
@@ -388,7 +397,8 @@ const patchSvgArrow = (
         svg,
         ele.childNodes[i].childNodes[j] as SVGElement,
         currentMs,
-        durationMs / (numParts + 2) / numChildren
+        durationMs / (numParts + 2) / numChildren,
+        options
       );
       currentMs += durationMs / (numParts + 2) / numChildren;
     }
@@ -399,24 +409,33 @@ const patchSvgRectangle = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   if (ele.childNodes[1]) {
     animatePolygon(
       svg,
       ele.childNodes[1] as SVGElement,
       currentMs,
-      durationMs * 0.75
+      durationMs * 0.75,
+      options
     );
     currentMs += durationMs * 0.75;
     animateFillPath(
       svg,
       ele.childNodes[0] as SVGElement,
       currentMs,
-      durationMs * 0.25
+      durationMs * 0.25,
+      options
     );
   } else {
-    animatePolygon(svg, ele.childNodes[0] as SVGElement, currentMs, durationMs);
+    animatePolygon(
+      svg,
+      ele.childNodes[0] as SVGElement,
+      currentMs,
+      durationMs,
+      options
+    );
   }
 };
 
@@ -424,24 +443,33 @@ const patchSvgEllipse = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   if (ele.childNodes[1]) {
     animatePath(
       svg,
       ele.childNodes[1] as SVGElement,
       currentMs,
-      durationMs * 0.75
+      durationMs * 0.75,
+      options
     );
     currentMs += durationMs * 0.75;
     animateFillPath(
       svg,
       ele.childNodes[0] as SVGElement,
       currentMs,
-      durationMs * 0.25
+      durationMs * 0.25,
+      options
     );
   } else {
-    animatePath(svg, ele.childNodes[0] as SVGElement, currentMs, durationMs);
+    animatePath(
+      svg,
+      ele.childNodes[0] as SVGElement,
+      currentMs,
+      durationMs,
+      options
+    );
   }
 };
 
@@ -450,12 +478,13 @@ const patchSvgText = (
   ele: SVGElement,
   width: number,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
   const len = childNodes.length;
   childNodes.forEach((child) => {
-    animateText(svg, width, child, currentMs, durationMs / len);
+    animateText(svg, width, child, currentMs, durationMs / len, options);
     currentMs += durationMs / len;
   });
 };
@@ -465,7 +494,8 @@ const patchSvgFreedraw = (
   ele: SVGElement,
   freeDrawElement: NonDeleted<ExcalidrawFreeDrawElement>,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const childNode = ele.childNodes[0] as SVGPathElement;
   childNode.setAttribute("opacity", "0");
@@ -486,7 +516,8 @@ const patchSvgFreedraw = (
       ""
     ),
     currentMs,
-    durationMs
+    durationMs,
+    options
   );
 
   // interporation
@@ -517,21 +548,29 @@ const patchSvgEle = (
   ele: SVGElement,
   excalidraElement: NonDeletedExcalidrawElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
+  options: AnimateOptions
 ) => {
   const { type, strokeSharpness, width } = excalidraElement;
   if (type === "line") {
-    patchSvgLine(svg, ele, strokeSharpness, currentMs, durationMs);
+    patchSvgLine(svg, ele, strokeSharpness, currentMs, durationMs, options);
   } else if (type === "arrow") {
-    patchSvgArrow(svg, ele, strokeSharpness, currentMs, durationMs);
+    patchSvgArrow(svg, ele, strokeSharpness, currentMs, durationMs, options);
   } else if (type === "rectangle" || type === "diamond") {
-    patchSvgRectangle(svg, ele, currentMs, durationMs);
+    patchSvgRectangle(svg, ele, currentMs, durationMs, options);
   } else if (type === "ellipse") {
-    patchSvgEllipse(svg, ele, currentMs, durationMs);
+    patchSvgEllipse(svg, ele, currentMs, durationMs, options);
   } else if (type === "text") {
-    patchSvgText(svg, ele, width, currentMs, durationMs);
+    patchSvgText(svg, ele, width, currentMs, durationMs, options);
   } else if (excalidraElement.type === "freedraw") {
-    patchSvgFreedraw(svg, ele, excalidraElement, currentMs, durationMs);
+    patchSvgFreedraw(
+      svg,
+      ele,
+      excalidraElement,
+      currentMs,
+      durationMs,
+      options
+    );
   }
 };
 
@@ -582,12 +621,12 @@ const sortSvgNodes = (
 export const animateSvg = (
   svg: SVGSVGElement,
   elements: readonly NonDeletedExcalidrawElement[],
-  startMs?: number
+  options: AnimateOptions = {}
 ) => {
   let finishedMs;
   const groups = createGroups(svg, elements);
   const finished = new Map();
-  let current = startMs ?? 1000; // 1 sec margin
+  let current = options.startMs ?? 1000; // 1 sec margin
   const groupDur = 5000;
   const individualDur = 500;
   const groupNodes = filterGroupNodes(svg.childNodes as NodeListOf<SVGElement>);
@@ -609,7 +648,7 @@ export const animateSvg = (
         const dur =
           extractNumberFromElement(element, "animateDuration") ||
           groupDur / (group.length + 1);
-        patchSvgEle(svg, ele, element, current, dur);
+        patchSvgEle(svg, ele, element, current, dur, options);
         current += dur;
         finished.set(ele, true);
         group.forEach(([childEle, childIndex]) => {
@@ -617,7 +656,14 @@ export const animateSvg = (
             extractNumberFromElement(elements[childIndex], "animateDuration") ||
             groupDur / (group.length + 1);
           if (!finished.has(childEle)) {
-            patchSvgEle(svg, childEle, elements[childIndex], current, dur);
+            patchSvgEle(
+              svg,
+              childEle,
+              elements[childIndex],
+              current,
+              dur,
+              options
+            );
             current += dur;
             finished.set(childEle, true);
           }
@@ -626,7 +672,7 @@ export const animateSvg = (
       } else {
         const dur =
           extractNumberFromElement(element, "animateDuration") || individualDur;
-        patchSvgEle(svg, ele, element, current, dur);
+        patchSvgEle(svg, ele, element, current, dur, options);
         current += dur;
         finished.set(ele, true);
       }
