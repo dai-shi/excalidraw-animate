@@ -52,7 +52,14 @@ export const useLoadSvg = () => {
       }[],
       inSequence?: boolean
     ) => {
-      let startMs: number | undefined;
+      const hash = window.location.hash.slice(1);
+      const searchParams = new URLSearchParams(hash);
+      const options = {
+        startMs: undefined as number | undefined,
+        pointerImg: searchParams.get("pointerImg") || undefined,
+        pointerWidth: searchParams.get("pointerWidth") || undefined,
+        pointerHeight: searchParams.get("pointerHeight") || undefined,
+      };
       const svgList = dataList.map((data) => {
         const elements = getNonDeletedElements(data.elements);
         const svg = exportToSvg({
@@ -64,10 +71,10 @@ export const useLoadSvg = () => {
           },
           exportPadding: 30,
         });
-        const result = animateSvg(svg, elements, startMs);
+        const result = animateSvg(svg, elements, options);
         console.log(svg);
         if (inSequence) {
-          startMs = result.finishedMs;
+          options.startMs = result.finishedMs;
         }
         return { svg, finishedMs: result.finishedMs };
       });
