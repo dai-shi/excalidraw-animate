@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { exportToSvg, restoreElements } from "@excalidraw/excalidraw";
+import {
+  exportToSvg,
+  restoreElements,
+  loadLibraryFromBlob,
+} from "@excalidraw/excalidraw";
 
 import type {
   ExcalidrawElement,
@@ -8,7 +12,6 @@ import type {
 } from "@excalidraw/excalidraw/types/element/types";
 
 import { loadScene } from "./vendor/loadScene";
-import { loadLibraryFromBlob } from "./vendor/loadLibraryFromBlob";
 
 import { animateSvg } from "./animate";
 
@@ -28,7 +31,7 @@ const importLibraryFromUrl = async (url: string) => {
       throw new Error();
     }
     return libraryFile.library.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem))
+      getNonDeletedElements(restoreElements(libraryItem, null))
     );
   } catch (error) {
     window.alert("Unable to load library");
@@ -46,7 +49,7 @@ export const useLoadSvg = () => {
   >([]);
 
   const loadDataList = useCallback(
-    (
+    async (
       dataList: {
         elements: readonly ExcalidrawElement[];
       }[],
@@ -60,24 +63,25 @@ export const useLoadSvg = () => {
         pointerWidth: searchParams.get("pointerWidth") || undefined,
         pointerHeight: searchParams.get("pointerHeight") || undefined,
       };
-      const svgList = dataList.map((data) => {
-        const elements = getNonDeletedElements(data.elements);
-        const svg = exportToSvg({
-          elements,
-          appState: {
-            exportBackground: true,
-            viewBackgroundColor: "white",
-            shouldAddWatermark: false,
-          },
-          exportPadding: 30,
-        });
-        const result = animateSvg(svg, elements, options);
-        console.log(svg);
-        if (inSequence) {
-          options.startMs = result.finishedMs;
-        }
-        return { svg, finishedMs: result.finishedMs };
-      });
+      const svgList = await Promise.all(
+        dataList.map(async (data) => {
+          const elements = getNonDeletedElements(data.elements);
+          const svg = await exportToSvg({
+            elements,
+            appState: {
+              exportBackground: true,
+              viewBackgroundColor: "white",
+            },
+            exportPadding: 30,
+          });
+          const result = animateSvg(svg, elements, options);
+          console.log(svg);
+          if (inSequence) {
+            options.startMs = result.finishedMs;
+          }
+          return { svg, finishedMs: result.finishedMs };
+        })
+      );
       setLoadedSvgList(svgList);
       return svgList;
     },
@@ -94,7 +98,7 @@ export const useLoadSvg = () => {
       if (matchIdKey) {
         const [, id, key] = matchIdKey;
         const data = await loadScene(id, key, null);
-        const [{ svg, finishedMs }] = loadDataList([data]);
+        const [{ svg, finishedMs }] = await loadDataList([data]);
         if (searchParams.get("autoplay") === "no") {
           svg.setCurrentTime(finishedMs);
         }
@@ -105,7 +109,7 @@ export const useLoadSvg = () => {
       if (matchLibrary) {
         const [, url] = matchLibrary;
         const dataList = await importLibraryFromUrl(url);
-        const svgList = loadDataList(
+        const svgList = await loadDataList(
           dataList.map((elements) => ({ elements })),
           searchParams.has("sequence")
         );

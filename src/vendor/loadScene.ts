@@ -107,9 +107,10 @@ export const loadScene = async (
     data = restore(
       await importFromBackend(id, privateKey),
       localDataState?.appState,
+      null,
     );
   } else {
-    data = restore(localDataState || null, null);
+    data = restore(localDataState || null, null, null);
   }
 
   return {

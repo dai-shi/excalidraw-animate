@@ -4,7 +4,7 @@ import type {
   ExcalidrawFreeDrawElement,
 } from "@excalidraw/excalidraw/types/element/types";
 
-import { getFreeDrawSvgPath } from "./vendor/getFreeDrawSvgPath";
+import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
 
 type AnimateOptions = {
   startMs?: number;
