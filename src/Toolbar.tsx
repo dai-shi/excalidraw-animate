@@ -1,17 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fileOpen } from "browser-fs-access";
 
-import { restoreElements } from "@excalidraw/excalidraw";
+import {
+  restoreElements,
+  loadLibraryFromBlob,
+  loadFromBlob,
+} from "@excalidraw/excalidraw";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
-
-import { loadLibraryFromBlob } from "./vendor/loadLibraryFromBlob";
-import { loadFromJSON } from "./vendor/loadFromJSON";
 
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
 import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
 import { getNonDeletedElements } from "./useLoadSvg";
+
+const loadFromJSON = async () => {
+  const blob = await fileOpen({
+    description: "Excalidraw files",
+  });
+  return loadFromBlob(blob, null, null);
+};
 
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 
@@ -63,7 +71,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
   }, []);
 
   const loadFile = async () => {
-    const data = await loadFromJSON(null);
+    const data = await loadFromJSON();
     loadDataList([data]);
   };
 
@@ -79,7 +87,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
       return;
     }
     const dataList = libraryFile.library.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem))
+      getNonDeletedElements(restoreElements(libraryItem, null))
     );
     loadDataList(dataList.map((elements) => ({ elements })));
   };
