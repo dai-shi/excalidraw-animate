@@ -26,7 +26,7 @@ const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 const getCombinedBeginTimeList = (svgList: Props["svgList"]) => {
   const beginTimeList = ([] as number[]).concat(
     ...svgList.map(({ svg }) =>
-      getBeginTimeList(svg).map((n) => Math.floor(n * 100) / 100)
+      getBeginTimeList(svg).map((n) => Math.floor(n / 100) * 100)
     )
   );
   return [...new Set(beginTimeList)].sort((a, b) => a - b);
@@ -121,8 +121,10 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     }
     const beginTimeList = getCombinedBeginTimeList(svgList);
     const currentTime = svgList[0].svg.getCurrentTime() * 1000;
-    let nextTime = beginTimeList.find((t) => t >= currentTime + 100);
-    if (!nextTime) {
+    let nextTime = beginTimeList.find((t) => t > currentTime + 50);
+    if (nextTime) {
+      nextTime -= 1;
+    } else {
       nextTime = currentTime + 500;
     }
     clearTimeout(timer.current as NodeJS.Timeout);
