@@ -1,6 +1,6 @@
 {
   "name": "excalidraw-animate",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "homepage": "./",
   "source": "./src/library.ts",
   "module": "./dist/library.js",
