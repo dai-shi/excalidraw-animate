@@ -6,6 +6,7 @@ import {
   loadLibraryFromBlob,
   loadFromBlob,
 } from "@excalidraw/excalidraw";
+import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 
 import "./Toolbar.css";
@@ -37,7 +38,9 @@ type Props = {
     svg: SVGSVGElement;
     finishedMs: number;
   }[];
-  loadDataList: (data: { elements: readonly ExcalidrawElement[] }[]) => void;
+  loadDataList: (
+    data: { elements: readonly ExcalidrawElement[]; files: BinaryFiles }[]
+  ) => void;
 };
 
 const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
@@ -89,7 +92,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     const dataList = libraryFile.library.map((libraryItem) =>
       getNonDeletedElements(restoreElements(libraryItem, null))
     );
-    loadDataList(dataList.map((elements) => ({ elements })));
+    loadDataList(dataList.map((elements) => ({ elements, files: {} })));
   };
 
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {

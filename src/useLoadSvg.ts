@@ -6,6 +6,7 @@ import {
   loadLibraryFromBlob,
 } from "@excalidraw/excalidraw";
 
+import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -52,6 +53,7 @@ export const useLoadSvg = () => {
     async (
       dataList: {
         elements: readonly ExcalidrawElement[];
+        files: BinaryFiles;
       }[],
       inSequence?: boolean
     ) => {
@@ -68,6 +70,7 @@ export const useLoadSvg = () => {
           const elements = getNonDeletedElements(data.elements);
           const svg = await exportToSvg({
             elements,
+            files: data.files,
             appState: {
               exportBackground: true,
               viewBackgroundColor: "white",
@@ -110,7 +113,7 @@ export const useLoadSvg = () => {
         const [, url] = matchLibrary;
         const dataList = await importLibraryFromUrl(url);
         const svgList = await loadDataList(
-          dataList.map((elements) => ({ elements })),
+          dataList.map((elements) => ({ elements, files: {} })),
           searchParams.has("sequence")
         );
         if (searchParams.get("autoplay") === "no") {

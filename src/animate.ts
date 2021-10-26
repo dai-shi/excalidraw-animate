@@ -543,6 +543,24 @@ const patchSvgFreedraw = (
   }
 };
 
+const patchSvgImage = (
+  svg: SVGSVGElement,
+  ele: SVGElement,
+  currentMs: number,
+  durationMs: number
+) => {
+  const toOpacity = ele.getAttribute("opacity") || "1.0";
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
+  animate.setAttribute("attributeName", "opacity");
+  animate.setAttribute("from", "0.0");
+  animate.setAttribute("to", toOpacity);
+  animate.setAttribute("begin", `${currentMs}ms`);
+  animate.setAttribute("dur", `${durationMs}ms`);
+  animate.setAttribute("fill", "freeze");
+  ele.appendChild(animate);
+  ele.setAttribute("opacity", "0.0");
+};
+
 const patchSvgEle = (
   svg: SVGSVGElement,
   ele: SVGElement,
@@ -571,6 +589,10 @@ const patchSvgEle = (
       durationMs,
       options
     );
+  } else if (type === "image") {
+    patchSvgImage(svg, ele, currentMs, durationMs);
+  } else {
+    console.error("unknown excalidraw element type", excalidraElement.type);
   }
 };
 
@@ -596,7 +618,9 @@ const createGroups = (
 };
 
 const filterGroupNodes = (nodes: NodeListOf<SVGElement>) =>
-  [...nodes].filter((node) => node.tagName === "g");
+  [...nodes].filter(
+    (node) => node.tagName === "g" || node.tagName === "use" /* for images */
+  );
 
 const extractNumberFromElement = (
   element: NonDeletedExcalidrawElement,
