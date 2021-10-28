@@ -1234,10 +1234,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@excalidraw/excalidraw@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.10.0.tgz#5329d6fb1b0cca068e2cd34da6d648dd6d0d3fec"
-  integrity sha512-0fHc/oX394dHAT7LEacwZ0vh8aeI179plYnfaeLeRHBtHARgmtlmvxcnxd2pxJ0Z1Uj/Cy76oK9MVw/y8P1HhQ==
+"@excalidraw/excalidraw@npm:@excalidraw/excalidraw-next@0.10.0-8d8769b":
+  version "0.10.0-8d8769b"
+  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw-next/-/excalidraw-next-0.10.0-8d8769b.tgz#a8492cd250bbcbf65651739fd2464c4d12abfeb8"
+  integrity sha512-e+Eoub9+QMwBHDc9vyYfPuS92bA7ay6+8fYTVokSqIQLyjlx10/cw7rlOnN78tG7MnhvoX22qGPpq+OS8aoL2Q==
 
 "@gar/promisify@^1.0.1":
   version "1.1.2"

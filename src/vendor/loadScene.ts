@@ -26,8 +26,9 @@ const getImportedKey = (key: string, usage: KeyUsage) =>
     false, // extractable
     [usage],
   );
+
 const decryptImported = async (
-  iv: ArrayBuffer,
+  iv: ArrayBuffer | Uint8Array,
   encrypted: ArrayBuffer,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
@@ -73,7 +74,7 @@ const importFromBackend = async (
 
       // We need to convert the decrypted array buffer to a string
       const string = new window.TextDecoder("utf-8").decode(
-        new Uint8Array(decrypted) as any,
+        new Uint8Array(decrypted),
       );
       data = JSON.parse(string);
     } else {
@@ -100,14 +101,14 @@ export const loadScene = async (
   // Non-optional so we don't forget to pass it even if `undefined`.
   localDataState: ImportedDataState | undefined | null,
 ) => {
-  let data: ReturnType<typeof restore>;
+  let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = restore(
       await importFromBackend(id, privateKey),
       localDataState?.appState,
-      null,
+      localDataState?.elements,
     );
   } else {
     data = restore(localDataState || null, null, null);
@@ -116,6 +117,10 @@ export const loadScene = async (
   return {
     elements: data.elements,
     appState: data.appState,
+    // note: this will always be empty because we're not storing files
+    // in the scene database/localStorage, and instead fetch them async
+    // from a different database
+    files: data.files,
     commitToHistory: false,
   };
 };
