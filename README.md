@@ -78,6 +78,8 @@ It's also provided as a package:
 - [Step through animations](https://twitter.com/dai_shi/status/1376930624804560900)
 - [Support freedraw](https://twitter.com/dai_shi/status/1391770531582537734)
 - [NPM package](https://twitter.com/dai_shi/status/1398600356322451456)
+- [Support images](https://twitter.com/dai_shi/status/1453012946129338368)
+- [Support filled arrow cap](https://twitter.com/dai_shi/status/1453732212478644231)
 
 ## Other projects with Excalidraw
 
