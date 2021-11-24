@@ -85,12 +85,12 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
       mimeTypes: ["application/json"],
     });
     const libraryFile = await loadLibraryFromBlob(blob);
-    if (!libraryFile || !libraryFile.library) {
+    if (!libraryFile || !libraryFile.libraryItems) {
       window.alert("Unable to load library");
       return;
     }
-    const dataList = libraryFile.library.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem, null))
+    const dataList = libraryFile.libraryItems.map((libraryItem) =>
+      getNonDeletedElements(restoreElements(libraryItem.elements, null))
     );
     loadDataList(dataList.map((elements) => ({ elements, files: {} })));
   };
