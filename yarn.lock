@@ -1234,10 +1234,12 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@excalidraw/excalidraw@npm:@excalidraw/excalidraw-next@0.10.0-8d8769b":
-  version "0.10.0-8d8769b"
-  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw-next/-/excalidraw-next-0.10.0-8d8769b.tgz#a8492cd250bbcbf65651739fd2464c4d12abfeb8"
-  integrity sha512-e+Eoub9+QMwBHDc9vyYfPuS92bA7ay6+8fYTVokSqIQLyjlx10/cw7rlOnN78tG7MnhvoX22qGPpq+OS8aoL2Q==
+"@excalidraw/excalidraw@npm:@excalidraw/excalidraw-next@0.10.0-f9d2d53":
+  version "0.10.0-f9d2d53"
+  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw-next/-/excalidraw-next-0.10.0-f9d2d53.tgz#7af465d264e9e0e8c1727a434b7734f9a3a51d09"
+  integrity sha512-TnbP5ntEX8972rTjnnV/VeCfSh/NLoPijrVpy1+5+8WmwPtGfR/GUmVqQU1DgRXKc5B+H61zR/SfktBZi3RjLQ==
+  dependencies:
+    dotenv "10.0.0"
 
 "@gar/promisify@^1.0.1":
   version "1.1.2"
@@ -4316,6 +4318,11 @@ dotenv-expand@5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-5.1.0.tgz#3fbaf020bfd794884072ea26b1e9791d45a629f0"
   integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
+
+dotenv@10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
+  integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
 
 dotenv@8.2.0:
   version "8.2.0"

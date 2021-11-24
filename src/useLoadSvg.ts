@@ -28,11 +28,11 @@ const importLibraryFromUrl = async (url: string) => {
     const request = await fetch(url);
     const blob = await request.blob();
     const libraryFile = await loadLibraryFromBlob(blob);
-    if (!libraryFile || !libraryFile.library) {
+    if (!libraryFile || !libraryFile.libraryItems) {
       throw new Error();
     }
-    return libraryFile.library.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem, null))
+    return libraryFile.libraryItems.map((libraryItem) =>
+      getNonDeletedElements(restoreElements(libraryItem.elements, null))
     );
   } catch (error) {
     window.alert("Unable to load library");
