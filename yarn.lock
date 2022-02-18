@@ -1234,10 +1234,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@excalidraw/excalidraw@npm:@excalidraw/excalidraw-next@0.10.0-f9d2d53":
-  version "0.10.0-f9d2d53"
-  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw-next/-/excalidraw-next-0.10.0-f9d2d53.tgz#7af465d264e9e0e8c1727a434b7734f9a3a51d09"
-  integrity sha512-TnbP5ntEX8972rTjnnV/VeCfSh/NLoPijrVpy1+5+8WmwPtGfR/GUmVqQU1DgRXKc5B+H61zR/SfktBZi3RjLQ==
+"@excalidraw/excalidraw@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.11.0.tgz#bc246de2a64d7037a21a85664b6f0dd14894cf93"
+  integrity sha512-wY0UdnN9JAcBKLzkGlVXiPSKgTO06YeeBhoIy/ezIiMJtfFtWBPjRjJROkdIGqnUmBz5L16MkuXE7b8j1b1ouw==
   dependencies:
     dotenv "10.0.0"
 
