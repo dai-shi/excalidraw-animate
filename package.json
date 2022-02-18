@@ -6,7 +6,7 @@
   "module": "./dist/library.js",
   "types": "./dist/library.d.ts",
   "dependencies": {
-    "@excalidraw/excalidraw": "npm:@excalidraw/excalidraw-next@0.10.0-f9d2d53"
+    "@excalidraw/excalidraw": "0.11.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.14.1",

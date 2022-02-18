@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  exportToSvg,
-  restoreElements,
-  loadLibraryFromBlob,
-} from "@excalidraw/excalidraw";
+import { exportToSvg, restoreElements } from "@excalidraw/excalidraw";
 
 import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import type {
@@ -13,8 +9,8 @@ import type {
 } from "@excalidraw/excalidraw/types/element/types";
 
 import { loadScene } from "./vendor/loadScene";
-
 import { animateSvg } from "./animate";
+import { importLibraryFromBlob } from "./importLibrary";
 
 export const getNonDeletedElements = (
   elements: readonly ExcalidrawElement[]
@@ -27,7 +23,7 @@ const importLibraryFromUrl = async (url: string) => {
   try {
     const request = await fetch(url);
     const blob = await request.blob();
-    const libraryFile = await loadLibraryFromBlob(blob);
+    const libraryFile = await importLibraryFromBlob(blob);
     if (!libraryFile || !libraryFile.libraryItems) {
       throw new Error();
     }
