@@ -80,6 +80,7 @@ It's also provided as a package:
 - [NPM package](https://twitter.com/dai_shi/status/1398600356322451456)
 - [Support images](https://twitter.com/dai_shi/status/1453012946129338368)
 - [Support filled arrow cap](https://twitter.com/dai_shi/status/1453732212478644231)
+- [Excalidraw v0.11.0](https://twitter.com/dai_shi/status/1494672036459081730)
 
 ## Other projects with Excalidraw
 
