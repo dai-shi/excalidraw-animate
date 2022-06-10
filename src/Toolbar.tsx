@@ -19,7 +19,8 @@ const loadFromJSON = async () => {
   return loadFromBlob(blob, null, null);
 };
 
-const linkRegex = /#json=([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
+const linkRegex =
+  /#json=([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 
 const getCombinedBeginTimeList = (svgList: Props["svgList"]) => {
   const beginTimeList = ([] as number[]).concat(
