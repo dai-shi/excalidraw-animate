@@ -91,7 +91,7 @@ export const useLoadSvg = () => {
     (async () => {
       const hash = window.location.hash.slice(1);
       const searchParams = new URLSearchParams(hash);
-      const matchIdKey = /([0-9]+),?([a-zA-Z0-9_-]*)/.exec(
+      const matchIdKey = /([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)/.exec(
         searchParams.get("json") || ""
       );
       if (matchIdKey) {
