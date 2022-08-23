@@ -81,6 +81,7 @@ It's also provided as a package:
 - [Support images](https://twitter.com/dai_shi/status/1453012946129338368)
 - [Support filled arrow cap](https://twitter.com/dai_shi/status/1453732212478644231)
 - [Excalidraw v0.11.0](https://twitter.com/dai_shi/status/1494672036459081730)
+- [Excalidraw v0.12.0](https://twitter.com/dai_shi/status/1561928834198704128)
 
 ## Other projects with Excalidraw
 
