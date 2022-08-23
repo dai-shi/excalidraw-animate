@@ -49,7 +49,7 @@ export const useLoadSvg = () => {
     async (
       dataList: {
         elements: readonly ExcalidrawElement[];
-        appState: Parameters<typeof exportToSvg>[0]['appState'];
+        appState: Parameters<typeof exportToSvg>[0]["appState"];
         files: BinaryFiles;
       }[],
       inSequence?: boolean
