@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fileOpen } from "browser-fs-access";
 
-import { restoreElements, loadFromBlob } from "@excalidraw/excalidraw";
+import {
+  restoreElements,
+  loadFromBlob,
+  loadLibraryFromBlob,
+} from "@excalidraw/excalidraw";
 import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 
@@ -10,7 +14,6 @@ import GitHubCorner from "./GitHubCorner";
 import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
 import { getNonDeletedElements } from "./useLoadSvg";
-import { importLibraryFromBlob } from "./importLibrary";
 
 const loadFromJSON = async () => {
   const blob = await fileOpen({
@@ -82,12 +85,8 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
       extensions: [".json", ".excalidrawlib"],
       mimeTypes: ["application/json"],
     });
-    const libraryFile = await importLibraryFromBlob(blob);
-    if (!libraryFile || !libraryFile.libraryItems) {
-      window.alert("Unable to load library");
-      return;
-    }
-    const dataList = libraryFile.libraryItems.map((libraryItem) =>
+    const libraryItems = await loadLibraryFromBlob(blob);
+    const dataList = libraryItems.map((libraryItem) =>
       getNonDeletedElements(restoreElements(libraryItem.elements, null))
     );
     loadDataList(dataList.map((elements) => ({ elements, files: {} })));
