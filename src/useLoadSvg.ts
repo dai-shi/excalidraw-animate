@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { exportToSvg, restoreElements, loadLibraryFromBlob } from "@excalidraw/excalidraw";
+import {
+  exportToSvg,
+  restoreElements,
+  loadLibraryFromBlob,
+} from "@excalidraw/excalidraw";
 
 import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import type {
