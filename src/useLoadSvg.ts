@@ -49,6 +49,7 @@ export const useLoadSvg = () => {
     async (
       dataList: {
         elements: readonly ExcalidrawElement[];
+        appState: Parameters<typeof exportToSvg>[0]["appState"];
         files: BinaryFiles;
       }[],
       inSequence?: boolean
@@ -67,10 +68,7 @@ export const useLoadSvg = () => {
           const svg = await exportToSvg({
             elements,
             files: data.files,
-            appState: {
-              exportBackground: true,
-              viewBackgroundColor: "white",
-            },
+            appState: data.appState,
             exportPadding: 30,
           });
           const result = animateSvg(svg, elements, options);
@@ -109,7 +107,7 @@ export const useLoadSvg = () => {
         const [, url] = matchLibrary;
         const dataList = await importLibraryFromUrl(url);
         const svgList = await loadDataList(
-          dataList.map((elements) => ({ elements, files: {} })),
+          dataList.map((elements) => ({ elements, appState: {}, files: {} })),
           searchParams.has("sequence")
         );
         if (searchParams.get("autoplay") === "no") {

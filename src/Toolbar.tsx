@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fileOpen } from "browser-fs-access";
 
 import {
+  exportToSvg,
   restoreElements,
   loadFromBlob,
   loadLibraryFromBlob,
@@ -40,7 +41,11 @@ type Props = {
     finishedMs: number;
   }[];
   loadDataList: (
-    data: { elements: readonly ExcalidrawElement[]; files: BinaryFiles }[]
+    data: {
+      elements: readonly ExcalidrawElement[];
+      appState: Parameters<typeof exportToSvg>[0]["appState"];
+      files: BinaryFiles;
+    }[]
   ) => void;
 };
 
@@ -89,7 +94,9 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     const dataList = libraryItems.map((libraryItem) =>
       getNonDeletedElements(restoreElements(libraryItem.elements, null))
     );
-    loadDataList(dataList.map((elements) => ({ elements, files: {} })));
+    loadDataList(
+      dataList.map((elements) => ({ elements, appState: {}, files: {} }))
+    );
   };
 
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
