@@ -336,13 +336,12 @@ const animateFromToPath = (
 const patchSvgLine = (
   svg: SVGSVGElement,
   ele: SVGElement,
-  strokeSharpness: string,
+  isRounded: boolean,
   currentMs: number,
   durationMs: number,
   options: AnimateOptions
 ) => {
-  const animateLine =
-    strokeSharpness !== "sharp" ? animatePath : animatePolygon;
+  const animateLine = isRounded ? animatePath : animatePolygon;
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
   if (childNodes[0].getAttribute("fill-rule")) {
     animateLine(
@@ -374,13 +373,12 @@ const patchSvgLine = (
 const patchSvgArrow = (
   svg: SVGSVGElement,
   ele: SVGElement,
-  strokeSharpness: string,
+  isRounded: boolean,
   currentMs: number,
   durationMs: number,
   options: AnimateOptions
 ) => {
-  const animateLine =
-    strokeSharpness !== "sharp" ? animatePath : animatePolygon;
+  const animateLine = isRounded ? animatePath : animatePolygon;
   const numParts = ele.childNodes.length;
   animateLine(
     svg,
@@ -569,11 +567,11 @@ const patchSvgEle = (
   durationMs: number,
   options: AnimateOptions
 ) => {
-  const { type, strokeSharpness, width } = excalidraElement;
+  const { type, roundness, width } = excalidraElement;
   if (type === "line") {
-    patchSvgLine(svg, ele, strokeSharpness, currentMs, durationMs, options);
+    patchSvgLine(svg, ele, !!roundness, currentMs, durationMs, options);
   } else if (type === "arrow") {
-    patchSvgArrow(svg, ele, strokeSharpness, currentMs, durationMs, options);
+    patchSvgArrow(svg, ele, !!roundness, currentMs, durationMs, options);
   } else if (type === "rectangle" || type === "diamond") {
     patchSvgRectangle(svg, ele, currentMs, durationMs, options);
   } else if (type === "ellipse") {
