@@ -38,7 +38,7 @@
     "test:lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx --ignore-pattern dist.",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
     "test:app": "react-scripts test --passWithNoTests",
-    "compile": "tsc --noEmit false --declaration --outDir dist && cp src/*.css dist && cp src/vendor/LICENSE dist/vendor"
+    "compile": "tsc -p tsconfig.build.json"
   },
   "eslintConfig": {
     "extends": "react-app"
