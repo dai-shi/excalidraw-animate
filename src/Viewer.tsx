@@ -1,7 +1,5 @@
 import React, { useEffect, useRef } from "react";
 
-import "./Viewer.css";
-
 type Props = {
   svgList: {
     svg: SVGSVGElement;
@@ -49,14 +47,13 @@ const Viewer: React.FC<Props> = ({ svgList }) => {
   const grids = `repeat(${repeat}, ${100 / repeat}%)`;
 
   return (
-    <div
-      className="Viewer"
-      style={{
-        gridTemplateColumns: grids,
-        gridTemplateRows: grids,
-      }}
-      ref={ref}
-    ></div>
+    <div className="flex items-center h-full">
+      <div
+        className="rounded-3xl p-2 bg-white flex-1"
+        style={{ gridTemplateColumns: grids, gridTemplateRows: grids }}
+        ref={ref}
+      ></div>
+    </div>
   );
 };
 

@@ -10,7 +10,6 @@ import {
 import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 
-import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
 import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
@@ -160,6 +159,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
       } else if (e.key.toLowerCase() === "s") {
         stepForwardAnimations();
       } else if (e.key.toLowerCase() === "r") {
+        e.preventDefault();
         resetAnimations();
       } else if (e.key.toLowerCase() === "q") {
         // toggle toolbar
@@ -212,46 +212,91 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     return null;
   }
 
+  const buttonStyles: string =
+    "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded";
+
   return (
-    <div className="Toolbar">
-      <div className="Toolbar-loader">
-        <button type="button" onClick={loadFile}>
-          Load File
-        </button>
-        <span>OR</span>
-        <button type="button" onClick={loadLibrary}>
-          Load Library
-        </button>
-        <span>OR</span>
-        <form onSubmit={loadLink}>
-          <input
-            placeholder="Enter link..."
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-          />
-          <button type="submit" disabled={!linkRegex.test(link)}>
-            Animate!
+    <>
+      <div className="flex items-center justify-center space-x-2 w-full">
+        <div className="w-1/6 p-0 m-0 text-center text-2xl font-bold">
+          Excalidraw Animate
+        </div>
+        <div className="flex items-center justify-center space-x-2 w-full">
+          <button type="button" onClick={loadFile} className={buttonStyles}>
+            Load File
           </button>
-        </form>
+          <span>OR</span>
+          <button
+            type="button"
+            onClick={() => {
+              loadLibrary();
+            }}
+            className={buttonStyles}
+          >
+            Load Library
+          </button>
+          <span>OR</span>
+          <form onSubmit={loadLink} className="flex items-center">
+            <div className="mr-3">
+              <input
+                placeholder="Enter link..."
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                className="input rounded pl-1"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!linkRegex.test(link)}
+              className={buttonStyles}
+            >
+              Animate!
+            </button>
+          </form>
+        </div>
+        <div className="w-1/6"></div>
       </div>
+
+      <GitHubCorner
+        link="https://github.com/dai-shi/excalidraw-animate"
+        size={40}
+      />
+
       {!!svgList.length && (
-        <div className="Toolbar-controller">
-          <button type="button" onClick={togglePausedAnimations}>
+        <div className="flex justify-center space-x-2">
+          <button
+            type="button"
+            onClick={togglePausedAnimations}
+            className={buttonStyles}
+          >
             {paused ? "Play (P)" : "Pause (P)"}
           </button>
-          <button type="button" onClick={stepForwardAnimations}>
+          <button
+            type="button"
+            onClick={stepForwardAnimations}
+            className={buttonStyles}
+          >
             Step (S)
           </button>
-          <button type="button" onClick={resetAnimations}>
+          <button
+            type="button"
+            onClick={resetAnimations}
+            className={buttonStyles}
+          >
             Reset (R)
           </button>
-          <button type="button" onClick={hideToolbar}>
+          <button type="button" onClick={hideToolbar} className={buttonStyles}>
             Hide Toolbar (Q)
           </button>
-          <button type="button" onClick={exportToSvg}>
+          <button type="button" onClick={exportToSvg} className={buttonStyles}>
             Export to SVG
           </button>
-          <button type="button" onClick={exportToWebm} disabled={processing}>
+          <button
+            type="button"
+            onClick={exportToWebm}
+            disabled={processing}
+            className={buttonStyles}
+          >
             {processing
               ? "Processing..."
               : webmData
@@ -260,11 +305,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
           </button>
         </div>
       )}
-      <GitHubCorner
-        link="https://github.com/dai-shi/excalidraw-animate"
-        size={40}
-      />
-    </div>
+    </>
   );
 };
 

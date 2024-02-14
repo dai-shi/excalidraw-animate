@@ -1,6 +1,5 @@
 import React from "react";
 
-import "./App.css";
 import Toolbar from "./Toolbar";
 import Viewer from "./Viewer";
 import { useLoadSvg } from "./useLoadSvg";
@@ -11,10 +10,14 @@ const App: React.FC = () => {
     return <div>Loading...</div>;
   }
   return (
-    <div className="App">
-      <Toolbar svgList={loadedSvgList} loadDataList={loadDataList} />
-      {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
-    </div>
+    <>
+      <div className="justify-between px-4 py-2 bg-gray-300">
+        <Toolbar svgList={loadedSvgList} loadDataList={loadDataList} />
+      </div>
+      <div className="mt-4 flex items-center justify-center">
+        {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
+      </div>
+    </>
   );
 };
 
