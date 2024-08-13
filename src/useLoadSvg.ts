@@ -17,10 +17,10 @@ import { loadScene } from "./vendor/loadScene";
 import { animateSvg } from "./animate";
 
 export const getNonDeletedElements = (
-  elements: readonly ExcalidrawElement[]
+  elements: readonly ExcalidrawElement[],
 ): NonDeletedExcalidrawElement[] =>
   elements.filter(
-    (element): element is NonDeletedExcalidrawElement => !element.isDeleted
+    (element): element is NonDeletedExcalidrawElement => !element.isDeleted,
   );
 
 const importLibraryFromUrl = async (url: string) => {
@@ -29,7 +29,7 @@ const importLibraryFromUrl = async (url: string) => {
     const blob = await request.blob();
     const libraryItems = await loadLibraryFromBlob(blob);
     return libraryItems.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem.elements, null))
+      getNonDeletedElements(restoreElements(libraryItem.elements, null)),
     );
   } catch (error) {
     window.alert("Unable to load library");
@@ -53,7 +53,7 @@ export const useLoadSvg = () => {
         appState: Parameters<typeof exportToSvg>[0]["appState"];
         files: BinaryFiles;
       }[],
-      inSequence?: boolean
+      inSequence?: boolean,
     ) => {
       const hash = window.location.hash.slice(1);
       const searchParams = new URLSearchParams(hash);
@@ -83,12 +83,12 @@ export const useLoadSvg = () => {
             options.startMs = result.finishedMs;
           }
           return { svg, finishedMs: result.finishedMs };
-        })
+        }),
       );
       setLoadedSvgList(svgList);
       return svgList;
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export const useLoadSvg = () => {
       const hash = window.location.hash.slice(1);
       const searchParams = new URLSearchParams(hash);
       const matchIdKey = /([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)/.exec(
-        searchParams.get("json") || ""
+        searchParams.get("json") || "",
       );
       if (matchIdKey) {
         const [, id, key] = matchIdKey;
@@ -107,14 +107,14 @@ export const useLoadSvg = () => {
         }
       }
       const matchLibrary = /(.*\.excalidrawlib)/.exec(
-        searchParams.get("library") || ""
+        searchParams.get("library") || "",
       );
       if (matchLibrary) {
         const [, url] = matchLibrary;
         const dataList = await importLibraryFromUrl(url);
         const svgList = await loadDataList(
           dataList.map((elements) => ({ elements, appState: {}, files: {} })),
-          searchParams.has("sequence")
+          searchParams.has("sequence"),
         );
         if (searchParams.get("autoplay") === "no") {
           svgList.forEach(({ svg, finishedMs }) => {
@@ -156,18 +156,18 @@ export const FONT_FAMILY = {
 function applyNewFontsToSvg(svg: SVGSVGElement, elements: ExcalidrawElement[]) {
   const textElements: ExcalidrawTextElement[] = elements.filter(
     (element): element is ExcalidrawTextElement =>
-      element.type === "text" && !!element.fontFamily
+      element.type === "text" && !!element.fontFamily,
   ) as ExcalidrawTextElement[];
 
   svg.querySelectorAll("text").forEach((textElement, index) => {
-    const fontFamily = textElements[index].fontFamily;
+    const fontFamily = textElements[index]?.fontFamily;
     convertFontFamily(textElement, fontFamily);
   });
 }
 
 function convertFontFamily(
   textElement: SVGTextElement,
-  fontFamilyNumber: number
+  fontFamilyNumber: number | undefined,
 ) {
   switch (fontFamilyNumber) {
     case FONT_FAMILY.Virgil:
@@ -201,7 +201,7 @@ function convertFontFamily(
     case FONT_FAMILY["Liberation Sans"]:
       textElement.setAttribute(
         "font-family",
-        `Liberation Sans, ${DEFAULT_FONT}`
+        `Liberation Sans, ${DEFAULT_FONT}`,
       );
       break;
 
