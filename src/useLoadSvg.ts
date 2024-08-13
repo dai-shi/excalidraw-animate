@@ -114,7 +114,7 @@ export const useLoadSvg = () => {
         const dataList = await importLibraryFromUrl(url);
         const svgList = await loadDataList(
           dataList.map((elements) => ({ elements, appState: {}, files: {} })),
-          searchParams.has("sequence"),
+          searchParams.has("sequence")
         );
         if (searchParams.get("autoplay") === "no") {
           svgList.forEach(({ svg, finishedMs }) => {
