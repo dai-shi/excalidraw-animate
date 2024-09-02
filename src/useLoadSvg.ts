@@ -159,9 +159,21 @@ function applyNewFontsToSvg(svg: SVGSVGElement, elements: ExcalidrawElement[]) {
       element.type === "text" && !!element.fontFamily
   ) as ExcalidrawTextElement[];
 
-  svg.querySelectorAll("text").forEach((textElement, index) => {
-    const fontFamily = textElements[index]?.fontFamily;
-    convertFontFamily(textElement, fontFamily);
+  /** index to keep track of block of text elements */
+  let currentTextElementIndex = 0;
+
+  // Since text element is represented in a group in given svg
+  // apply font family based on the group that contains the text elements
+  svg.querySelectorAll("g").forEach((svgGroup) => {
+    // It indicates the group is not for text - thus skip it
+    if (svgGroup.hasAttribute("stroke-linecap")) return;
+
+    const fontFamily = textElements[currentTextElementIndex]?.fontFamily;
+    svgGroup.querySelectorAll("text").forEach((svgText) => {
+      convertFontFamily(svgText, fontFamily);
+    });
+
+    currentTextElementIndex += 1;
   });
 }
 
