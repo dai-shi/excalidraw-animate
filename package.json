@@ -1,6 +1,7 @@
 {
   "name": "excalidraw-animate",
   "version": "0.6.1",
+  "packageManager": "pnpm@9.4.0",
   "homepage": "./",
   "source": "./src/library.ts",
   "module": "./dist/library.js",
@@ -32,8 +33,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "yarn run test:all",
-    "test:all": "yarn run test:type && yarn run test:lint && yarn run test:format && yarn run test:app --watchAll=false",
+    "test": "pnpm run test:all",
+    "test:all": "pnpm run test:type && pnpm run test:lint && pnpm run test:format && pnpm run test:app --watchAll=false",
     "test:type": "tsc",
     "test:lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx --ignore-pattern dist.",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
