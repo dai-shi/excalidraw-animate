@@ -1,6 +1,7 @@
 {
   "name": "excalidraw-animate",
   "version": "0.6.1",
+  "type": "module",
   "packageManager": "pnpm@9.4.0",
   "homepage": "./",
   "source": "./src/library.ts",
@@ -17,22 +18,22 @@
     "@types/pako": "^2.0.0",
     "@types/react": "^18.2.4",
     "@types/react-dom": "^18.2.3",
+    "@vitejs/plugin-react": "^4.3.4",
     "browser-fs-access": "^0.33.1",
-    "crypto": "^1.0.1",
     "jest-canvas-mock": "^2.5.0",
     "prettier": "^2.8.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vite": "^6.2.4"
   },
   "files": [
     "src",
     "dist"
   ],
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite preview",
+    "build": "vite build",
     "test": "pnpm run test:all",
     "test:all": "pnpm run test:type && pnpm run test:lint && pnpm run test:format && pnpm run test:app --watchAll=false",
     "test:type": "tsc",
@@ -47,18 +48,6 @@
   "jest": {
     "transformIgnorePatterns": [
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
     ]
   }
 }
