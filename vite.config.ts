@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { configDefaults } from "vitest/config";
 
 export default defineConfig({
+  base: "/excalidraw-animate/",
   plugins: [react()],
   build: {
     outDir: "build",
