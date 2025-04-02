@@ -16,5 +16,5 @@
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src", "test/setupTests.ts"]
 }

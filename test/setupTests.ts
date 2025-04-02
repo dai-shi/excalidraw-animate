@@ -3,15 +3,8 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom/extend-expect";
-import "jest-canvas-mock";
-import crypto from "crypto";
+import "vitest-canvas-mock";
 
 const element = document.createElement("div");
 element.id = "root";
 document.body.appendChild(element);
-
-(window as any).crypto = {
-  getRandomValues: function (buffer: any) {
-    return crypto.randomFillSync(buffer);
-  },
-};

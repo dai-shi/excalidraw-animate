@@ -2,19 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="A tool to animate Excalidraw drawings"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <meta name="description" content="A tool to animate Excalidraw drawings" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -26,29 +23,33 @@
     -->
     <title>Excalidraw Animate</title>
     <!-- Links for Lilita One font. Remove these links once Excalidraw is updated to the next version (v0.17.6 as of now) -->
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap"
+      rel="stylesheet"
+    />
     <style>
       /* Styles for additional fonts that are not part of Excalidraw package in the current version.
        Remove them all once Excalidraw is updated (v0.17.6 as of now) */
       @font-face {
-        font-family: 'Excalifont'; 
-        src: url('https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/Excalifont-Regular-C9eKQy_N.woff2'); 
+        font-family: "Excalifont";
+        src: url("https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/Excalifont-Regular-C9eKQy_N.woff2");
       }
       @font-face {
-        font-family: 'Comic Shanns'; 
-        src: url('https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/ComicShanns-Regular-D0c8wzsC.woff2'); 
+        font-family: "Comic Shanns";
+        src: url("https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/ComicShanns-Regular-D0c8wzsC.woff2");
       }
       @font-face {
-        font-family: 'Nunito'; 
-        src: url('https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2'); 
+        font-family: "Nunito";
+        src: url("https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2");
       }
       @font-face {
-        font-family: 'Lilita One'; 
-        src: url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap'); 
+        font-family: "Lilita One";
+        src: url("https://fonts.googleapis.com/css2?family=Lilita+One&display=swap");
       }
     </style>
+    <script defer type="module" src="/src/index.tsx"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
