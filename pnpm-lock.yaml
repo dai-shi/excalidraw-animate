@@ -25,7 +25,7 @@ importers:
         specifier: ^1.0.16
         version: 1.0.21
       '@types/node':
-        specifier: '20'
+        specifier: ^20.14.8
         version: 20.17.29
       '@types/pako':
         specifier: ^2.0.0
