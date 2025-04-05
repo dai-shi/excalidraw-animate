@@ -7,8 +7,8 @@ import {
   loadFromBlob,
   loadLibraryFromBlob,
 } from "@excalidraw/excalidraw";
-import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
-import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
+import type { BinaryFiles } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";

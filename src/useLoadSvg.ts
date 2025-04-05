@@ -6,12 +6,11 @@ import {
   loadLibraryFromBlob,
 } from "@excalidraw/excalidraw";
 
-import type { BinaryFiles } from "@excalidraw/excalidraw/types/types";
+import type { BinaryFiles } from "@excalidraw/excalidraw/types";
 import type {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/excalidraw/types/element/types";
+} from "@excalidraw/excalidraw/element/types";
 
 import { loadScene } from "./vendor/loadScene";
 import { animateSvg } from "./animate";
@@ -72,11 +71,6 @@ export const useLoadSvg = () => {
             appState: data.appState,
             exportPadding: 30,
           });
-
-          // This is a patch up function to apply new fonts that are not part of Excalidraw package
-          // Remove this function once Excalidraw package is updated (v0.17.6 as of now)
-          applyNewFontsToSvg(svg, elements);
-
           const result = animateSvg(svg, elements, options);
           console.log(svg);
           if (inSequence) {
@@ -128,97 +122,3 @@ export const useLoadSvg = () => {
 
   return { loading, loadedSvgList, loadDataList };
 };
-
-// Change below are to apply new fonts that are not part of current version of Excalidraw package
-// Remove them all below once Excalidraw is updated (v0.17.6 as of now)
-// ================================================
-const DEFAULT_FONT = "Segoe UI Emoji";
-/** Up to date version of font family. It's brought from the latest version of Excalidraw repo */
-export const FONT_FAMILY = {
-  Virgil: 1,
-  Helvetica: 2,
-  Cascadia: 3,
-  // leave 4 unused as it was historically used for Assistant (which we don't use anymore) or custom font (Obsidian)
-  Excalifont: 5,
-  Nunito: 6,
-  "Lilita One": 7,
-  "Comic Shanns": 8,
-  "Liberation Sans": 9,
-} as const;
-
-/**
- * Recursively apply new fonts to all text elements in the given SVG.
- * `exportToSvg()` is not compatible with new fonts due to a discrepancy between package and release excalidraw.
- * This function patches up the fonts resulting in a default font family.
- *
- * issue link: https://github.com/dai-shi/excalidraw-animate/issues/55
- *  */
-function applyNewFontsToSvg(svg: SVGSVGElement, elements: ExcalidrawElement[]) {
-  const textElements: ExcalidrawTextElement[] = elements.filter(
-    (element): element is ExcalidrawTextElement =>
-      element.type === "text" && !!element.fontFamily
-  ) as ExcalidrawTextElement[];
-
-  /** index to keep track of block of text elements */
-  let currentTextElementIndex = 0;
-
-  // Since text element is represented in a group in given svg
-  // apply font family based on the group that contains the text elements
-  svg.querySelectorAll("g").forEach((svgGroup) => {
-    // It indicates the group is not for text - thus skip it
-    if (svgGroup.hasAttribute("stroke-linecap")) return;
-
-    const fontFamily = textElements[currentTextElementIndex]?.fontFamily;
-    svgGroup.querySelectorAll("text").forEach((svgText) => {
-      convertFontFamily(svgText, fontFamily);
-    });
-
-    currentTextElementIndex += 1;
-  });
-}
-
-function convertFontFamily(
-  textElement: SVGTextElement,
-  fontFamilyNumber: number | undefined
-) {
-  switch (fontFamilyNumber) {
-    case FONT_FAMILY.Virgil:
-      textElement.setAttribute("font-family", `Virgil, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY.Helvetica:
-      textElement.setAttribute("font-family", `Helvetica, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY.Cascadia:
-      textElement.setAttribute("font-family", `Cascadia, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY.Excalifont:
-      textElement.setAttribute("font-family", `Excalifont, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY.Nunito:
-      textElement.setAttribute("font-family", `Nunito, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY["Lilita One"]:
-      textElement.setAttribute("font-family", `Lilita One, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY["Comic Shanns"]:
-      textElement.setAttribute("font-family", `Comic Shanns, ${DEFAULT_FONT}`);
-      break;
-
-    case FONT_FAMILY["Liberation Sans"]:
-      textElement.setAttribute(
-        "font-family",
-        `Liberation Sans, ${DEFAULT_FONT}`
-      );
-      break;
-
-    default:
-      textElement.setAttribute("font-family", DEFAULT_FONT);
-      break;
-  }
-}
