@@ -290,22 +290,20 @@ const animateText = (
   pathForTextIndex += 1;
   const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
   path.setAttribute("id", "pathForText" + pathForTextIndex);
-
-  const textPath = svg.ownerDocument.createTextNode(ele.textContent ?? "");
-  ele.textContent = " "; // HACK for Firebox as `null` does not work
-  ele.appendChild(textPath);
-  ele.setAttribute("opacity", "0.0");
-
   const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "opacity");
-  animate.setAttribute("from", `0.0`);
-  animate.setAttribute("to", `1.0`);
+  animate.setAttribute("attributeName", "d");
+  animate.setAttribute("from", `m${x} ${y} h0`);
+  animate.setAttribute("to", `m${x} ${y} h${width}`);
   animate.setAttribute("begin", `${currentMs}ms`);
   animate.setAttribute("dur", `${durationMs}ms`);
   animate.setAttribute("fill", "freeze");
-  ele.appendChild(animate);
-
+  path.appendChild(animate);
+  const textPath = svg.ownerDocument.createElementNS(SVG_NS, "textPath");
+  textPath.setAttribute("href", "#pathForText" + pathForTextIndex);
+  textPath.textContent = ele.textContent;
+  ele.textContent = " "; // HACK for Firebox as `null` does not work
   findNode(svg, "defs")?.appendChild(path);
+  ele.appendChild(textPath);
   animatePointer(
     svg,
     ele,
