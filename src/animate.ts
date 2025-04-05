@@ -2,7 +2,7 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawFreeDrawElement,
-} from "@excalidraw/excalidraw/types/element/types";
+} from "@excalidraw/excalidraw/element/types";
 
 import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
 
