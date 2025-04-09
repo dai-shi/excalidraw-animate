@@ -1,0 +1,13 @@
+diff --git a/dist/dev/index.js b/dist/dev/index.js
+index badbd9491957f53ecf89932d20d8e1f75583519f..568151ee81cd2101bf4f2772892061f06c8c53a9 100644
+--- a/dist/dev/index.js
++++ b/dist/dev/index.js
+@@ -924,7 +924,7 @@ var InitializeApp = (props) => {
+ // components/App.tsx
+ import React43, { useContext as useContext3 } from "react";
+ import { flushSync as flushSync2 } from "react-dom";
+-import rough from "roughjs/bin/rough";
++import rough from "roughjs/bin/rough.js";
+ import clsx55 from "clsx";
+ import { nanoid } from "nanoid";
+ 
