@@ -49,7 +49,7 @@ type Props = {
   ) => void;
 };
 
-const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
+const Toolbar = ({ svgList, loadDataList }: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | "never">(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);

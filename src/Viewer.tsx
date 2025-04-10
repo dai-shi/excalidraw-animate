@@ -9,7 +9,7 @@ type Props = {
   }[];
 };
 
-const Viewer: React.FC<Props> = ({ svgList }) => {
+const Viewer = ({ svgList }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

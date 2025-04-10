@@ -10,7 +10,7 @@ type Props = {
 };
 
 // http://tholman.com/github-corners/
-const GitHubCorner: React.FC<Props> = ({ link, size, fill, color }) => (
+const GitHubCorner = ({ link, size, fill, color }: Props) => (
   <a
     href={link}
     className="GitHubCorner-container"
