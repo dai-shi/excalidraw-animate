@@ -1,4 +1,4 @@
-import "./App.css";
+import "./AnimateApp.css";
 import Toolbar from "./Toolbar";
 import Viewer from "./Viewer";
 import { useLoadSvg } from "./useLoadSvg";
