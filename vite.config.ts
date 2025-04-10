@@ -8,6 +8,9 @@ export default defineConfig({
   build: {
     outDir: "build",
   },
+  ssr: {
+    noExternal: ["open-color", "@excalidraw/excalidraw"],
+  },
   test: {
     globals: true,
     environment: "jsdom",
@@ -15,6 +18,7 @@ export default defineConfig({
     exclude: [...configDefaults.exclude],
     deps: {
       interopDefault: true,
+      inline: ["open-color", "@excalidraw/excalidraw"],
     },
     server: {
       deps: {

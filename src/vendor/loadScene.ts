@@ -1,6 +1,6 @@
 import { inflate } from "pako";
 import { restore } from "@excalidraw/excalidraw";
-import type { ImportedDataState } from "@excalidraw/excalidraw/types/data/types";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 
 const t = (s: string) => s;
 
