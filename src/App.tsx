@@ -5,7 +5,7 @@ import Toolbar from "./Toolbar";
 import Viewer from "./Viewer";
 import { useLoadSvg } from "./useLoadSvg";
 
-const App: React.FC = () => {
+const AnimateApp: React.FC = () => {
   const { loading, loadedSvgList, loadDataList } = useLoadSvg();
   if (loading) {
     return <div>Loading...</div>;
@@ -16,6 +16,14 @@ const App: React.FC = () => {
       {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
     </div>
   );
+};
+
+export default AnimateApp;
+import React from "react";
+import AnimateApp from "./AnimateApp"; // Assuming the rename happens
+
+const App: React.FC = () => {
+  return <AnimateApp />;
 };
 
 export default App;
