@@ -1,5 +1,3 @@
-import React from "react";
-
 import "./App.css";
 import Toolbar from "./Toolbar";
 import Viewer from "./Viewer";

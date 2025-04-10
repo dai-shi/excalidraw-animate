@@ -1,5 +1,3 @@
-import React from "react";
-
 import "./GitHubCorner.css";
 
 type Props = {
