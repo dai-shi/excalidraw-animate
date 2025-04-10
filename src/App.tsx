@@ -1,19 +1,33 @@
-import React from "react";
+import { useState } from "react";
+import AnimateApp from "./AnimateApp";
+import ExcalidrawApp from "./ExcalidrawApp";
 
-import "./App.css";
-import Toolbar from "./Toolbar";
-import Viewer from "./Viewer";
-import { useLoadSvg } from "./useLoadSvg";
+type ViewMode = "animate" | "excalidraw";
 
-const App: React.FC = () => {
-  const { loading, loadedSvgList, loadDataList } = useLoadSvg();
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+const App = () => {
+  const [viewMode, setViewMode] = useState<ViewMode>("animate");
+
+  const toggleViewMode = () => {
+    setViewMode((prevMode) =>
+      prevMode === "animate" ? "excalidraw" : "animate"
+    );
+  };
+
   return (
-    <div className="App">
-      <Toolbar svgList={loadedSvgList} loadDataList={loadDataList} />
-      {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
+    <div>
+      <button
+        onClick={toggleViewMode}
+        style={{
+          position: "absolute",
+          top: 1,
+          left: 1,
+          fontSize: 8,
+          zIndex: 10,
+        }}
+      >
+        {viewMode === "animate" ? "Edit" : "Animate"}
+      </button>
+      {viewMode === "animate" ? <AnimateApp /> : <ExcalidrawApp />}
     </div>
   );
 };

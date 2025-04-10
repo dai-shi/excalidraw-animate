@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import "./Viewer.css";
 
@@ -9,7 +9,7 @@ type Props = {
   }[];
 };
 
-const Viewer: React.FC<Props> = ({ svgList }) => {
+const Viewer = ({ svgList }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

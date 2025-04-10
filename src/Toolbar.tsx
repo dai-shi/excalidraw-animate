@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { fileOpen } from "browser-fs-access";
 
 import {
@@ -49,7 +55,7 @@ type Props = {
   ) => void;
 };
 
-const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
+const Toolbar = ({ svgList, loadDataList }: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | "never">(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -99,7 +105,7 @@ const Toolbar: React.FC<Props> = ({ svgList, loadDataList }) => {
     );
   };
 
-  const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
+  const loadLink = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const match = linkRegex.exec(link);
     if (!match) {
