@@ -36,8 +36,9 @@
     "dist"
   ],
   "scripts": {
-    "start": "vite preview",
+    "dev": "vite",
     "build": "vite build",
+    "start": "vite preview",
     "test": "pnpm run test:all",
     "test:all": "pnpm run test:type && pnpm run test:lint && pnpm run test:format && pnpm run test:app --run",
     "test:type": "tsc",
