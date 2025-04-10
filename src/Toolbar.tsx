@@ -99,7 +99,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     );
   };
 
-  const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
+  const loadLink = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const match = linkRegex.exec(link);
     if (!match) {
