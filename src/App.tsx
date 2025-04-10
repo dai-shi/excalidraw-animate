@@ -17,9 +17,15 @@ const App = () => {
     <div>
       <button
         onClick={toggleViewMode}
-        style={{ position: "absolute", top: 10, left: 10, zIndex: 10 }}
+        style={{
+          position: "absolute",
+          top: 1,
+          left: 1,
+          fontSize: 8,
+          zIndex: 10,
+        }}
       >
-        Switch to {viewMode === "animate" ? "Excalidraw" : "Animate"} View
+        {viewMode === "animate" ? "Edit" : "Animate"}
       </button>
       {viewMode === "animate" ? <AnimateApp /> : <ExcalidrawApp />}
     </div>
