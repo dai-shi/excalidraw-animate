@@ -5,7 +5,7 @@ import { useLoadSvg } from "./useLoadSvg";
 const AnimateApp = () => {
   const { loading, loadedSvgList, loadDataList } = useLoadSvg();
   if (loading) {
-    return <div>Loading...</div>;
+    return <div style={{ margin: "3px 3px 3px 40px" }}>Loading...</div>;
   }
   return (
     <div className="App">
