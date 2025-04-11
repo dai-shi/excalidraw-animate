@@ -16,7 +16,6 @@ import {
 import type { BinaryFiles } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
-import "./Toolbar.css";
 import GitHubCorner from "./GitHubCorner";
 import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
@@ -219,45 +218,75 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
   }
 
   return (
-    <div className="Toolbar">
-      <div className="Toolbar-loader">
-        <button type="button" onClick={loadFile}>
+    <div>
+      <div style={{ margin: "3px 3px 3px 40px" }}>
+        <button type="button" onClick={loadFile} style={{ marginRight: 3 }}>
           Load File
         </button>
-        <span>OR</span>
-        <button type="button" onClick={loadLibrary}>
+        <span style={{ marginRight: 3 }}>OR</span>
+        <button type="button" onClick={loadLibrary} style={{ marginRight: 3 }}>
           Load Library
         </button>
         <span>OR</span>
-        <form onSubmit={loadLink}>
+        <form onSubmit={loadLink} style={{ display: "inline" }}>
           <input
             placeholder="Enter link..."
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            style={{ marginLeft: 3, marginRight: 3 }}
           />
-          <button type="submit" disabled={!linkRegex.test(link)}>
+          <button
+            type="submit"
+            disabled={!linkRegex.test(link)}
+            style={{ marginRight: 3 }}
+          >
             Animate!
           </button>
         </form>
       </div>
       {!!svgList.length && (
-        <div className="Toolbar-controller">
-          <button type="button" onClick={togglePausedAnimations}>
+        <div style={{ marginLeft: 3 }}>
+          <button
+            type="button"
+            onClick={togglePausedAnimations}
+            style={{ marginRight: 3 }}
+          >
             {paused ? "Play (P)" : "Pause (P)"}
           </button>
-          <button type="button" onClick={stepForwardAnimations}>
+          <button
+            type="button"
+            onClick={stepForwardAnimations}
+            style={{ marginRight: 3 }}
+          >
             Step (S)
           </button>
-          <button type="button" onClick={resetAnimations}>
+          <button
+            type="button"
+            onClick={resetAnimations}
+            style={{ marginRight: 3 }}
+          >
             Reset (R)
           </button>
-          <button type="button" onClick={hideToolbar}>
+          <button
+            type="button"
+            onClick={hideToolbar}
+            style={{ marginRight: 3 }}
+          >
             Hide Toolbar (Q)
           </button>
-          <button type="button" onClick={exportToSvg}>
+          <button
+            type="button"
+            onClick={exportToSvg}
+            style={{ marginRight: 3 }}
+          >
             Export to SVG
           </button>
-          <button type="button" onClick={exportToWebm} disabled={processing}>
+          <button
+            type="button"
+            onClick={exportToWebm}
+            disabled={processing}
+            style={{ marginRight: 3 }}
+          >
             {processing
               ? "Processing..."
               : webmData
