@@ -48,7 +48,7 @@ const Viewer = ({ svgList }: Props) => {
 
   return (
     <div
-      className="Viewer"
+      className="Viewer-container"
       style={{
         height: "100vh",
         display: "grid",

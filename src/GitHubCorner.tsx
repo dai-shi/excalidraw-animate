@@ -1,5 +1,3 @@
-import "./GitHubCorner.css";
-
 type Props = {
   link: string;
   size?: number;
