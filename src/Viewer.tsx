@@ -1,7 +1,5 @@
 import { useEffect, useRef } from "react";
 
-import "./Viewer.css";
-
 type Props = {
   svgList: {
     svg: SVGSVGElement;
@@ -50,8 +48,10 @@ const Viewer = ({ svgList }: Props) => {
 
   return (
     <div
-      className="Viewer"
+      className="Viewer-container"
       style={{
+        height: "100vh",
+        display: "grid",
         gridTemplateColumns: grids,
         gridTemplateRows: grids,
       }}

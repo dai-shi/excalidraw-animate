@@ -1,9 +1,0 @@
-.Viewer {
-  height: 100vh;
-  display: grid;
-}
-
-.Viewer svg {
-  width: 100%;
-  height: 100%;
-}
