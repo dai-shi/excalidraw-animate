@@ -2,21 +2,44 @@ import { useState } from "react";
 import AnimateApp from "./AnimateApp";
 import ExcalidrawApp from "./ExcalidrawApp";
 
+import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+
+const STORAGE_KEY = "excalidraw-app";
+
+const loadFromStorage = ():
+  | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
+  | undefined => {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "");
+    console.log("loadFromStorage", data);
+    data.appState.collaborators = new Map();
+  } catch (e) {
+    return undefined;
+  }
+};
+
+const saveToStorage = (data: {
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+  files: BinaryFiles;
+}) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+};
+
 type ViewMode = "animate" | "excalidraw";
 
 const App = () => {
-  const [viewMode, setViewMode] = useState<ViewMode>("animate");
+  const [mode, setMode] = useState<ViewMode>("animate");
 
-  const toggleViewMode = () => {
-    setViewMode((prevMode) =>
-      prevMode === "animate" ? "excalidraw" : "animate"
-    );
+  const toggleMode = () => {
+    setMode((prev) => (prev === "animate" ? "excalidraw" : "animate"));
   };
 
   return (
     <div>
       <button
-        onClick={toggleViewMode}
+        onClick={toggleMode}
         style={{
           position: "absolute",
           top: 1,
@@ -25,9 +48,16 @@ const App = () => {
           zIndex: 10,
         }}
       >
-        {viewMode === "animate" ? "Edit" : "Animate"}
+        {mode === "animate" ? "Edit" : "Animate"}
       </button>
-      {viewMode === "animate" ? <AnimateApp /> : <ExcalidrawApp />}
+      {mode === "animate" ? (
+        <AnimateApp />
+      ) : (
+        <ExcalidrawApp
+          initialData={loadFromStorage()}
+          onChangeData={(data) => saveToStorage(data)}
+        />
+      )}
     </div>
   );
 };
