@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   exportToSvg,
   restoreElements,
   loadLibraryFromBlob,
   getNonDeletedElements,
-} from "@excalidraw/excalidraw";
+} from '@excalidraw/excalidraw';
 
-import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
-import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types';
+import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 
-import { loadScene } from "./vendor/loadScene";
-import { animateSvg } from "./animate";
+import { loadScene } from './vendor/loadScene';
+import { animateSvg } from './animate';
 
 const importLibraryFromUrl = async (url: string) => {
   try {
@@ -19,10 +19,10 @@ const importLibraryFromUrl = async (url: string) => {
     const blob = await request.blob();
     const libraryItems = await loadLibraryFromBlob(blob);
     return libraryItems.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem.elements, null))
+      getNonDeletedElements(restoreElements(libraryItem.elements, null)),
     );
   } catch {
-    window.alert("Unable to load library");
+    window.alert('Unable to load library');
     return [];
   }
 };
@@ -30,7 +30,7 @@ const importLibraryFromUrl = async (url: string) => {
 export const useLoadSvg = (
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
-    | undefined
+    | undefined,
 ) => {
   const [loading, setLoading] = useState(true);
   const [loadedSvgList, setLoadedSvgList] = useState<
@@ -44,18 +44,18 @@ export const useLoadSvg = (
     async (
       dataList: {
         elements: readonly ExcalidrawElement[];
-        appState: Parameters<typeof exportToSvg>[0]["appState"];
+        appState: Parameters<typeof exportToSvg>[0]['appState'];
         files: BinaryFiles;
       }[],
-      inSequence?: boolean
+      inSequence?: boolean,
     ) => {
       const hash = window.location.hash.slice(1);
       const searchParams = new URLSearchParams(hash);
       const options = {
         startMs: undefined as number | undefined,
-        pointerImg: searchParams.get("pointerImg") || undefined,
-        pointerWidth: searchParams.get("pointerWidth") || undefined,
-        pointerHeight: searchParams.get("pointerHeight") || undefined,
+        pointerImg: searchParams.get('pointerImg') || undefined,
+        pointerWidth: searchParams.get('pointerWidth') || undefined,
+        pointerHeight: searchParams.get('pointerHeight') || undefined,
       };
       const svgList = await Promise.all(
         dataList.map(async (data) => {
@@ -72,12 +72,12 @@ export const useLoadSvg = (
             options.startMs = result.finishedMs;
           }
           return { svg, finishedMs: result.finishedMs };
-        })
+        }),
       );
       setLoadedSvgList(svgList);
       return svgList;
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -85,27 +85,27 @@ export const useLoadSvg = (
       const hash = window.location.hash.slice(1);
       const searchParams = new URLSearchParams(hash);
       const matchIdKey = /([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)/.exec(
-        searchParams.get("json") || ""
+        searchParams.get('json') || '',
       );
       if (matchIdKey) {
         const [, id, key] = matchIdKey;
         const data = await loadScene(id, key, null);
         const [{ svg, finishedMs }] = await loadDataList([data]);
-        if (searchParams.get("autoplay") === "no") {
+        if (searchParams.get('autoplay') === 'no') {
           svg.setCurrentTime(finishedMs);
         }
       }
       const matchLibrary = /(.*\.excalidrawlib)/.exec(
-        searchParams.get("library") || ""
+        searchParams.get('library') || '',
       );
       if (matchLibrary) {
         const [, url] = matchLibrary;
         const dataList = await importLibraryFromUrl(url);
         const svgList = await loadDataList(
           dataList.map((elements) => ({ elements, appState: {}, files: {} })),
-          searchParams.has("sequence")
+          searchParams.has('sequence'),
         );
-        if (searchParams.get("autoplay") === "no") {
+        if (searchParams.get('autoplay') === 'no') {
           svgList.forEach(({ svg, finishedMs }) => {
             svg.setCurrentTime(finishedMs);
           });

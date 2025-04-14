@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 type Props = {
   svgList: {
@@ -26,7 +26,7 @@ const Viewer = ({ svgList }: Props) => {
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const searchParams = new URLSearchParams(hash);
-    if (searchParams.get("autoplay") === "no") {
+    if (searchParams.get('autoplay') === 'no') {
       if (ref.current) {
         const ele = ref.current;
         const callback = () => {
@@ -35,9 +35,9 @@ const Viewer = ({ svgList }: Props) => {
             svg.unpauseAnimations();
           });
         };
-        ele.addEventListener("click", callback);
+        ele.addEventListener('click', callback);
         return () => {
-          ele.removeEventListener("click", callback);
+          ele.removeEventListener('click', callback);
         };
       }
     }
@@ -50,8 +50,8 @@ const Viewer = ({ svgList }: Props) => {
     <div
       className="Viewer-container"
       style={{
-        height: "100vh",
-        display: "grid",
+        height: '100vh',
+        display: 'grid',
         gridTemplateColumns: grids,
         gridTemplateRows: grids,
       }}

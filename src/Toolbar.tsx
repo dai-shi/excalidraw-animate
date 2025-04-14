@@ -4,8 +4,8 @@ import {
   useRef,
   useState,
   type FormEvent,
-} from "react";
-import { fileOpen } from "browser-fs-access";
+} from 'react';
+import { fileOpen } from 'browser-fs-access';
 
 import {
   exportToSvg,
@@ -13,17 +13,17 @@ import {
   loadFromBlob,
   loadLibraryFromBlob,
   getNonDeletedElements,
-} from "@excalidraw/excalidraw";
-import type { BinaryFiles } from "@excalidraw/excalidraw/types";
-import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+} from '@excalidraw/excalidraw';
+import type { BinaryFiles } from '@excalidraw/excalidraw/types';
+import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 
-import GitHubCorner from "./GitHubCorner";
-import { getBeginTimeList } from "./animate";
-import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
+import GitHubCorner from './GitHubCorner';
+import { getBeginTimeList } from './animate';
+import { exportToSvgFile, exportToWebmFile, prepareWebmData } from './export';
 
 const loadFromJSON = async () => {
   const blob = await fileOpen({
-    description: "Excalidraw files",
+    description: 'Excalidraw files',
   });
   return loadFromBlob(blob, null, null);
 };
@@ -31,11 +31,11 @@ const loadFromJSON = async () => {
 const linkRegex =
   /#json=([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)|^http.*\.excalidrawlib$/;
 
-const getCombinedBeginTimeList = (svgList: Props["svgList"]) => {
+const getCombinedBeginTimeList = (svgList: Props['svgList']) => {
   const beginTimeList = ([] as number[]).concat(
     ...svgList.map(({ svg }) =>
-      getBeginTimeList(svg).map((n) => Math.floor(n / 100) * 100)
-    )
+      getBeginTimeList(svg).map((n) => Math.floor(n / 100) * 100),
+    ),
   );
   return [...new Set(beginTimeList)].sort((a, b) => a - b);
 };
@@ -48,17 +48,17 @@ type Props = {
   loadDataList: (
     data: {
       elements: readonly ExcalidrawElement[];
-      appState: Parameters<typeof exportToSvg>[0]["appState"];
+      appState: Parameters<typeof exportToSvg>[0]['appState'];
       files: BinaryFiles;
-    }[]
+    }[],
   ) => void;
 };
 
 const Toolbar = ({ svgList, loadDataList }: Props) => {
-  const [showToolbar, setShowToolbar] = useState<boolean | "never">(false);
+  const [showToolbar, setShowToolbar] = useState<boolean | 'never'>(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [link, setLink] = useState("");
+  const [link, setLink] = useState('');
   const [webmData, setWebmData] = useState<Blob>();
   useEffect(() => {
     setWebmData(undefined);
@@ -77,10 +77,10 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const searchParams = new URLSearchParams(hash);
-    if (searchParams.get("toolbar") !== "no") {
+    if (searchParams.get('toolbar') !== 'no') {
       setShowToolbar(true);
     } else {
-      setShowToolbar("never");
+      setShowToolbar('never');
     }
   }, []);
 
@@ -91,16 +91,16 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
 
   const loadLibrary = async () => {
     const blob = await fileOpen({
-      description: "Excalidraw library files",
-      extensions: [".json", ".excalidrawlib"],
-      mimeTypes: ["application/json"],
+      description: 'Excalidraw library files',
+      extensions: ['.json', '.excalidrawlib'],
+      mimeTypes: ['application/json'],
     });
     const libraryItems = await loadLibraryFromBlob(blob);
     const dataList = libraryItems.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem.elements, null))
+      getNonDeletedElements(restoreElements(libraryItem.elements, null)),
     );
     loadDataList(
-      dataList.map((elements) => ({ elements, appState: {}, files: {} }))
+      dataList.map((elements) => ({ elements, appState: {}, files: {} })),
     );
   };
 
@@ -108,7 +108,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     event.preventDefault();
     const match = linkRegex.exec(link);
     if (!match) {
-      window.alert("Invalid link");
+      window.alert('Invalid link');
       return;
     }
     if (match[1]) {
@@ -126,7 +126,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     setPaused((p) => !p);
   }, [svgList]);
 
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<NodeJS.Timeout>(undefined);
   const stepForwardAnimations = useCallback(() => {
     if (!svgList.length) {
       return;
@@ -160,28 +160,28 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "p") {
+      if (e.key.toLowerCase() === 'p') {
         togglePausedAnimations();
-      } else if (e.key.toLowerCase() === "s") {
+      } else if (e.key.toLowerCase() === 's') {
         stepForwardAnimations();
-      } else if (e.key.toLowerCase() === "r") {
+      } else if (e.key.toLowerCase() === 'r') {
         resetAnimations();
-      } else if (e.key.toLowerCase() === "q") {
+      } else if (e.key.toLowerCase() === 'q') {
         // toggle toolbar
-        setShowToolbar((s) => (typeof s === "boolean" ? !s : s));
+        setShowToolbar((s) => (typeof s === 'boolean' ? !s : s));
       } else {
         // show toolbar otherwise
-        setShowToolbar((s) => (typeof s === "boolean" ? true : s));
+        setShowToolbar((s) => (typeof s === 'boolean' ? true : s));
       }
     };
-    document.addEventListener("keydown", onKeydown);
+    document.addEventListener('keydown', onKeydown);
     return () => {
-      document.removeEventListener("keydown", onKeydown);
+      document.removeEventListener('keydown', onKeydown);
     };
   }, [togglePausedAnimations, stepForwardAnimations, resetAnimations]);
 
   const hideToolbar = () => {
-    setShowToolbar((s) => (typeof s === "boolean" ? false : s));
+    setShowToolbar((s) => (typeof s === 'boolean' ? false : s));
   };
 
   const exportToSvg = () => {
@@ -219,7 +219,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
 
   return (
     <div>
-      <div style={{ margin: "3px 3px 3px 40px" }}>
+      <div style={{ margin: '3px 3px 3px 40px' }}>
         <button type="button" onClick={loadFile} style={{ marginRight: 3 }}>
           Load File
         </button>
@@ -228,7 +228,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
           Load Library
         </button>
         <span>OR</span>
-        <form onSubmit={loadLink} style={{ display: "inline" }}>
+        <form onSubmit={loadLink} style={{ display: 'inline' }}>
           <input
             placeholder="Enter link..."
             value={link}
@@ -251,7 +251,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
             onClick={togglePausedAnimations}
             style={{ marginRight: 3 }}
           >
-            {paused ? "Play (P)" : "Pause (P)"}
+            {paused ? 'Play (P)' : 'Pause (P)'}
           </button>
           <button
             type="button"
@@ -288,10 +288,10 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
             style={{ marginRight: 3 }}
           >
             {processing
-              ? "Processing..."
+              ? 'Processing...'
               : webmData
-              ? "Export to WebM"
-              : "Prepare WebM"}
+                ? 'Export to WebM'
+                : 'Prepare WebM'}
           </button>
         </div>
       )}
