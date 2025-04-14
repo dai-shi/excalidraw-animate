@@ -12,8 +12,9 @@ const loadFromStorage = ():
   | undefined => {
   try {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "");
-    console.log("loadFromStorage", data);
     data.appState.collaborators = new Map();
+    data.scrollToContent = true;
+    return data;
   } catch (e) {
     return undefined;
   }
@@ -24,7 +25,9 @@ const saveToStorage = (data: {
   appState: AppState;
   files: BinaryFiles;
 }) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {}
 };
 
 type ViewMode = "animate" | "excalidraw";
