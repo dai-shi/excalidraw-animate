@@ -2,9 +2,9 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawFreeDrawElement,
-} from "@excalidraw/excalidraw/element/types";
+} from '@excalidraw/excalidraw/element/types';
 
-import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
+import { getFreeDrawSvgPath } from '@excalidraw/excalidraw';
 
 type AnimateOptions = {
   startMs?: number;
@@ -13,7 +13,7 @@ type AnimateOptions = {
   pointerHeight?: string;
 };
 
-const SVG_NS = "http://www.w3.org/2000/svg";
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const findNode = (ele: SVGElement, name: string) => {
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
@@ -30,17 +30,17 @@ const hideBeforeAnimation = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  freeze?: boolean
+  freeze?: boolean,
 ) => {
-  ele.setAttribute("opacity", "0");
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "opacity");
-  animate.setAttribute("from", "1");
-  animate.setAttribute("to", "1");
-  animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${durationMs}ms`);
+  ele.setAttribute('opacity', '0');
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+  animate.setAttribute('attributeName', 'opacity');
+  animate.setAttribute('from', '1');
+  animate.setAttribute('to', '1');
+  animate.setAttribute('begin', `${currentMs}ms`);
+  animate.setAttribute('dur', `${durationMs}ms`);
   if (freeze) {
-    animate.setAttribute("fill", "freeze");
+    animate.setAttribute('fill', 'freeze');
   }
   ele.appendChild(animate);
 };
@@ -63,7 +63,7 @@ const pickOnePathItem = (path: string) => {
       }
       return prev;
     },
-    [0, 0]
+    [0, 0],
   );
   return items[longestIndex];
 };
@@ -74,25 +74,25 @@ const animatePointer = (
   path: string,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   if (!options.pointerImg) return;
-  const img = svg.ownerDocument.createElementNS(SVG_NS, "image");
-  img.setAttribute("href", options.pointerImg);
+  const img = svg.ownerDocument.createElementNS(SVG_NS, 'image');
+  img.setAttribute('href', options.pointerImg);
   if (options.pointerWidth) {
-    img.setAttribute("width", options.pointerWidth);
+    img.setAttribute('width', options.pointerWidth);
   }
   if (options.pointerHeight) {
-    img.setAttribute("height", options.pointerHeight);
+    img.setAttribute('height', options.pointerHeight);
   }
   hideBeforeAnimation(svg, img, currentMs, durationMs);
   const animateMotion = svg.ownerDocument.createElementNS(
     SVG_NS,
-    "animateMotion"
+    'animateMotion',
   );
-  animateMotion.setAttribute("path", pickOnePathItem(path));
-  animateMotion.setAttribute("begin", `${currentMs}ms`);
-  animateMotion.setAttribute("dur", `${durationMs}ms`);
+  animateMotion.setAttribute('path', pickOnePathItem(path));
+  animateMotion.setAttribute('begin', `${currentMs}ms`);
+  animateMotion.setAttribute('dur', `${durationMs}ms`);
   img.appendChild(animateMotion);
   ele.parentNode?.appendChild(img);
 };
@@ -102,9 +102,9 @@ const animatePath = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
-  const dTo = ele.getAttribute("d") || "";
+  const dTo = ele.getAttribute('d') || '';
   const mCount = dTo.match(/M/g)?.length || 0;
   const cCount = dTo.match(/C/g)?.length || 0;
   const repeat = cCount / mCount;
@@ -113,13 +113,13 @@ const animatePath = (
     const dFrom = dTo.replace(
       new RegExp(
         [
-          "M(\\S+) (\\S+)",
-          "((?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){",
+          'M(\\S+) (\\S+)',
+          '((?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){',
           `${i}`, // skip count
-          "})",
-          "(?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){1,}",
-        ].join(""),
-        "g"
+          '})',
+          '(?: C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+){1,}',
+        ].join(''),
+        'g',
       ),
       (...a) => {
         const [x, y] = a[3]
@@ -129,18 +129,18 @@ const animatePath = (
           `M${a[1]} ${a[2]}${a[3]}` +
           ` C${x} ${y}, ${x} ${y}, ${x} ${y}`.repeat(repeat - i)
         );
-      }
+      },
     );
     if (i === 0) {
-      ele.setAttribute("d", dFrom);
+      ele.setAttribute('d', dFrom);
     }
-    const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-    animate.setAttribute("attributeName", "d");
-    animate.setAttribute("from", dFrom);
-    animate.setAttribute("to", dLast);
-    animate.setAttribute("begin", `${currentMs + i * (durationMs / repeat)}ms`);
-    animate.setAttribute("dur", `${durationMs / repeat}ms`);
-    animate.setAttribute("fill", "freeze");
+    const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+    animate.setAttribute('attributeName', 'd');
+    animate.setAttribute('from', dFrom);
+    animate.setAttribute('to', dLast);
+    animate.setAttribute('begin', `${currentMs + i * (durationMs / repeat)}ms`);
+    animate.setAttribute('dur', `${durationMs / repeat}ms`);
+    animate.setAttribute('fill', 'freeze');
     ele.appendChild(animate);
     dLast = dFrom;
   }
@@ -153,27 +153,27 @@ const animateFillPath = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
-  const dTo = ele.getAttribute("d") || "";
-  if (dTo.includes("C")) {
+  const dTo = ele.getAttribute('d') || '';
+  if (dTo.includes('C')) {
     animatePath(svg, ele, currentMs, durationMs, options);
     return;
   }
   const dFrom = dTo.replace(
-    new RegExp(["M(\\S+) (\\S+)", "((?: L\\S+ \\S+){1,})"].join("")),
+    new RegExp(['M(\\S+) (\\S+)', '((?: L\\S+ \\S+){1,})'].join('')),
     (...a) => {
       return `M${a[1]} ${a[2]}` + a[3].replace(/L\S+ \S+/g, `L${a[1]} ${a[2]}`);
-    }
+    },
   );
-  ele.setAttribute("d", dFrom);
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "d");
-  animate.setAttribute("from", dFrom);
-  animate.setAttribute("to", dTo);
-  animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${durationMs}ms`);
-  animate.setAttribute("fill", "freeze");
+  ele.setAttribute('d', dFrom);
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+  animate.setAttribute('attributeName', 'd');
+  animate.setAttribute('from', dFrom);
+  animate.setAttribute('to', dTo);
+  animate.setAttribute('begin', `${currentMs}ms`);
+  animate.setAttribute('dur', `${durationMs}ms`);
+  animate.setAttribute('fill', 'freeze');
   ele.appendChild(animate);
 };
 
@@ -182,33 +182,33 @@ const animatePolygon = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
-  let dTo = ele.getAttribute("d") || "";
+  let dTo = ele.getAttribute('d') || '';
   let mCount = dTo.match(/M/g)?.length || 0;
   let cCount = dTo.match(/C/g)?.length || 0;
   if (mCount === cCount + 1) {
     // workaround for round rect
-    dTo = dTo.replace(/^M\S+ \S+ M/, "M");
+    dTo = dTo.replace(/^M\S+ \S+ M/, 'M');
     mCount = dTo.match(/M/g)?.length || 0;
     cCount = dTo.match(/C/g)?.length || 0;
   }
-  if (mCount !== cCount) throw new Error("unexpected m/c counts");
-  const dups = ele.getAttribute("stroke-dasharray") ? 1 : Math.min(2, mCount);
+  if (mCount !== cCount) throw new Error('unexpected m/c counts');
+  const dups = ele.getAttribute('stroke-dasharray') ? 1 : Math.min(2, mCount);
   const repeat = mCount / dups;
   let dLast = dTo;
   for (let i = repeat - 1; i >= 0; i -= 1) {
     const dFrom = dTo.replace(
       new RegExp(
         [
-          "((?:",
-          "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
-          "){",
+          '((?:',
+          'M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?'.repeat(dups),
+          '){',
           `${i}`, // skip count
-          "})",
-          "M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
-          ".*",
-        ].join("")
+          '})',
+          'M(\\S+) (\\S+) C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?'.repeat(dups),
+          '.*',
+        ].join(''),
       ),
       (...a) => {
         return (
@@ -218,21 +218,21 @@ const animatePolygon = (
               const [x, y] = a.slice(2 + dups * 2 + d * 2);
               return `M${x} ${y} C${x} ${y}, ${x} ${y}, ${x} ${y} `;
             })
-            .join("")
+            .join('')
             .repeat(repeat - i)
         );
-      }
+      },
     );
     if (i === 0) {
-      ele.setAttribute("d", dFrom);
+      ele.setAttribute('d', dFrom);
     }
-    const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-    animate.setAttribute("attributeName", "d");
-    animate.setAttribute("from", dFrom);
-    animate.setAttribute("to", dLast);
-    animate.setAttribute("begin", `${currentMs + i * (durationMs / repeat)}ms`);
-    animate.setAttribute("dur", `${durationMs / repeat}ms`);
-    animate.setAttribute("fill", "freeze");
+    const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+    animate.setAttribute('attributeName', 'd');
+    animate.setAttribute('from', dFrom);
+    animate.setAttribute('to', dLast);
+    animate.setAttribute('begin', `${currentMs + i * (durationMs / repeat)}ms`);
+    animate.setAttribute('dur', `${durationMs / repeat}ms`);
+    animate.setAttribute('fill', 'freeze');
     ele.appendChild(animate);
     dLast = dFrom;
     animatePointer(
@@ -241,20 +241,20 @@ const animatePolygon = (
       dTo.replace(
         new RegExp(
           [
-            "(?:",
-            "M\\S+ \\S+ C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?".repeat(dups),
-            "){",
+            '(?:',
+            'M\\S+ \\S+ C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+ ?'.repeat(dups),
+            '){',
             `${i}`, // skip count
-            "}",
-            "(M\\S+ \\S+ C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+) ?".repeat(dups),
-            ".*",
-          ].join("")
+            '}',
+            '(M\\S+ \\S+ C\\S+ \\S+, \\S+ \\S+, \\S+ \\S+) ?'.repeat(dups),
+            '.*',
+          ].join(''),
         ),
-        "$1"
+        '$1',
       ),
       currentMs + i * (durationMs / repeat),
       durationMs / repeat,
-      options
+      options,
     );
   }
   hideBeforeAnimation(svg, ele, currentMs, durationMs, true);
@@ -268,41 +268,41 @@ const animateText = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
-  const anchor = ele.getAttribute("text-anchor") || "start";
-  if (anchor !== "start") {
+  const anchor = ele.getAttribute('text-anchor') || 'start';
+  if (anchor !== 'start') {
     // Not sure how to support it, fallback with opacity
-    const toOpacity = ele.getAttribute("opacity") || "1.0";
-    const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-    animate.setAttribute("attributeName", "opacity");
-    animate.setAttribute("from", "0.0");
-    animate.setAttribute("to", toOpacity);
-    animate.setAttribute("begin", `${currentMs}ms`);
-    animate.setAttribute("dur", `${durationMs}ms`);
-    animate.setAttribute("fill", "freeze");
+    const toOpacity = ele.getAttribute('opacity') || '1.0';
+    const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+    animate.setAttribute('attributeName', 'opacity');
+    animate.setAttribute('from', '0.0');
+    animate.setAttribute('to', toOpacity);
+    animate.setAttribute('begin', `${currentMs}ms`);
+    animate.setAttribute('dur', `${durationMs}ms`);
+    animate.setAttribute('fill', 'freeze');
     ele.appendChild(animate);
-    ele.setAttribute("opacity", "0.0");
+    ele.setAttribute('opacity', '0.0');
     return;
   }
-  const x = Number(ele.getAttribute("x") || 0);
-  const y = Number(ele.getAttribute("y") || 0);
+  const x = Number(ele.getAttribute('x') || 0);
+  const y = Number(ele.getAttribute('y') || 0);
   pathForTextIndex += 1;
-  const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
-  path.setAttribute("id", "pathForText" + pathForTextIndex);
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "d");
-  animate.setAttribute("from", `m${x} ${y} h0`);
-  animate.setAttribute("to", `m${x} ${y} h${width}`);
-  animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${durationMs}ms`);
-  animate.setAttribute("fill", "freeze");
+  const path = svg.ownerDocument.createElementNS(SVG_NS, 'path');
+  path.setAttribute('id', 'pathForText' + pathForTextIndex);
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+  animate.setAttribute('attributeName', 'd');
+  animate.setAttribute('from', `m${x} ${y} h0`);
+  animate.setAttribute('to', `m${x} ${y} h${width}`);
+  animate.setAttribute('begin', `${currentMs}ms`);
+  animate.setAttribute('dur', `${durationMs}ms`);
+  animate.setAttribute('fill', 'freeze');
   path.appendChild(animate);
-  const textPath = svg.ownerDocument.createElementNS(SVG_NS, "textPath");
-  textPath.setAttribute("href", "#pathForText" + pathForTextIndex);
+  const textPath = svg.ownerDocument.createElementNS(SVG_NS, 'textPath');
+  textPath.setAttribute('href', '#pathForText' + pathForTextIndex);
   textPath.textContent = ele.textContent;
-  ele.textContent = " "; // HACK for Firebox as `null` does not work
-  findNode(svg, "defs")?.appendChild(path);
+  ele.textContent = ' '; // HACK for Firebox as `null` does not work
+  findNode(svg, 'defs')?.appendChild(path);
   ele.appendChild(textPath);
   animatePointer(
     svg,
@@ -310,7 +310,7 @@ const animateText = (
     `m${x} ${y} h${width}`,
     currentMs,
     durationMs,
-    options
+    options,
   );
 };
 
@@ -320,15 +320,15 @@ const animateFromToPath = (
   dFrom: string,
   dTo: string,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
 ) => {
-  const path = svg.ownerDocument.createElementNS(SVG_NS, "path");
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "d");
-  animate.setAttribute("from", dFrom);
-  animate.setAttribute("to", dTo);
-  animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${durationMs}ms`);
+  const path = svg.ownerDocument.createElementNS(SVG_NS, 'path');
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+  animate.setAttribute('attributeName', 'd');
+  animate.setAttribute('from', dFrom);
+  animate.setAttribute('to', dTo);
+  animate.setAttribute('begin', `${currentMs}ms`);
+  animate.setAttribute('dur', `${durationMs}ms`);
   path.appendChild(animate);
   ele.appendChild(path);
 };
@@ -339,17 +339,17 @@ const patchSvgLine = (
   isRounded: boolean,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   const animateLine = isRounded ? animatePath : animatePolygon;
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
-  if (childNodes[0].getAttribute("fill-rule")) {
+  if (childNodes[0].getAttribute('fill-rule')) {
     animateLine(
       svg,
       childNodes[0].childNodes[1] as SVGElement,
       currentMs,
       durationMs * 0.75,
-      options
+      options,
     );
     currentMs += durationMs * 0.75;
     animateFillPath(
@@ -357,7 +357,7 @@ const patchSvgLine = (
       childNodes[0].childNodes[0] as SVGElement,
       currentMs,
       durationMs * 0.25,
-      options
+      options,
     );
   } else {
     animateLine(
@@ -365,7 +365,7 @@ const patchSvgLine = (
       childNodes[0].childNodes[0] as SVGElement,
       currentMs,
       durationMs,
-      options
+      options,
     );
   }
 };
@@ -376,7 +376,7 @@ const patchSvgArrow = (
   isRounded: boolean,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   const animateLine = isRounded ? animatePath : animatePolygon;
   const numParts = ele.childNodes.length;
@@ -385,7 +385,7 @@ const patchSvgArrow = (
     ele.childNodes[0].childNodes[0] as SVGElement,
     currentMs,
     (durationMs / (numParts + 2)) * 3,
-    options
+    options,
   );
   currentMs += (durationMs / (numParts + 2)) * 3;
   for (let i = 1; i < numParts; i += 1) {
@@ -396,7 +396,7 @@ const patchSvgArrow = (
         ele.childNodes[i].childNodes[j] as SVGElement,
         currentMs,
         durationMs / (numParts + 2) / numChildren,
-        options
+        options,
       );
       currentMs += durationMs / (numParts + 2) / numChildren;
     }
@@ -408,7 +408,7 @@ const patchSvgRectangle = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   if (ele.childNodes[1]) {
     animatePolygon(
@@ -416,7 +416,7 @@ const patchSvgRectangle = (
       ele.childNodes[1] as SVGElement,
       currentMs,
       durationMs * 0.75,
-      options
+      options,
     );
     currentMs += durationMs * 0.75;
     animateFillPath(
@@ -424,7 +424,7 @@ const patchSvgRectangle = (
       ele.childNodes[0] as SVGElement,
       currentMs,
       durationMs * 0.25,
-      options
+      options,
     );
   } else {
     animatePolygon(
@@ -432,7 +432,7 @@ const patchSvgRectangle = (
       ele.childNodes[0] as SVGElement,
       currentMs,
       durationMs,
-      options
+      options,
     );
   }
 };
@@ -442,7 +442,7 @@ const patchSvgEllipse = (
   ele: SVGElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   if (ele.childNodes[1]) {
     animatePath(
@@ -450,7 +450,7 @@ const patchSvgEllipse = (
       ele.childNodes[1] as SVGElement,
       currentMs,
       durationMs * 0.75,
-      options
+      options,
     );
     currentMs += durationMs * 0.75;
     animateFillPath(
@@ -458,7 +458,7 @@ const patchSvgEllipse = (
       ele.childNodes[0] as SVGElement,
       currentMs,
       durationMs * 0.25,
-      options
+      options,
     );
   } else {
     animatePath(
@@ -466,7 +466,7 @@ const patchSvgEllipse = (
       ele.childNodes[0] as SVGElement,
       currentMs,
       durationMs,
-      options
+      options,
     );
   }
 };
@@ -477,7 +477,7 @@ const patchSvgText = (
   width: number,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   const childNodes = ele.childNodes as NodeListOf<SVGElement>;
   const len = childNodes.length;
@@ -493,34 +493,34 @@ const patchSvgFreedraw = (
   freeDrawElement: NonDeleted<ExcalidrawFreeDrawElement>,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   const childNode = ele.childNodes[0] as SVGPathElement;
-  childNode.setAttribute("opacity", "0");
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "opacity");
-  animate.setAttribute("from", "0");
-  animate.setAttribute("to", "1");
-  animate.setAttribute("calcMode", "discrete");
-  animate.setAttribute("begin", `${currentMs + durationMs - 1}ms`);
-  animate.setAttribute("dur", `${1}ms`);
-  animate.setAttribute("fill", "freeze");
+  childNode.setAttribute('opacity', '0');
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+  animate.setAttribute('attributeName', 'opacity');
+  animate.setAttribute('from', '0');
+  animate.setAttribute('to', '1');
+  animate.setAttribute('calcMode', 'discrete');
+  animate.setAttribute('begin', `${currentMs + durationMs - 1}ms`);
+  animate.setAttribute('dur', `${1}ms`);
+  animate.setAttribute('fill', 'freeze');
   childNode.appendChild(animate);
   animatePointer(
     svg,
     childNode,
     freeDrawElement.points.reduce(
       (p, [x, y]) => (p ? p + ` T ${x} ${y}` : `M ${x} ${y}`),
-      ""
+      '',
     ),
     currentMs,
     durationMs,
-    options
+    options,
   );
 
   // interporation
   const repeat = freeDrawElement.points.length;
-  let dTo = childNode.getAttribute("d") as string;
+  let dTo = childNode.getAttribute('d') as string;
   for (let i = repeat - 1; i >= 0; i -= 1) {
     const dFrom =
       i > 0
@@ -528,14 +528,14 @@ const patchSvgFreedraw = (
             ...freeDrawElement,
             points: freeDrawElement.points.slice(0, i),
           })
-        : "M 0 0";
+        : 'M 0 0';
     animateFromToPath(
       svg,
       ele,
       dFrom,
       dTo,
       currentMs + i * (durationMs / repeat),
-      durationMs / repeat
+      durationMs / repeat,
     );
     dTo = dFrom;
   }
@@ -545,18 +545,18 @@ const patchSvgImage = (
   svg: SVGSVGElement,
   ele: SVGElement,
   currentMs: number,
-  durationMs: number
+  durationMs: number,
 ) => {
-  const toOpacity = ele.getAttribute("opacity") || "1.0";
-  const animate = svg.ownerDocument.createElementNS(SVG_NS, "animate");
-  animate.setAttribute("attributeName", "opacity");
-  animate.setAttribute("from", "0.0");
-  animate.setAttribute("to", toOpacity);
-  animate.setAttribute("begin", `${currentMs}ms`);
-  animate.setAttribute("dur", `${durationMs}ms`);
-  animate.setAttribute("fill", "freeze");
+  const toOpacity = ele.getAttribute('opacity') || '1.0';
+  const animate = svg.ownerDocument.createElementNS(SVG_NS, 'animate');
+  animate.setAttribute('attributeName', 'opacity');
+  animate.setAttribute('from', '0.0');
+  animate.setAttribute('to', toOpacity);
+  animate.setAttribute('begin', `${currentMs}ms`);
+  animate.setAttribute('dur', `${durationMs}ms`);
+  animate.setAttribute('fill', 'freeze');
   ele.appendChild(animate);
-  ele.setAttribute("opacity", "0.0");
+  ele.setAttribute('opacity', '0.0');
 };
 
 const patchSvgEle = (
@@ -565,44 +565,44 @@ const patchSvgEle = (
   excalidraElement: NonDeletedExcalidrawElement,
   currentMs: number,
   durationMs: number,
-  options: AnimateOptions
+  options: AnimateOptions,
 ) => {
   const { type, roundness, width } = excalidraElement;
-  if (type === "line") {
+  if (type === 'line') {
     patchSvgLine(svg, ele, !!roundness, currentMs, durationMs, options);
-  } else if (type === "arrow") {
+  } else if (type === 'arrow') {
     patchSvgArrow(svg, ele, !!roundness, currentMs, durationMs, options);
-  } else if (type === "rectangle" || type === "diamond") {
+  } else if (type === 'rectangle' || type === 'diamond') {
     patchSvgRectangle(svg, ele, currentMs, durationMs, options);
-  } else if (type === "ellipse") {
+  } else if (type === 'ellipse') {
     patchSvgEllipse(svg, ele, currentMs, durationMs, options);
-  } else if (type === "text") {
+  } else if (type === 'text') {
     patchSvgText(svg, ele, width, currentMs, durationMs, options);
-  } else if (excalidraElement.type === "freedraw") {
+  } else if (excalidraElement.type === 'freedraw') {
     patchSvgFreedraw(
       svg,
       ele,
       excalidraElement,
       currentMs,
       durationMs,
-      options
+      options,
     );
-  } else if (type === "image") {
+  } else if (type === 'image') {
     patchSvgImage(svg, ele, currentMs, durationMs);
   } else {
-    console.error("unknown excalidraw element type", excalidraElement.type);
+    console.error('unknown excalidraw element type', excalidraElement.type);
   }
 };
 
 const createGroups = (
   svg: SVGSVGElement,
-  elements: readonly NonDeletedExcalidrawElement[]
+  elements: readonly NonDeletedExcalidrawElement[],
 ) => {
   const groups: { [groupId: string]: (readonly [SVGElement, number])[] } = {};
   let index = 0;
   const childNodes = svg.childNodes as NodeListOf<SVGElement>;
   childNodes.forEach((ele) => {
-    if (ele.tagName === "g") {
+    if (ele.tagName === 'g') {
       const { groupIds } = elements[index];
       if (groupIds.length >= 1) {
         const groupId = groupIds[0];
@@ -617,12 +617,12 @@ const createGroups = (
 
 const filterGroupNodes = (nodes: NodeListOf<SVGElement>) =>
   [...nodes].filter(
-    (node) => node.tagName === "g" || node.tagName === "use" /* for images */
+    (node) => node.tagName === 'g' || node.tagName === 'use' /* for images */,
   );
 
 const extractNumberFromElement = (
   element: NonDeletedExcalidrawElement,
-  key: string
+  key: string,
 ) => {
   const match = element.id.match(new RegExp(`${key}:(-?\\d+)`));
   return (match && Number(match[1])) || 0;
@@ -630,20 +630,20 @@ const extractNumberFromElement = (
 
 const sortSvgNodes = (
   nodes: SVGElement[],
-  elements: readonly NonDeletedExcalidrawElement[]
+  elements: readonly NonDeletedExcalidrawElement[],
 ) =>
   [...nodes].sort((a, b) => {
     const aIndex = nodes.indexOf(a);
     const bIndex = nodes.indexOf(b);
-    const aOrder = extractNumberFromElement(elements[aIndex], "animateOrder");
-    const bOrder = extractNumberFromElement(elements[bIndex], "animateOrder");
+    const aOrder = extractNumberFromElement(elements[aIndex], 'animateOrder');
+    const bOrder = extractNumberFromElement(elements[bIndex], 'animateOrder');
     return aOrder - bOrder;
   });
 
 export const animateSvg = (
   svg: SVGSVGElement,
   elements: readonly NonDeletedExcalidrawElement[],
-  options: AnimateOptions = {}
+  options: AnimateOptions = {},
 ) => {
   const groups = createGroups(svg, elements);
   const finished = new Map();
@@ -652,14 +652,14 @@ export const animateSvg = (
   const individualDur = 500;
   const groupNodes = filterGroupNodes(svg.childNodes as NodeListOf<SVGElement>);
   if (groupNodes.length !== elements.length) {
-    throw new Error("element length mismatch");
+    throw new Error('element length mismatch');
   }
   const groupElement2Element = new Map(
-    groupNodes.map((ele, index) => [ele, elements[index]])
+    groupNodes.map((ele, index) => [ele, elements[index]]),
   );
   sortSvgNodes(groupNodes, elements).forEach((ele) => {
     const element = groupElement2Element.get(
-      ele
+      ele,
     ) as NonDeletedExcalidrawElement;
     const { groupIds } = element;
     if (!finished.has(ele)) {
@@ -667,14 +667,14 @@ export const animateSvg = (
         const groupId = groupIds[0];
         const group = groups[groupId];
         const dur =
-          extractNumberFromElement(element, "animateDuration") ||
+          extractNumberFromElement(element, 'animateDuration') ||
           groupDur / (group.length + 1);
         patchSvgEle(svg, ele, element, current, dur, options);
         current += dur;
         finished.set(ele, true);
         group.forEach(([childEle, childIndex]) => {
           const dur =
-            extractNumberFromElement(elements[childIndex], "animateDuration") ||
+            extractNumberFromElement(elements[childIndex], 'animateDuration') ||
             groupDur / (group.length + 1);
           if (!finished.has(childEle)) {
             patchSvgEle(
@@ -683,7 +683,7 @@ export const animateSvg = (
               elements[childIndex],
               current,
               dur,
-              options
+              options,
             );
             current += dur;
             finished.set(childEle, true);
@@ -692,7 +692,7 @@ export const animateSvg = (
         delete groups[groupId];
       } else {
         const dur =
-          extractNumberFromElement(element, "animateDuration") || individualDur;
+          extractNumberFromElement(element, 'animateDuration') || individualDur;
         patchSvgEle(svg, ele, element, current, dur, options);
         current += dur;
         finished.set(ele, true);
@@ -707,8 +707,8 @@ export const getBeginTimeList = (svg: SVGSVGElement) => {
   const beginTimeList: number[] = [];
   const tmpTimeList: number[] = [];
   const findAnimate = (ele: SVGElement) => {
-    if (ele.tagName === "animate") {
-      const match = /([0-9.]+)ms/.exec(ele.getAttribute("begin") || "");
+    if (ele.tagName === 'animate') {
+      const match = /([0-9.]+)ms/.exec(ele.getAttribute('begin') || '');
       if (match) {
         tmpTimeList.push(Number(match[1]));
       }
@@ -718,13 +718,13 @@ export const getBeginTimeList = (svg: SVGSVGElement) => {
     });
   };
   (svg.childNodes as NodeListOf<SVGElement>).forEach((ele) => {
-    if (ele.tagName === "g") {
+    if (ele.tagName === 'g') {
       findAnimate(ele);
       if (tmpTimeList.length) {
         beginTimeList.push(Math.min(...tmpTimeList));
         tmpTimeList.splice(0);
       }
-    } else if (ele.tagName === "defs") {
+    } else if (ele.tagName === 'defs') {
       (ele.childNodes as NodeListOf<SVGElement>).forEach((ele) => {
         findAnimate(ele);
         if (tmpTimeList.length) {

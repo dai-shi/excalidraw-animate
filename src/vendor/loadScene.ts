@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { inflate } from "pako";
-import { restore } from "@excalidraw/excalidraw";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import { inflate } from 'pako';
+import { restore } from '@excalidraw/excalidraw';
+import type { ImportedDataState } from '@excalidraw/excalidraw/data/types';
 
 const t = (s: string) => s;
 
 // const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
-const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
+const BACKEND_V2_GET = 'https://json.excalidraw.com/api/v2/';
 const IV_LENGTH_BYTES = 12; // 96 bits
 const ENCRYPTION_KEY_BITS = 128;
 const CONCAT_BUFFERS_VERSION = 1;
@@ -20,18 +20,18 @@ function dataView(
   buffer: Uint8Array,
   bytes: 1 | 2 | 4,
   offset: number,
-  value: number
+  value: number,
 ): Uint8Array;
 function dataView(
   buffer: Uint8Array,
   bytes: 1 | 2 | 4,
   offset: number,
-  value?: number
+  value?: number,
 ): Uint8Array | number {
   if (value != null) {
     if (value > Math.pow(2, DATA_VIEW_BITS_MAP[bytes]) - 1) {
       throw new Error(
-        `attempting to set value higher than the allocated bytes (value: ${value}, bytes: ${bytes})`
+        `attempting to set value higher than the allocated bytes (value: ${value}, bytes: ${bytes})`,
       );
     }
     const method = `setUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
@@ -51,7 +51,7 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
   const version = dataView(
     concatenatedBuffer,
     NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
-    cursor
+    cursor,
   );
   // If version is outside of the supported versions, throw an error.
   // This usually means the buffer wasn't encoded using this API, so we'd only
@@ -66,7 +66,7 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
     const chunkSize = dataView(
       concatenatedBuffer,
       NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
-      cursor
+      cursor,
     );
     cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
 
@@ -86,41 +86,41 @@ type FileEncodingInfo = {
     Thus, if there are issues we can check whether they're not using the
     unoffic version */
   version: 1 | 2;
-  compression: "pako@1" | null;
-  encryption: "AES-GCM" | null;
+  compression: 'pako@1' | null;
+  encryption: 'AES-GCM' | null;
 };
 
 const getCryptoKey = (key: string, usage: KeyUsage) =>
   window.crypto.subtle.importKey(
-    "jwk",
+    'jwk',
     {
-      alg: "A128GCM",
+      alg: 'A128GCM',
       ext: true,
       k: key,
-      key_ops: ["encrypt", "decrypt"],
-      kty: "oct",
+      key_ops: ['encrypt', 'decrypt'],
+      kty: 'oct',
     },
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       length: ENCRYPTION_KEY_BITS,
     },
     false, // extractable
-    [usage]
+    [usage],
   );
 
 const decryptData = async (
   iv: Uint8Array,
   encrypted: Uint8Array | ArrayBuffer,
-  privateKey: string
+  privateKey: string,
 ): Promise<ArrayBuffer> => {
-  const key = await getCryptoKey(privateKey, "decrypt");
+  const key = await getCryptoKey(privateKey, 'decrypt');
   return window.crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv,
     },
     key,
-    encrypted
+    encrypted,
   );
 };
 
@@ -128,10 +128,10 @@ const _decryptAndDecompress = async (
   iv: Uint8Array,
   decryptedBuffer: Uint8Array,
   decryptionKey: string,
-  isCompressed: boolean
+  isCompressed: boolean,
 ) => {
   decryptedBuffer = new Uint8Array(
-    await decryptData(iv, decryptedBuffer, decryptionKey)
+    await decryptData(iv, decryptedBuffer, decryptionKey),
   );
 
   if (isCompressed) {
@@ -143,13 +143,13 @@ const _decryptAndDecompress = async (
 
 const decompressData = async <T extends Record<string, any>>(
   bufferView: Uint8Array,
-  options: { decryptionKey: string }
+  options: { decryptionKey: string },
 ) => {
   // first chunk is encoding metadata (ignored for now)
   const [encodingMetadataBuffer, iv, buffer] = splitBuffers(bufferView);
 
   const encodingMetadata: FileEncodingInfo = JSON.parse(
-    new TextDecoder().decode(encodingMetadataBuffer)
+    new TextDecoder().decode(encodingMetadataBuffer),
   );
 
   try {
@@ -158,12 +158,12 @@ const decompressData = async <T extends Record<string, any>>(
         iv,
         buffer,
         options.decryptionKey,
-        !!encodingMetadata.compression
-      )
+        !!encodingMetadata.compression,
+      ),
     );
 
     const metadata = JSON.parse(
-      new TextDecoder().decode(contentsMetadataBuffer)
+      new TextDecoder().decode(contentsMetadataBuffer),
     ) as T;
 
     return {
@@ -175,7 +175,7 @@ const decompressData = async <T extends Record<string, any>>(
   } catch (error: any) {
     console.error(
       `Error during decompressing and decrypting the file.`,
-      encodingMetadata
+      encodingMetadata,
     );
     throw error;
   }
@@ -202,8 +202,8 @@ const legacy_decodeFromBackend = async ({
   }
 
   // We need to convert the decrypted array buffer to a string
-  const string = new window.TextDecoder("utf-8").decode(
-    new Uint8Array(decrypted)
+  const string = new window.TextDecoder('utf-8').decode(
+    new Uint8Array(decrypted),
   );
   const data: ImportedDataState = JSON.parse(string);
 
@@ -215,13 +215,13 @@ const legacy_decodeFromBackend = async ({
 
 const importFromBackend = async (
   id: string,
-  decryptionKey: string
+  decryptionKey: string,
 ): Promise<ImportedDataState> => {
   try {
     const response = await fetch(`${BACKEND_V2_GET}${id}`);
 
     if (!response.ok) {
-      window.alert(t("alerts.importBackendFailed"));
+      window.alert(t('alerts.importBackendFailed'));
       return {};
     }
     const buffer = await response.arrayBuffer();
@@ -231,10 +231,10 @@ const importFromBackend = async (
         new Uint8Array(buffer),
         {
           decryptionKey,
-        }
+        },
       );
       const data: ImportedDataState = JSON.parse(
-        new TextDecoder().decode(decodedBuffer)
+        new TextDecoder().decode(decodedBuffer),
       );
 
       return {
@@ -243,13 +243,13 @@ const importFromBackend = async (
       };
     } catch (error: any) {
       console.warn(
-        "error when decoding shareLink data using the new format:",
-        error
+        'error when decoding shareLink data using the new format:',
+        error,
       );
       return legacy_decodeFromBackend({ buffer, decryptionKey });
     }
   } catch (error: any) {
-    window.alert(t("alerts.importBackendFailed"));
+    window.alert(t('alerts.importBackendFailed'));
     console.error(error);
     return {};
   }
@@ -261,7 +261,7 @@ export const loadScene = async (
   // Supply local state even if importing from backend to ensure we restore
   // localStorage user settings which we do not persist on server.
   // Non-optional so we don't forget to pass it even if `undefined`.
-  localDataState: ImportedDataState | undefined | null
+  localDataState: ImportedDataState | undefined | null,
 ) => {
   let data;
   if (id != null && privateKey != null) {
@@ -270,7 +270,7 @@ export const loadScene = async (
     data = restore(
       await importFromBackend(id, privateKey),
       localDataState?.appState,
-      localDataState?.elements
+      localDataState?.elements,
     );
   } else {
     data = restore(localDataState || null, null, null);
