@@ -12,6 +12,7 @@ import {
   restoreElements,
   loadFromBlob,
   loadLibraryFromBlob,
+  getNonDeletedElements,
 } from "@excalidraw/excalidraw";
 import type { BinaryFiles } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -19,7 +20,6 @@ import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import GitHubCorner from "./GitHubCorner";
 import { getBeginTimeList } from "./animate";
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from "./export";
-import { getNonDeletedElements } from "./useLoadSvg";
 
 const loadFromJSON = async () => {
   const blob = await fileOpen({

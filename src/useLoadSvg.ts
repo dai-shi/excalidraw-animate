@@ -4,23 +4,14 @@ import {
   exportToSvg,
   restoreElements,
   loadLibraryFromBlob,
+  getNonDeletedElements,
 } from "@excalidraw/excalidraw";
 
-import type { BinaryFiles } from "@excalidraw/excalidraw/types";
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "@excalidraw/excalidraw/element/types";
+import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 import { loadScene } from "./vendor/loadScene";
 import { animateSvg } from "./animate";
-
-export const getNonDeletedElements = (
-  elements: readonly ExcalidrawElement[]
-): NonDeletedExcalidrawElement[] =>
-  elements.filter(
-    (element): element is NonDeletedExcalidrawElement => !element.isDeleted
-  );
 
 const importLibraryFromUrl = async (url: string) => {
   try {
@@ -36,7 +27,11 @@ const importLibraryFromUrl = async (url: string) => {
   }
 };
 
-export const useLoadSvg = () => {
+export const useLoadSvg = (
+  initialData:
+    | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
+    | undefined
+) => {
   const [loading, setLoading] = useState(true);
   const [loadedSvgList, setLoadedSvgList] = useState<
     {
@@ -116,9 +111,12 @@ export const useLoadSvg = () => {
           });
         }
       }
+      if (!matchIdKey && !matchLibrary && initialData) {
+        await loadDataList([initialData]);
+      }
       setLoading(false);
     })();
-  }, [loadDataList]);
+  }, [loadDataList, initialData]);
 
   return { loading, loadedSvgList, loadDataList };
 };
