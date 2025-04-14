@@ -645,7 +645,6 @@ export const animateSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   options: AnimateOptions = {}
 ) => {
-  let finishedMs;
   const groups = createGroups(svg, elements);
   const finished = new Map();
   let current = options.startMs ?? 1000; // 1 sec margin
@@ -700,7 +699,7 @@ export const animateSvg = (
       }
     }
   });
-  finishedMs = current + 1000; // 1 sec margin
+  const finishedMs = current + 1000; // 1 sec margin
   return { finishedMs };
 };
 

@@ -21,7 +21,7 @@ const importLibraryFromUrl = async (url: string) => {
     return libraryItems.map((libraryItem) =>
       getNonDeletedElements(restoreElements(libraryItem.elements, null))
     );
-  } catch (error) {
+  } catch {
     window.alert("Unable to load library");
     return [];
   }

@@ -24,33 +24,35 @@ export const prepareWebmData = (
     finishedMs: number;
   }[]
 ) =>
-  new Promise<Blob>(async (resolve, reject) => {
-    try {
-      const stream = (await (navigator.mediaDevices as any).getDisplayMedia({
+  new Promise<Blob>((resolve, reject) => {
+    navigator.mediaDevices
+      .getDisplayMedia({
         video: {
+          // FIXME should we remove this?
+          // @ts-expect-error no such types
           cursor: "never",
           displaySurface: "browser",
         },
-      })) as MediaStream;
-      const recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (e) => {
-        resolve(e.data);
-      };
-      let maxFinishedMs = 0;
-      svgList.forEach(({ svg, finishedMs }) => {
-        maxFinishedMs = Math.max(maxFinishedMs, finishedMs);
-        svg.pauseAnimations();
-        svg.setCurrentTime(0);
-      });
-      recorder.start();
-      svgList.forEach(({ svg }) => {
-        svg.unpauseAnimations();
-      });
-      setTimeout(() => {
-        recorder.stop();
-        stream.getVideoTracks()[0].stop();
-      }, maxFinishedMs);
-    } catch (e) {
-      reject(e);
-    }
+      })
+      .then((stream) => {
+        const recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = (e) => {
+          resolve(e.data);
+        };
+        let maxFinishedMs = 0;
+        svgList.forEach(({ svg, finishedMs }) => {
+          maxFinishedMs = Math.max(maxFinishedMs, finishedMs);
+          svg.pauseAnimations();
+          svg.setCurrentTime(0);
+        });
+        recorder.start();
+        svgList.forEach(({ svg }) => {
+          svg.unpauseAnimations();
+        });
+        setTimeout(() => {
+          recorder.stop();
+          stream.getVideoTracks()[0].stop();
+        }, maxFinishedMs);
+      })
+      .catch(reject);
   });
