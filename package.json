@@ -12,6 +12,7 @@
     "pako": "2.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.19.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/dom-mediacapture-record": "^1.0.16",
@@ -21,12 +22,19 @@
     "@types/react-dom": "^18.2.3",
     "@vitejs/plugin-react": "^4.3.4",
     "browser-fs-access": "^0.33.1",
-    "eslint": "8.57.0",
+    "eslint": "^9.19.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-compiler": "19.0.0-beta-decd7b8-20250118",
+    "eslint-plugin-react-hooks": "5.2.0-canary-de1eaa26-20250124",
     "jsdom": "^26.0.0",
     "prettier": "^2.8.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.0.4",
+    "typescript-eslint": "^8.21.0",
     "vite": "^6.2.4",
     "vitest": "^3.1.1",
     "vitest-canvas-mock": "^0.3.3"
@@ -42,12 +50,9 @@
     "test": "pnpm run test:all",
     "test:all": "pnpm run test:type && pnpm run test:lint && pnpm run test:format && pnpm run test:app --run",
     "test:type": "tsc",
-    "test:lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx --ignore-pattern dist.",
+    "test:lint": "eslint .",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
     "test:app": "vitest",
     "compile": "tsc -p tsconfig.build.json"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   }
 }

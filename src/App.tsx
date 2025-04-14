@@ -15,7 +15,7 @@ const loadFromStorage = ():
     data.appState.collaborators = new Map();
     data.scrollToContent = true;
     return data;
-  } catch (e) {
+  } catch {
     return undefined;
   }
 };
@@ -27,7 +27,9 @@ const saveToStorage = (data: {
 }) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {}
+  } catch {
+    // ignore
+  }
 };
 
 type ViewMode = "animate" | "excalidraw";
