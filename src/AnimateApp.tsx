@@ -1,9 +1,18 @@
+import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+
 import Toolbar from "./Toolbar";
 import Viewer from "./Viewer";
 import { useLoadSvg } from "./useLoadSvg";
 
-const AnimateApp = () => {
-  const { loading, loadedSvgList, loadDataList } = useLoadSvg();
+const AnimateApp = ({
+  initialData,
+}: {
+  initialData:
+    | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
+    | undefined;
+}) => {
+  const { loading, loadedSvgList, loadDataList } = useLoadSvg(initialData);
   if (loading) {
     return <div style={{ margin: "3px 3px 3px 40px" }}>Loading...</div>;
   }

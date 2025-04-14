@@ -54,7 +54,7 @@ const App = () => {
         {mode === "animate" ? "Edit" : "Animate"}
       </button>
       {mode === "animate" ? (
-        <AnimateApp />
+        <AnimateApp initialData={loadFromStorage()} />
       ) : (
         <ExcalidrawApp
           initialData={loadFromStorage()}
