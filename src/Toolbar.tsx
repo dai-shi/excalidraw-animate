@@ -64,6 +64,23 @@ const Toolbar = ({ svgList, loadDataList, isDarkMode, onToggleMode, onToggleDark
   const [link, setLink] = useState('');
   const [webmData, setWebmData] = useState<Blob>();
   const [mode, setMode] = useState<'animate' | 'edit'>('animate');
+  const [isScrolled, setIsScrolled] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsScrolled(true);
+      } else if (currentScrollY < lastScrollY.current) {
+        setIsScrolled(false);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     setWebmData(undefined);
@@ -223,7 +240,7 @@ const Toolbar = ({ svgList, loadDataList, isDarkMode, onToggleMode, onToggleDark
   }
 
   return (
-    <div className="toolbar">
+    <div className={`toolbar ${isScrolled ? 'hidden' : ''}`}>
       <div className="toolbar-section">
         <button type="button" onClick={onToggleMode} className="toolbar-button">
           {mode === 'animate' ? 'Edit' : 'Animate'}

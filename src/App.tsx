@@ -36,7 +36,7 @@ type ViewMode = 'animate' | 'excalidraw';
 
 const App = () => {
   const [mode, setMode] = useState<ViewMode>('animate');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleMode = () => {
     setMode((prev) => (prev === 'animate' ? 'excalidraw' : 'animate'));

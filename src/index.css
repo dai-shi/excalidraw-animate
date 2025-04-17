@@ -6,7 +6,7 @@ body {
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  overflow: auto;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -37,6 +37,11 @@ body {
   right: 0;
   padding: 10px;
   z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.toolbar.hidden {
+  transform: translateY(-100%);
 }
 
 .dark-mode .toolbar {
@@ -53,8 +58,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-top: 60px; 
-  height: calc(100vh - 60px);
+  padding-top: 60px;
+  min-height: 100vh;
 }
 
 .Viewer-container {
