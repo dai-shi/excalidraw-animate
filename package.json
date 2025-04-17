@@ -8,7 +8,7 @@
   "module": "./dist/library.js",
   "types": "./dist/library.d.ts",
   "dependencies": {
-    "@excalidraw/excalidraw": "0.18.0",
+    "@excalidraw/excalidraw": "^0.18.0",
     "pako": "2.1.0"
   },
   "devDependencies": {

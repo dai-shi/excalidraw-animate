@@ -7,10 +7,16 @@ import { useLoadSvg } from './useLoadSvg';
 
 const AnimateApp = ({
   initialData,
+  isDarkMode,
+  onToggleMode,
+  onToggleDarkMode,
 }: {
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
     | undefined;
+  isDarkMode: boolean;
+  onToggleMode: () => void;
+  onToggleDarkMode: () => void;
 }) => {
   const { loading, loadedSvgList, loadDataList } = useLoadSvg(initialData);
   if (loading) {
@@ -18,7 +24,13 @@ const AnimateApp = ({
   }
   return (
     <div className="App">
-      <Toolbar svgList={loadedSvgList} loadDataList={loadDataList} />
+      <Toolbar 
+        svgList={loadedSvgList} 
+        loadDataList={loadDataList}
+        isDarkMode={isDarkMode}
+        onToggleMode={onToggleMode}
+        onToggleDarkMode={onToggleDarkMode}
+      />
       {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
     </div>
   );

@@ -36,27 +36,39 @@ type ViewMode = 'animate' | 'excalidraw';
 
 const App = () => {
   const [mode, setMode] = useState<ViewMode>('animate');
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const toggleMode = () => {
     setMode((prev) => (prev === 'animate' ? 'excalidraw' : 'animate'));
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+
   return (
-    <div>
-      <button
-        onClick={toggleMode}
-        style={{
-          position: 'absolute',
-          top: 1,
-          left: 1,
-          fontSize: 8,
-          zIndex: 10,
-        }}
-      >
-        {mode === 'animate' ? 'Edit' : 'Animate'}
-      </button>
+    <div className={isDarkMode ? 'dark-mode' : 'light-mode'}>
+      <div className="top-buttons">
+        <button
+          onClick={toggleMode}
+          className="mode-button"
+        >
+          {mode === 'animate' ? 'Edit' : 'Animate'}
+        </button>
+        <button
+          onClick={toggleDarkMode}
+          className="mode-button"
+        >
+          {isDarkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
       {mode === 'animate' ? (
-        <AnimateApp initialData={loadFromStorage()} />
+        <AnimateApp 
+          initialData={loadFromStorage()} 
+          isDarkMode={isDarkMode}
+          onToggleMode={toggleMode}
+          onToggleDarkMode={toggleDarkMode}
+        />
       ) : (
         <ExcalidrawApp
           initialData={loadFromStorage()}

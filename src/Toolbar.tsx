@@ -52,14 +52,19 @@ type Props = {
       files: BinaryFiles;
     }[],
   ) => void;
+  isDarkMode: boolean;
+  onToggleMode: () => void;
+  onToggleDarkMode: () => void;
 };
 
-const Toolbar = ({ svgList, loadDataList }: Props) => {
+const Toolbar = ({ svgList, loadDataList, isDarkMode, onToggleMode, onToggleDarkMode }: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | 'never'>(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [link, setLink] = useState('');
   const [webmData, setWebmData] = useState<Blob>();
+  const [mode, setMode] = useState<'animate' | 'edit'>('animate');
+
   useEffect(() => {
     setWebmData(undefined);
   }, [svgList]);
@@ -218,80 +223,83 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
   }
 
   return (
-    <div>
-      <div style={{ margin: '3px 3px 3px 40px' }}>
-        <button type="button" onClick={loadFile} style={{ marginRight: 3 }}>
+    <div className="toolbar">
+      <div className="toolbar-section">
+        <button type="button" onClick={onToggleMode} className="toolbar-button">
+          {mode === 'animate' ? 'Edit' : 'Animate'}
+        </button>
+        <button type="button" onClick={onToggleDarkMode} className="toolbar-button">
+          {isDarkMode ? '☀️' : '🌙'}
+        </button>
+        <span className="toolbar-separator">|</span>
+        <button type="button" onClick={loadFile} className="toolbar-button">
           Load File
         </button>
-        <span style={{ marginRight: 3 }}>OR</span>
-        <button type="button" onClick={loadLibrary} style={{ marginRight: 3 }}>
+        <span className="toolbar-separator">OR</span>
+        <button type="button" onClick={loadLibrary} className="toolbar-button">
           Load Library
         </button>
-        <span>OR</span>
-        <form onSubmit={loadLink} style={{ display: 'inline' }}>
+        <span className="toolbar-separator">OR</span>
+        <form onSubmit={loadLink} className="toolbar-form">
           <input
             placeholder="Enter link..."
             value={link}
             onChange={(e) => setLink(e.target.value)}
-            style={{ marginLeft: 3, marginRight: 3 }}
+            className="toolbar-input"
           />
           <button
             type="submit"
             disabled={!linkRegex.test(link)}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
             Animate!
           </button>
         </form>
       </div>
       {!!svgList.length && (
-        <div style={{ marginLeft: 3 }}>
+        <div className="toolbar-section">
           <button
             type="button"
             onClick={togglePausedAnimations}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
-            {paused ? 'Play (P)' : 'Pause (P)'}
+            {paused ? 'Play' : 'Pause'}
           </button>
           <button
             type="button"
             onClick={stepForwardAnimations}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
-            Step (S)
+            Step Forward
           </button>
           <button
             type="button"
             onClick={resetAnimations}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
-            Reset (R)
+            Reset
           </button>
           <button
             type="button"
             onClick={hideToolbar}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
             Hide Toolbar (Q)
           </button>
           <button
             type="button"
             onClick={exportToSvg}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
-            Export to SVG
+            Export SVG
           </button>
           <button
             type="button"
             onClick={exportToWebm}
             disabled={processing}
-            style={{ marginRight: 3 }}
+            className="toolbar-button"
           >
-            {processing
-              ? 'Processing...'
-              : webmData
-                ? 'Export to WebM'
-                : 'Prepare WebM'}
+            {processing ? 'Processing...' : 'Export WebM'}
           </button>
         </div>
       )}
