@@ -24,8 +24,8 @@ const AnimateApp = ({
   }
   return (
     <div className="App">
-      <Toolbar 
-        svgList={loadedSvgList} 
+      <Toolbar
+        svgList={loadedSvgList}
         loadDataList={loadDataList}
         isDarkMode={isDarkMode}
         onToggleMode={onToggleMode}

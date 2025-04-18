@@ -49,22 +49,16 @@ const App = () => {
   return (
     <div className={isDarkMode ? 'dark-mode' : 'light-mode'}>
       <div className="top-buttons">
-        <button
-          onClick={toggleMode}
-          className="mode-button"
-        >
+        <button onClick={toggleMode} className="mode-button">
           {mode === 'animate' ? 'Edit' : 'Animate'}
         </button>
-        <button
-          onClick={toggleDarkMode}
-          className="mode-button"
-        >
+        <button onClick={toggleDarkMode} className="mode-button">
           {isDarkMode ? '☀️' : '🌙'}
         </button>
       </div>
       {mode === 'animate' ? (
-        <AnimateApp 
-          initialData={loadFromStorage()} 
+        <AnimateApp
+          initialData={loadFromStorage()}
           isDarkMode={isDarkMode}
           onToggleMode={toggleMode}
           onToggleDarkMode={toggleDarkMode}

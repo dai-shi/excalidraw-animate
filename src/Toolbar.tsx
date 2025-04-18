@@ -57,7 +57,13 @@ type Props = {
   onToggleDarkMode: () => void;
 };
 
-const Toolbar = ({ svgList, loadDataList, isDarkMode, onToggleMode, onToggleDarkMode }: Props) => {
+const Toolbar = ({
+  svgList,
+  loadDataList,
+  isDarkMode,
+  onToggleMode,
+  onToggleDarkMode,
+}: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | 'never'>(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -245,7 +251,11 @@ const Toolbar = ({ svgList, loadDataList, isDarkMode, onToggleMode, onToggleDark
         <button type="button" onClick={onToggleMode} className="toolbar-button">
           {mode === 'animate' ? 'Edit' : 'Animate'}
         </button>
-        <button type="button" onClick={onToggleDarkMode} className="toolbar-button">
+        <button
+          type="button"
+          onClick={onToggleDarkMode}
+          className="toolbar-button"
+        >
           {isDarkMode ? '☀️' : '🌙'}
         </button>
         <span className="toolbar-separator">|</span>
