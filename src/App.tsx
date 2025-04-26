@@ -51,6 +51,14 @@ const App = () => {
           left: 1,
           fontSize: 8,
           zIndex: 10,
+          backgroundColor: '#28a745',
+          border: 'none',
+          color: '#fff',
+          padding: '6px 12px',
+          borderRadius: 4,
+          cursor: 'pointer',
+          transition: 'background-color 0.2s ease',
+          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)', // soft shadow
         }}
       >
         {mode === 'animate' ? 'Edit' : 'Animate'}
