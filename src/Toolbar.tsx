@@ -219,12 +219,23 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
 
   return (
     <div>
-      <div style={{ margin: '3px 3px 3px 40px' }}>
-        <button type="button" onClick={loadFile} style={{ marginRight: 3 }}>
+      <div style={{
+        top: 10,
+        left: 10,
+        background: '#fff',
+        border: '1px solid #ccc',
+        borderRadius: 8,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        padding: 10,
+        zIndex: 1000,
+        fontFamily: 'Arial, sans-serif',
+        maxWidth: 650,
+      }}>
+        <button type="button" onClick={loadFile} style={buttonStyle}>
           Load File
         </button>
         <span style={{ marginRight: 3 }}>OR</span>
-        <button type="button" onClick={loadLibrary} style={{ marginRight: 3 }}>
+        <button type="button" onClick={loadLibrary} style={buttonStyle}>
           Load Library
         </button>
         <span>OR</span>
@@ -233,51 +244,61 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
             placeholder="Enter link..."
             value={link}
             onChange={(e) => setLink(e.target.value)}
-            style={{ marginLeft: 3, marginRight: 3 }}
+            style={inputStyle}
           />
           <button
             type="submit"
             disabled={!linkRegex.test(link)}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             Animate!
           </button>
         </form>
       </div>
       {!!svgList.length && (
-        <div style={{ marginLeft: 3 }}>
+        <div style={{       top: 10,
+          left: 10,
+          background: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: 8,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          padding: 10,
+          zIndex: 1000,
+          fontFamily: 'Arial, sans-serif',
+          maxWidth: 650,
+    }}>
           <button
             type="button"
             onClick={togglePausedAnimations}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             {paused ? 'Play (P)' : 'Pause (P)'}
           </button>
           <button
             type="button"
             onClick={stepForwardAnimations}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             Step (S)
           </button>
           <button
             type="button"
             onClick={resetAnimations}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             Reset (R)
           </button>
           <button
             type="button"
             onClick={hideToolbar}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             Hide Toolbar (Q)
           </button>
           <button
             type="button"
             onClick={exportToSvg}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             Export to SVG
           </button>
@@ -285,7 +306,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
             type="button"
             onClick={exportToWebm}
             disabled={processing}
-            style={{ marginRight: 3 }}
+            style={buttonStyle}
           >
             {processing
               ? 'Processing...'
@@ -302,5 +323,26 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     </div>
   );
 };
+
+const buttonStyle = {
+  backgroundColor: '#007BFF',
+  border: 'none',
+  color: '#fff',
+  padding: '6px 12px',
+  borderRadius: 4,
+  cursor: 'pointer',
+  fontSize: 14,
+  transition: 'background-color 0.2s ease',
+  marginRight: 3,
+};
+
+const inputStyle = {
+  padding: '6px 10px',
+  borderRadius: '6px',
+  border: '1px solid #ccc',
+  marginLeft: '6px',
+  marginRight: '6px',
+};
+
 
 export default Toolbar;
