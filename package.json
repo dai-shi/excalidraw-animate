@@ -7,6 +7,17 @@
   "source": "./src/library.ts",
   "module": "./dist/library.js",
   "types": "./dist/library.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview",
+    "test": "pnpm run '/^test:.*/'",
+    "test:type": "tsc",
+    "test:lint": "eslint .",
+    "test:format": "prettier -c .",
+    "test:spec": "vitest run",
+    "compile": "tsc -p tsconfig.build.json"
+  },
   "dependencies": {
     "@excalidraw/excalidraw": "0.18.0",
     "pako": "2.1.0"
@@ -44,16 +55,5 @@
   ],
   "prettier": {
     "singleQuote": true
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "vite preview",
-    "test": "pnpm run '/^test:.*/'",
-    "test:type": "tsc",
-    "test:lint": "eslint .",
-    "test:format": "prettier -c .",
-    "test:spec": "vitest run",
-    "compile": "tsc -p tsconfig.build.json"
   }
 }
