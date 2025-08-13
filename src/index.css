@@ -115,6 +115,14 @@ code {
   cursor: pointer;
 }
 
+.app-button-compact {
+  position: absolute;
+  height: calc(var(--default-button-size) * 0.5); 
+  top: 1px;
+  left: 1px;
+  z-index: 10;
+}
+
 .app-button[disabled],
 .app-button[aria-disabled="true"] {
   opacity: 0.5;
@@ -142,16 +150,13 @@ code {
 }
 
 .toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   min-height: var(--lg-button-size);
   display: flex;
   align-items: center;
   gap: 0.5rem;          
   row-gap: 0.5rem;      
-  padding-block: 0.5rem 0; /* top and bottom */
-  padding-inline: 0.5rem; /* left and right */
+  padding-block: 1rem 0; /* top and bottom */
+  padding-inline: 3rem 0; /* left and right */
   transition: opacity .2s ease;
 }
 
