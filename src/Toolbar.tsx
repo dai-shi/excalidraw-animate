@@ -219,73 +219,53 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
 
   return (
     <div>
-      <div style={{ margin: '3px 3px 3px 40px' }}>
-        <button type="button" onClick={loadFile} style={{ marginRight: 3 }}>
+      <div className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}>
+        <button type="button" onClick={loadFile} className="app-button">
           Load File
         </button>
-        <span style={{ marginRight: 3 }}>OR</span>
-        <button type="button" onClick={loadLibrary} style={{ marginRight: 3 }}>
+        <span>OR</span>
+        <button type="button" onClick={loadLibrary} className="app-button">
           Load Library
         </button>
         <span>OR</span>
-        <form onSubmit={loadLink} style={{ display: 'inline' }}>
+        <form onSubmit={loadLink}>
           <input
+            className="app-input"
             placeholder="Enter link..."
             value={link}
             onChange={(e) => setLink(e.target.value)}
-            style={{ marginLeft: 3, marginRight: 3 }}
           />
           <button
             type="submit"
             disabled={!linkRegex.test(link)}
-            style={{ marginRight: 3 }}
+            className="app-button"
           >
             Animate!
           </button>
         </form>
       </div>
       {!!svgList.length && (
-        <div style={{ marginLeft: 3 }}>
-          <button
-            type="button"
-            onClick={togglePausedAnimations}
-            style={{ marginRight: 3 }}
-          >
+      <div className="toolbar">
+          <button type="button" onClick={togglePausedAnimations} className="app-button">
             {paused ? 'Play (P)' : 'Pause (P)'}
           </button>
-          <button
-            type="button"
-            onClick={stepForwardAnimations}
-            style={{ marginRight: 3 }}
-          >
+          <button type="button" onClick={stepForwardAnimations} className="app-button">
             Step (S)
           </button>
-          <button
-            type="button"
-            onClick={resetAnimations}
-            style={{ marginRight: 3 }}
-          >
+          <button type="button" onClick={resetAnimations} className="app-button">
             Reset (R)
           </button>
-          <button
-            type="button"
-            onClick={hideToolbar}
-            style={{ marginRight: 3 }}
-          >
+          <button type="button" onClick={hideToolbar} className="app-button">
             Hide Toolbar (Q)
           </button>
-          <button
-            type="button"
-            onClick={exportToSvg}
-            style={{ marginRight: 3 }}
-          >
+          <button type="button" onClick={exportToSvg} className="app-button">
             Export to SVG
           </button>
           <button
             type="button"
             onClick={exportToWebm}
             disabled={processing}
-            style={{ marginRight: 3 }}
+            className="app-button"
           >
             {processing
               ? 'Processing...'
