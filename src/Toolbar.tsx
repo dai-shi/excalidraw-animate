@@ -219,7 +219,9 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
 
   return (
     <div>
-      <div className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}>
+      <div
+        className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}
+      >
         <button type="button" onClick={loadFile} className="app-button">
           Load File
         </button>
@@ -245,14 +247,26 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
         </form>
       </div>
       {!!svgList.length && (
-      <div className="toolbar">
-          <button type="button" onClick={togglePausedAnimations} className="app-button">
+        <div className="toolbar">
+          <button
+            type="button"
+            onClick={togglePausedAnimations}
+            className="app-button"
+          >
             {paused ? 'Play (P)' : 'Pause (P)'}
           </button>
-          <button type="button" onClick={stepForwardAnimations} className="app-button">
+          <button
+            type="button"
+            onClick={stepForwardAnimations}
+            className="app-button"
+          >
             Step (S)
           </button>
-          <button type="button" onClick={resetAnimations} className="app-button">
+          <button
+            type="button"
+            onClick={resetAnimations}
+            className="app-button"
+          >
             Reset (R)
           </button>
           <button type="button" onClick={hideToolbar} className="app-button">
