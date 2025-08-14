@@ -43,16 +43,7 @@ const App = () => {
 
   return (
     <div>
-      <button
-        onClick={toggleMode}
-        style={{
-          position: 'absolute',
-          top: 1,
-          left: 1,
-          fontSize: 8,
-          zIndex: 10,
-        }}
-      >
+      <button className="app-button app-button-compact" onClick={toggleMode}>
         {mode === 'animate' ? 'Edit' : 'Animate'}
       </button>
       {mode === 'animate' ? (
