@@ -142,73 +142,96 @@ export const AnimateConfig = ({
   const onChangeAnimatePointerWidth = (e: ChangeEvent<HTMLInputElement>) => {
     saveAnimateOption('pointerWidth', e.target.value);
   };
-
-  return (
-    <div>
-      <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
-        Animate order:{' '}
-        {animateOrderSet.size > 1 ? (
-          <>(mixed)</>
-        ) : (
-          <input
-            disabled={animateOrderDisabled}
-            value={
-              (animateOrderSet.size === 1 &&
-                animateOrderSet.values().next().value) ||
-              0
-            }
-            onChange={onChangeAnimateOrder}
-            type="number"
-            style={{ width: 40 }}
-          />
-        )}
-      </div>
-      <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
-        Animate duration (ms):{' '}
-        {animateDurationSet.size > 1 ? (
-          <>(mixed)</>
-        ) : (
-          <input
-            disabled={animateDurationDisabled}
-            value={
-              (animateDurationSet.size === 1 &&
-                animateDurationSet.values().next().value) ||
-              ''
-            }
-            onChange={onChangeAnimateDuration}
-            placeholder="Default"
-            style={{ width: 50 }}
-          />
-        )}
-      </div>
-      <div>
-        Animate pointer:{' '}
+return (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+      fontSize: 14,
+    }}
+  >
+    <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
+      Animate order:
+      {animateOrderSet.size > 1 ? (
+        <>(mixed)</>
+      ) : (
         <input
+          className="app-input"
+          type="number"
+          disabled={animateOrderDisabled}
+          value={
+            animateOrderSet.size === 1
+              ? animateOrderSet.values().next().value
+              : 0
+          }
+          onChange={onChangeAnimateOrder}
+          style={{ width: 50, minWidth: 50 }}
+        />
+      )}
+    </div>
+
+    <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
+      Animate duration (ms):
+      {animateDurationSet.size > 1 ? (
+        <>(mixed)</>
+      ) : (
+        <input
+          className="app-input"
+          disabled={animateDurationDisabled}
+          value={
+            animateDurationSet.size === 1
+              ? animateDurationSet.values().next().value
+              : ''
+          }
+          onChange={onChangeAnimateDuration}
+          placeholder="Default"
+          style={{ width: 50, minWidth: 50 }}
+        />
+      )}
+    </div>
+
+    <div style={{ display: 'grid', gap: 4 }}>
+      <div>Animate pointer:</div>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}
+      >
+        <input
+          className="app-input"
           defaultValue={defaultAnimateOptions.pointerImg || ''}
           onChange={onChangeAnimatePointerText}
           placeholder="URL..."
-          style={{ width: 50 }}
-        />{' '}
-        <label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onChangeAnimatePointerFile}
-            style={{ width: 0 }}
-          />
+        />
+        <input
+          id="pointerFile"
+          type="file"
+          accept="image/*"
+          onChange={onChangeAnimatePointerFile}
+          style={{ display: 'none' }}
+        />
+        <label
+          htmlFor="pointerFile"
+          className="app-button"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
           File
         </label>
       </div>
-      <div>
-        (Pointer width:{' '}
-        <input
-          defaultValue={defaultAnimateOptions.pointerWidth || ''}
-          onChange={onChangeAnimatePointerWidth}
-          placeholder="Num..."
-          style={{ width: 50 }}
-        />
-        )
-      </div>
     </div>
-  );
+
+    <div>
+      Pointer width:
+      <input
+        className="app-input"
+        defaultValue={defaultAnimateOptions.pointerWidth || ''}
+        onChange={onChangeAnimatePointerWidth}
+        placeholder="Num..."
+        style={{ width: 50, minWidth: 50 }}
+      />
+    </div>
+  </div>
+);
 };
