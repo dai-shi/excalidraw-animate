@@ -158,16 +158,18 @@ export const AnimateConfig = ({
     <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
       Order:{' '}
       {animateOrderSet.size > 1 ? (
-        <>(mixed)</>
+        <span style={{ opacity: 0.5 }}>
+              (Mixed values – cannot edit)
+        </span>
       ) : (
         <input
           className="app-input"
           type="number"
           disabled={animateOrderDisabled}
           value={
-            animateOrderSet.size === 1
-              ? animateOrderSet.values().next().value
-              : 0
+            (animateOrderSet.size === 1 &&
+              animateOrderSet.values().next().value) ||
+            0
           }
           onChange={onChangeAnimateOrder}
           style={{ width: 50, minWidth: 50 }}
@@ -178,16 +180,18 @@ export const AnimateConfig = ({
     <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
       Duration:{' '}
       {animateDurationSet.size > 1 ? (
-        <>(mixed)</>
+        <span style={{ opacity: 0.5 }}>
+              (Mixed values – cannot edit)
+        </span>
       ) : (
         <>
           <input
             className="app-input"
             disabled={animateDurationDisabled}
             value={
-              animateDurationSet.size === 1
-                ? animateDurationSet.values().next().value
-                : ''
+              (animateDurationSet.size === 1 &&
+                animateDurationSet.values().next().value) ||
+              ''
             }
             onChange={onChangeAnimateDuration}
             placeholder="Default"
@@ -208,7 +212,7 @@ export const AnimateConfig = ({
           className="app-input"
           defaultValue={defaultAnimateOptions.pointerImg || ''}
           onChange={onChangeAnimatePointerText}
-          placeholder="URL..."
+          placeholder="Enter URL or choose a File..."
         />
         <input
           id="pointerFile"
@@ -225,7 +229,7 @@ export const AnimateConfig = ({
             alignItems: 'center',
           }}
         >
-          File
+          File...
         </label>
       </div>
 
@@ -235,7 +239,7 @@ export const AnimateConfig = ({
         className="app-input"
         defaultValue={defaultAnimateOptions.pointerWidth || ''}
         onChange={onChangeAnimatePointerWidth}
-        placeholder="Num..."
+        placeholder="Default"
         style={{ width: 50, minWidth: 50 }}
       />{' '}
       px
