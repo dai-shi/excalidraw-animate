@@ -144,13 +144,25 @@ export const AnimateConfig = ({
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        fontSize: 14,
+      }}
+    >
+      {/* Animation Section */}
+      <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Animation</div>
+
       <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
-        Animate order:{' '}
+        Order:{' '}
         {animateOrderSet.size > 1 ? (
-          <>(mixed)</>
+          <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
         ) : (
           <input
+            className="app-input"
+            type="number"
             disabled={animateOrderDisabled}
             value={
               (animateOrderSet.size === 1 &&
@@ -158,56 +170,75 @@ export const AnimateConfig = ({
               0
             }
             onChange={onChangeAnimateOrder}
-            type="number"
-            style={{ width: 40 }}
+            style={{ width: 50, minWidth: 50 }}
           />
         )}
       </div>
+
       <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
-        Animate duration (ms):{' '}
+        Duration:{' '}
         {animateDurationSet.size > 1 ? (
-          <>(mixed)</>
+          <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
         ) : (
-          <input
-            disabled={animateDurationDisabled}
-            value={
-              (animateDurationSet.size === 1 &&
-                animateDurationSet.values().next().value) ||
-              ''
-            }
-            onChange={onChangeAnimateDuration}
-            placeholder="Default"
-            style={{ width: 50 }}
-          />
+          <>
+            <input
+              className="app-input"
+              disabled={animateDurationDisabled}
+              value={
+                (animateDurationSet.size === 1 &&
+                  animateDurationSet.values().next().value) ||
+                ''
+              }
+              onChange={onChangeAnimateDuration}
+              placeholder="Default"
+              style={{ width: 50, minWidth: 50 }}
+            />{' '}
+            ms
+          </>
         )}
       </div>
-      <div>
-        Animate pointer:{' '}
+
+      {/* Pointer Section */}
+      <div style={{ fontWeight: 'bold', margin: '8px 0 4px' }}>Pointer</div>
+
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}
+      >
         <input
+          className="app-input"
           defaultValue={defaultAnimateOptions.pointerImg || ''}
           onChange={onChangeAnimatePointerText}
-          placeholder="URL..."
-          style={{ width: 50 }}
-        />{' '}
-        <label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onChangeAnimatePointerFile}
-            style={{ width: 0 }}
-          />
-          File
+          placeholder="Enter URL or choose a File..."
+        />
+        <input
+          id="pointerFile"
+          type="file"
+          accept="image/*"
+          onChange={onChangeAnimatePointerFile}
+          style={{ display: 'none' }}
+        />
+        <label
+          htmlFor="pointerFile"
+          className="app-button"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
+          File...
         </label>
       </div>
+
       <div>
-        (Pointer width:{' '}
+        Width:{' '}
         <input
+          className="app-input"
           defaultValue={defaultAnimateOptions.pointerWidth || ''}
           onChange={onChangeAnimatePointerWidth}
-          placeholder="Num..."
-          style={{ width: 50 }}
-        />
-        )
+          placeholder="Default"
+          style={{ width: 50, minWidth: 50 }}
+        />{' '}
+        px
       </div>
     </div>
   );

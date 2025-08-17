@@ -102,7 +102,7 @@ code {
 /* Excalidraw styles: colors, size, border radius for outer DOM */
 .app-button {
   height: var(--lg-button-size);
-  padding: 0.625rem;
+  padding: 0 0.625rem;
   line-height: 0;
   background: var(--color-surface-low);
   border: none; /* Excalidraw often uses a 1px outline shadow instead of a border */
