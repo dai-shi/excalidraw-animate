@@ -142,17 +142,21 @@ export const AnimateConfig = ({
   const onChangeAnimatePointerWidth = (e: ChangeEvent<HTMLInputElement>) => {
     saveAnimateOption('pointerWidth', e.target.value);
   };
-return (
+  
+  return (
   <div
     style={{
       display: 'flex',
       flexDirection: 'column',
-      gap: 8,
+      gap: 12,
       fontSize: 14,
     }}
   >
+    {/* Animation Section */}
+    <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Animation</div>
+
     <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
-      Animate order:
+      Order:{' '}
       {animateOrderSet.size > 1 ? (
         <>(mixed)</>
       ) : (
@@ -172,27 +176,31 @@ return (
     </div>
 
     <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
-      Animate duration (ms):
+      Duration:{' '}
       {animateDurationSet.size > 1 ? (
         <>(mixed)</>
       ) : (
-        <input
-          className="app-input"
-          disabled={animateDurationDisabled}
-          value={
-            animateDurationSet.size === 1
-              ? animateDurationSet.values().next().value
-              : ''
-          }
-          onChange={onChangeAnimateDuration}
-          placeholder="Default"
-          style={{ width: 50, minWidth: 50 }}
-        />
+        <>
+          <input
+            className="app-input"
+            disabled={animateDurationDisabled}
+            value={
+              animateDurationSet.size === 1
+                ? animateDurationSet.values().next().value
+                : ''
+            }
+            onChange={onChangeAnimateDuration}
+            placeholder="Default"
+            style={{ width: 50, minWidth: 50 }}
+          />{' '}
+          ms
+        </>
       )}
     </div>
 
-    <div style={{ display: 'grid', gap: 4 }}>
-      <div>Animate pointer:</div>
+      {/* Pointer Section */}
+      <div style={{ fontWeight: 'bold', margin: '8px 0 4px' }}>Pointer</div>
+
       <div
         style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}
       >
@@ -220,17 +228,17 @@ return (
           File
         </label>
       </div>
-    </div>
 
     <div>
-      Pointer width:
+      Width:{' '}
       <input
         className="app-input"
         defaultValue={defaultAnimateOptions.pointerWidth || ''}
         onChange={onChangeAnimatePointerWidth}
         placeholder="Num..."
         style={{ width: 50, minWidth: 50 }}
-      />
+      />{' '}
+      px
     </div>
   </div>
 );
