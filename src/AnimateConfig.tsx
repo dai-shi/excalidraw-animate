@@ -142,65 +142,61 @@ export const AnimateConfig = ({
   const onChangeAnimatePointerWidth = (e: ChangeEvent<HTMLInputElement>) => {
     saveAnimateOption('pointerWidth', e.target.value);
   };
-  
+
   return (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 12,
-      fontSize: 14,
-    }}
-  >
-    {/* Animation Section */}
-    <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Animation</div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        fontSize: 14,
+      }}
+    >
+      {/* Animation Section */}
+      <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Animation</div>
 
-    <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
-      Order:{' '}
-      {animateOrderSet.size > 1 ? (
-        <span style={{ opacity: 0.5 }}>
-              (Mixed values – cannot edit)
-        </span>
-      ) : (
-        <input
-          className="app-input"
-          type="number"
-          disabled={animateOrderDisabled}
-          value={
-            (animateOrderSet.size === 1 &&
-              animateOrderSet.values().next().value) ||
-            0
-          }
-          onChange={onChangeAnimateOrder}
-          style={{ width: 50, minWidth: 50 }}
-        />
-      )}
-    </div>
-
-    <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
-      Duration:{' '}
-      {animateDurationSet.size > 1 ? (
-        <span style={{ opacity: 0.5 }}>
-              (Mixed values – cannot edit)
-        </span>
-      ) : (
-        <>
+      <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
+        Order:{' '}
+        {animateOrderSet.size > 1 ? (
+          <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
+        ) : (
           <input
             className="app-input"
-            disabled={animateDurationDisabled}
+            type="number"
+            disabled={animateOrderDisabled}
             value={
-              (animateDurationSet.size === 1 &&
-                animateDurationSet.values().next().value) ||
-              ''
+              (animateOrderSet.size === 1 &&
+                animateOrderSet.values().next().value) ||
+              0
             }
-            onChange={onChangeAnimateDuration}
-            placeholder="Default"
+            onChange={onChangeAnimateOrder}
             style={{ width: 50, minWidth: 50 }}
-          />{' '}
-          ms
-        </>
-      )}
-    </div>
+          />
+        )}
+      </div>
+
+      <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
+        Duration:{' '}
+        {animateDurationSet.size > 1 ? (
+          <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
+        ) : (
+          <>
+            <input
+              className="app-input"
+              disabled={animateDurationDisabled}
+              value={
+                (animateDurationSet.size === 1 &&
+                  animateDurationSet.values().next().value) ||
+                ''
+              }
+              onChange={onChangeAnimateDuration}
+              placeholder="Default"
+              style={{ width: 50, minWidth: 50 }}
+            />{' '}
+            ms
+          </>
+        )}
+      </div>
 
       {/* Pointer Section */}
       <div style={{ fontWeight: 'bold', margin: '8px 0 4px' }}>Pointer</div>
@@ -233,17 +229,17 @@ export const AnimateConfig = ({
         </label>
       </div>
 
-    <div>
-      Width:{' '}
-      <input
-        className="app-input"
-        defaultValue={defaultAnimateOptions.pointerWidth || ''}
-        onChange={onChangeAnimatePointerWidth}
-        placeholder="Default"
-        style={{ width: 50, minWidth: 50 }}
-      />{' '}
-      px
+      <div>
+        Width:{' '}
+        <input
+          className="app-input"
+          defaultValue={defaultAnimateOptions.pointerWidth || ''}
+          onChange={onChangeAnimatePointerWidth}
+          placeholder="Default"
+          style={{ width: 50, minWidth: 50 }}
+        />{' '}
+        px
+      </div>
     </div>
-  </div>
-);
+  );
 };
