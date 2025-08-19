@@ -218,7 +218,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
   }
 
   return (
-    <div>
+    <div style={{ marginTop: 5 }}>
       <div
         className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}
       >

@@ -63,13 +63,17 @@ const App = () => {
         style={{
           position: 'absolute',
           zIndex: 10,
+          top: 0,
+          left: 0,
+          display: 'flex',
+          gap: 5,
         }}
       >
         <button className="app-button app-button-compact" onClick={toggleMode}>
           {mode === 'animate' ? 'Edit' : 'Animate'}
         </button>
         <button className="app-button app-button-compact" onClick={toggleTheme}>
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+          {theme === 'light' ? '🌙' : '☀️'}
         </button>
       </div>
       {mode === 'animate' ? (

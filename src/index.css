@@ -14,6 +14,11 @@
   --default-button-size: 2rem;
   --default-icon-size: 1rem;
 
+    /* spacing */
+  --space-factor: 0.25rem;
+}
+
+:root.light {
   /* surfaces / text */
   --color-surface-high: #f1f0ff;
   --color-surface-mid: #f6f6f9;
@@ -41,9 +46,40 @@
   --button-hover-bg: var(--color-surface-high);
   --button-active-bg: var(--color-surface-high);
   --button-active-border: var(--color-brand-active);
+}
 
-  /* spacing */
-  --space-factor: 0.25rem;
+:root.dark {
+  /* surfaces / text */
+  --color-surface-high: #2e2d39;
+  --color-surface-mid: hsl(240 6% 10%);
+  --color-surface-low: hsl(240, 8%, 15%);
+  --color-surface-lowest: hsl(0, 0%, 7%);
+  --color-on-surface: #e3e3e8;
+
+  /* primary / brand */
+  --color-primary: #a8a5ff;
+  --color-primary-darker: #b2aeff;
+  --color-primary-darkest: #beb9ff;
+  --color-primary-light: #4f4d6f;
+  --color-primary-light-darker: #43415e;
+  --color-primary-hover: #bbb8ff;
+  --color-on-primary-container: #e0dfff;
+  --color-brand-active: #d0ccff;
+  --color-brand-hover: #bbb8ff;
+
+  /* inputs / borders */
+  --input-bg-color: #31303B;
+  --input-border-color: #444;
+  --default-border-color: var(--color-surface-high);
+
+  /* interaction */
+  --button-hover-bg: var(--color-surface-high);
+  --button-active-bg: var(--color-surface-high);
+  --button-active-border: var(--color-brand-active);
+}
+
+html, body, #root {
+  background: var(--color-surface-lowest);
 }
 
 body {
@@ -136,6 +172,11 @@ code {
   background: var(--button-active-bg);
 }
 
+.excalidraw .animate-panel {
+   /* Direct values because var(--input-bg-color) doesn't resolve here */
+  --animate-panel-input-bg: #31303B;
+}
+
 .app-input {
   height: var(--lg-button-size);
   box-sizing: border-box;
@@ -143,6 +184,8 @@ code {
   border-radius: var(--space-factor);
   font-size: var(--font-size-sm);
   min-width: 200px;
+  background: var(--animate-panel-input-bg, var(--input-bg-color));
+  color: var(--color-on-surface);
 }
 
 .app-input:not(:focus):hover {
