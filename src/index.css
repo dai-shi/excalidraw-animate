@@ -117,10 +117,7 @@ code {
 }
 
 .app-button-compact {
-  position: absolute;
   height: calc(var(--default-button-size) * 0.5);
-  top: 1px;
-  left: 1px;
   z-index: 10;
 }
 

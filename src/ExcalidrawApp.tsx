@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Excalidraw, Footer, Sidebar } from '@excalidraw/excalidraw';
 import type {
   AppState,
@@ -16,6 +16,8 @@ import type { Drawing } from './AnimateConfig';
 const ExcalidrawApp = ({
   initialData,
   onChangeData,
+  theme,
+  onThemeChange,  
 }: {
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
@@ -25,16 +27,31 @@ const ExcalidrawApp = ({
     appState: AppState;
     files: BinaryFiles;
   }) => void;
+  theme:  'light' | 'dark';
+  onThemeChange: (t: 'light' | 'dark') => void;
 }) => {
   const [drawing, setDrawing] = useState<Drawing | undefined>(initialData);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
+  const lastExcalidrawThemeRef = useRef<'light' | 'dark' | null>(null);
+
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <Excalidraw
+        theme={theme}
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
         initialData={initialData}
         onChange={(elements, appState, files) => {
+          const t = appState?.theme;
+          if (
+            (t === 'light' || t === 'dark') &&
+            t !== lastExcalidrawThemeRef.current
+          ) {
+            lastExcalidrawThemeRef.current = t;
+            if (t !== theme) {
+              onThemeChange(t);
+            }
+          }
           setDrawing((prev) => {
             if (
               prev &&
