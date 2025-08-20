@@ -78,6 +78,11 @@
   --button-active-border: var(--color-brand-active);
 }
 
+:root.dark .excalidraw .animate-config {
+  /* Direct values because var(--input-bg-color) doesn't resolve here */
+  --animate-config-input-bg-color: #31303B;
+}
+
 html, body, #root {
   background: var(--color-surface-lowest);
 }
@@ -172,11 +177,6 @@ code {
   background: var(--button-active-bg);
 }
 
-.excalidraw .animate-panel {
-   /* Direct values because var(--input-bg-color) doesn't resolve here */
-  --animate-panel-input-bg: #31303B;
-}
-
 .app-input {
   height: var(--lg-button-size);
   box-sizing: border-box;
@@ -184,7 +184,7 @@ code {
   border-radius: var(--space-factor);
   font-size: var(--font-size-sm);
   min-width: 200px;
-  background: var(--animate-panel-input-bg, var(--input-bg-color));
+  background: var(--animate-config-input-bg-color, var(--input-bg-color));
   color: var(--color-on-surface);
 }
 

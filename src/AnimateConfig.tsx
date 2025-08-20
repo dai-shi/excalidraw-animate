@@ -145,7 +145,7 @@ export const AnimateConfig = ({
 
   return (
     <div
-      className="animate-panel"
+      className="animate-config"
       style={{
         display: 'flex',
         flexDirection: 'column',
