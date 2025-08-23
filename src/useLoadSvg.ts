@@ -63,7 +63,10 @@ export const useLoadSvg = (
           const svg = await exportToSvg({
             elements,
             files: data.files,
-            appState: data.appState,
+            appState: {
+              ...data.appState,
+              exportBackground: false,
+            },
             exportPadding: 30,
           });
           const result = animateSvg(svg, elements, options);
