@@ -7,14 +7,11 @@ import { useLoadSvg } from './useLoadSvg';
 
 const AnimateApp = ({
   initialData,
-  theme,
 }: {
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
     | undefined;
-  theme:  'light' | 'dark';
 }) => {
-  console.log('AnimateApp theme is :', theme);
   const { loading, loadedSvgList, loadDataList } = useLoadSvg(initialData);
   if (loading) {
     return <div style={{ margin: '3px 3px 3px 40px' }}>Loading...</div>;

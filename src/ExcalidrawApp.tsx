@@ -17,7 +17,7 @@ const ExcalidrawApp = ({
   initialData,
   onChangeData,
   theme,
-  onThemeChange,  
+  onThemeChange,
 }: {
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
@@ -27,7 +27,7 @@ const ExcalidrawApp = ({
     appState: AppState;
     files: BinaryFiles;
   }) => void;
-  theme:  'light' | 'dark';
+  theme: 'light' | 'dark';
   onThemeChange: (t: 'light' | 'dark') => void;
 }) => {
   const [drawing, setDrawing] = useState<Drawing | undefined>(initialData);

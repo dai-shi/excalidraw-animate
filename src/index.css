@@ -14,7 +14,7 @@
   --default-button-size: 2rem;
   --default-icon-size: 1rem;
 
-    /* spacing */
+  /* spacing */
   --space-factor: 0.25rem;
 }
 
@@ -68,7 +68,7 @@
   --color-brand-hover: #bbb8ff;
 
   /* inputs / borders */
-  --input-bg-color: #31303B;
+  --input-bg-color: #31303b;
   --input-border-color: #444;
   --default-border-color: var(--color-surface-high);
 
@@ -80,10 +80,12 @@
 
 :root.dark .excalidraw .animate-config {
   /* Direct values because var(--input-bg-color) doesn't resolve here */
-  --animate-config-input-bg-color: #31303B;
+  --animate-config-input-bg-color: #31303b;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   background: var(--color-surface-lowest);
 }
 

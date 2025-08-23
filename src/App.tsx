@@ -77,7 +77,7 @@ const App = () => {
         </button>
       </div>
       {mode === 'animate' ? (
-        <AnimateApp initialData={loadFromStorage()} theme={theme} />
+        <AnimateApp initialData={loadFromStorage()} />
       ) : (
         <ExcalidrawApp
           initialData={loadFromStorage()}
