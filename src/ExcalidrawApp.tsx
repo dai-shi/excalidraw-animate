@@ -13,12 +13,7 @@ import '@excalidraw/excalidraw/index.css';
 import { AnimateConfig } from './AnimateConfig';
 import type { Drawing } from './AnimateConfig';
 
-const ExcalidrawApp = ({
-  initialData,
-  onChangeData,
-  theme,
-  onThemeChange,
-}: {
+type Props = {
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
     | undefined;
@@ -29,7 +24,14 @@ const ExcalidrawApp = ({
   }) => void;
   theme: 'light' | 'dark';
   onThemeChange: (t: 'light' | 'dark') => void;
-}) => {
+};
+
+const ExcalidrawApp = ({
+  initialData,
+  onChangeData,
+  theme,
+  onThemeChange,
+}: Props) => {
   const [drawing, setDrawing] = useState<Drawing | undefined>(initialData);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
