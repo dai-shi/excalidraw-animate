@@ -13,6 +13,44 @@ import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import { loadScene } from './vendor/loadScene';
 import { animateSvg } from './animate';
 
+const THEME_FILTER = 'invert(93%) hue-rotate(180deg)';
+const IMAGE_CORRECTION = 'invert(100%) hue-rotate(180deg) saturate(1.25)';
+
+export const applyThemeToSvg = (
+  svg: SVGSVGElement,
+  theme: 'light' | 'dark',
+): SVGSVGElement => {
+  if (theme !== 'dark') return svg;
+
+  const cloned = svg.cloneNode(true) as SVGSVGElement;
+
+  // Global filter (sourced from Excalidraw's THEME_FILTER in
+  // packages/common/src/constants.ts; planned to mirror CSS --theme-filter)
+  cloned.style.filter = THEME_FILTER;
+
+  // Apply image-only correction (approx. of Excalidraw's Canvas IMAGE_INVERT_FILTER
+  // in packages/element/src/renderElement.ts)
+  cloned.querySelectorAll<SVGImageElement>('image').forEach((img) => {
+    const href =
+      img.getAttribute('href') || img.getAttribute('xlink:href') || '';
+
+    // skip SVGs
+    if (/^data:image\/svg\+xml/i.test(href) || /\.svg(?:$|\?)/i.test(href)) {
+      return;
+    }
+
+    // append correction filter
+    const current = img.style.filter?.trim() || '';
+    if (!current.includes(IMAGE_CORRECTION)) {
+      img.style.filter = current
+        ? `${current} ${IMAGE_CORRECTION}`
+        : IMAGE_CORRECTION;
+    }
+  });
+
+  return cloned;
+};
+
 const importLibraryFromUrl = async (url: string) => {
   try {
     const request = await fetch(url);
@@ -31,6 +69,7 @@ export const useLoadSvg = (
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
     | undefined,
+  theme: 'light' | 'dark',
 ) => {
   const [loading, setLoading] = useState(true);
   const [loadedSvgList, setLoadedSvgList] = useState<
@@ -66,18 +105,19 @@ export const useLoadSvg = (
             appState: data.appState,
             exportPadding: 30,
           });
-          const result = animateSvg(svg, elements, options);
+          const themedSvg = applyThemeToSvg(svg, theme);
+          const result = animateSvg(themedSvg, elements, options);
           console.log(svg);
           if (inSequence) {
             options.startMs = result.finishedMs;
           }
-          return { svg, finishedMs: result.finishedMs };
+          return { svg: themedSvg, finishedMs: result.finishedMs };
         }),
       );
       setLoadedSvgList(svgList);
       return svgList;
     },
-    [],
+    [theme],
   );
 
   useEffect(() => {
