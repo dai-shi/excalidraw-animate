@@ -71,7 +71,11 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
   const [link, setLink] = useState('');
   const [webmData, setWebmData] = useState<Blob>();
   const [showExport, setShowExport] = useState(false);
-  const [exportTheme, setExportTheme] = useState<'light' | 'dark'>('light');
+  const getCurrentTheme = () =>
+    document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  const [exportTheme, setExportTheme] = useState<'light' | 'dark'>(
+    getCurrentTheme,
+  );
   const [exportBackground, setExportBackground] = useState(false);
 
   useEffect(() => {
@@ -102,6 +106,17 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     const data = await loadFromJSON();
     loadDataList([data]);
   };
+
+  useEffect(() => {
+    if (!showExport) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowExport(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showExport]);
 
   const loadLibrary = async () => {
     const blob = await fileOpen({
@@ -239,6 +254,45 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     return null;
   }
 
+  const Toggle = ({
+    checked,
+    onChange,
+  }: {
+    checked: boolean;
+    onChange: () => void;
+    ariaLabel: string;
+  }) => (
+    <button
+      type="button"
+      onClick={onChange}
+      style={{
+        position: 'relative',
+        width: 52,
+        height: 28,
+        borderRadius: 999,
+        background: checked
+          ? 'var(--color-primary)'
+          : 'var(--color-surface-lowest)',
+        border: checked ? 'none' : '1.5px solid #999',
+        cursor: 'pointer',
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute',
+          top: checked ? 3 : 6,
+          left: checked ? 27 : 7,
+          width: checked ? 22 : 14,
+          height: checked ? 22 : 14,
+          borderRadius: '50%',
+          background: checked
+            ? 'var(--color-surface-lowest)'
+            : 'var(--color-on-surface)',
+        }}
+      />
+    </button>
+  );
+
   return (
     <>
       <div style={{ marginTop: 5 }}>
@@ -297,7 +351,10 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
             </button>
             <button
               type="button"
-              onClick={() => setShowExport(true)}
+              onClick={() => {
+                setExportTheme(getCurrentTheme());
+                setShowExport(true);
+              }}
               className="app-button"
             >
               Export to SVG
@@ -322,42 +379,56 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
         />
       </div>
       {showExport && (
-        <div role="dialog" aria-modal="true">
-          <h3>Export</h3>
-
-          <div>
-            <label>
-              Theme:
-              <select
-                value={exportTheme}
-                onChange={(e) =>
-                  setExportTheme(e.target.value as 'light' | 'dark')
-                }
-              >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-            </label>
-          </div>
-
-          <div>
-            <label>
-              <input
-                type="checkbox"
+        <div
+          role="presentation"
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowExport(false);
+          }}
+        >
+          <div role="dialog" className="modal-panel">
+            <h3
+              style={{
+                margin: 0,
+                marginBottom: '0.75rem',
+                fontWeight: 800,
+                fontSize: '1.1rem',
+                textAlign: 'left',
+              }}
+            >
+              Export to SVG
+            </h3>
+            <div className="modal-row">
+              <div style={{ fontWeight: 600 }}>Background</div>
+              <Toggle
                 checked={exportBackground}
-                onChange={(e) => setExportBackground(e.target.checked)}
+                onChange={() => setExportBackground(!exportBackground)}
+                ariaLabel="Toggle background"
               />
-              Background
-            </label>
-          </div>
-
-          <div style={{ marginTop: 8 }}>
-            <button type="button" onClick={exportToSvg}>
-              Export
-            </button>
-            <button type="button" onClick={() => setShowExport(false)}>
-              Cancel
-            </button>
+            </div>
+            <div className="modal-row">
+              <div style={{ fontWeight: 600 }}>Dark mode</div>
+              <Toggle
+                checked={exportTheme === 'dark'}
+                onChange={() =>
+                  setExportTheme(exportTheme === 'dark' ? 'light' : 'dark')
+                }
+                ariaLabel="Toggle dark mode"
+              />
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="app-button app-button--primary"
+                onClick={exportToSvg}
+                onClickCapture={() => {
+                  exportToSvg();
+                  setShowExport(false);
+                }}
+              >
+                Export
+              </button>
+            </div>
           </div>
         </div>
       )}
