@@ -22,7 +22,11 @@ const AnimateApp = ({ initialData, theme }: Props) => {
   }
   return (
     <div className="App">
-      <Toolbar svgList={loadedSvgList} loadDataList={loadDataList} />
+      <Toolbar
+        svgList={loadedSvgList}
+        loadDataList={loadDataList}
+        theme={theme}
+      />
       {!!loadedSvgList.length && <Viewer svgList={loadedSvgList} />}
     </div>
   );

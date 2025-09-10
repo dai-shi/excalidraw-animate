@@ -45,10 +45,7 @@ const ExcalidrawApp = ({
         initialData={initialData}
         onChange={(elements, appState, files) => {
           const t = appState?.theme;
-          if (
-            (t === 'light' || t === 'dark') &&
-            t !== lastExcalidrawThemeRef.current
-          ) {
+          if (t !== lastExcalidrawThemeRef.current) {
             lastExcalidrawThemeRef.current = t;
             if (t !== theme) {
               onThemeChange(t);

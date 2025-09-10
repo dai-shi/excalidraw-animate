@@ -53,8 +53,7 @@ const App = () => {
   };
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   return (

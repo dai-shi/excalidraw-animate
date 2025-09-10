@@ -62,20 +62,17 @@ type Props = {
       files: BinaryFiles;
     }[],
   ) => void;
+  theme: 'light' | 'dark';
 };
 
-const Toolbar = ({ svgList, loadDataList }: Props) => {
+const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | 'never'>(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [link, setLink] = useState('');
   const [webmData, setWebmData] = useState<Blob>();
   const [showExport, setShowExport] = useState(false);
-  const getCurrentTheme = () =>
-    document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-  const [exportTheme, setExportTheme] = useState<'light' | 'dark'>(
-    getCurrentTheme,
-  );
+  const [exportTheme, setExportTheme] = useState<'light' | 'dark'>(theme);
   const [exportBackground, setExportBackground] = useState(false);
 
   useEffect(() => {
@@ -352,7 +349,7 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
             <button
               type="button"
               onClick={() => {
-                setExportTheme(getCurrentTheme());
+                setExportTheme(theme);
                 setShowExport(true);
               }}
               className="app-button"
