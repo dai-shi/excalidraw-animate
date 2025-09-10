@@ -49,7 +49,7 @@ const ExcalidrawApp = ({
           onChangeData({ elements, appState, files });
         }}
       >
-        <Sidebar name="custom">
+        <Sidebar name="custom" docked={true}>
           <Sidebar.Header />
           <div style={{ padding: '1rem' }}>
             {drawing && excalidrawAPI ? (
