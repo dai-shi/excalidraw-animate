@@ -42,7 +42,6 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (!theme) return;
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(theme);
     localStorage.setItem('theme', theme);
@@ -82,7 +81,6 @@ const App = () => {
           initialData={loadFromStorage()}
           onChangeData={(data) => saveToStorage(data)}
           theme={theme}
-          onThemeChange={(t) => setTheme(t)}
         />
       )}
     </div>
