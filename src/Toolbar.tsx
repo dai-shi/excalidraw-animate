@@ -20,6 +20,7 @@ import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import GitHubCorner from './GitHubCorner';
 import { getBeginTimeList } from './animate';
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from './export';
+import { applyThemeToSvg } from './useLoadSvg';
 
 const loadFromJSON = async () => {
   const blob = await fileOpen({
@@ -40,6 +41,15 @@ const getCombinedBeginTimeList = (svgList: Props['svgList']) => {
   return [...new Set(beginTimeList)].sort((a, b) => a - b);
 };
 
+const removeBackgroundRect = (svg: SVGSVGElement): SVGSVGElement => {
+  const cloned = svg.cloneNode(true) as SVGSVGElement;
+  const firstRect = cloned.querySelector('rect');
+  if (firstRect) {
+    firstRect.remove();
+  }
+  return cloned;
+};
+
 type Props = {
   svgList: {
     svg: SVGSVGElement;
@@ -52,14 +62,19 @@ type Props = {
       files: BinaryFiles;
     }[],
   ) => void;
+  theme: 'light' | 'dark';
 };
 
-const Toolbar = ({ svgList, loadDataList }: Props) => {
+const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | 'never'>(false);
   const [paused, setPaused] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [link, setLink] = useState('');
   const [webmData, setWebmData] = useState<Blob>();
+  const [showExport, setShowExport] = useState(false);
+  const [exportTheme, setExportTheme] = useState<'light' | 'dark'>(theme);
+  const [exportBackground, setExportBackground] = useState(false);
+
   useEffect(() => {
     setWebmData(undefined);
   }, [svgList]);
@@ -88,6 +103,17 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     const data = await loadFromJSON();
     loadDataList([data]);
   };
+
+  useEffect(() => {
+    if (!showExport) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowExport(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showExport]);
 
   const loadLibrary = async () => {
     const blob = await fileOpen({
@@ -189,7 +215,15 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
       return;
     }
     svgList.forEach(({ svg }) => {
-      exportToSvgFile(svg);
+      if (exportTheme === 'light' && exportBackground) {
+        exportToSvgFile(svg);
+      } else if (exportTheme === 'light' && !exportBackground) {
+        exportToSvgFile(removeBackgroundRect(svg));
+      } else if (exportTheme === 'dark' && exportBackground) {
+        exportToSvgFile(applyThemeToSvg(svg, 'dark'));
+      } else if (exportTheme === 'dark' && !exportBackground) {
+        exportToSvgFile(applyThemeToSvg(removeBackgroundRect(svg), 'dark'));
+      }
     });
   };
 
@@ -217,83 +251,185 @@ const Toolbar = ({ svgList, loadDataList }: Props) => {
     return null;
   }
 
+  const Toggle = ({
+    checked,
+    onChange,
+  }: {
+    checked: boolean;
+    onChange: () => void;
+    ariaLabel: string;
+  }) => (
+    <button
+      type="button"
+      onClick={onChange}
+      style={{
+        position: 'relative',
+        width: 52,
+        height: 28,
+        borderRadius: 999,
+        background: checked
+          ? 'var(--color-primary)'
+          : 'var(--color-surface-lowest)',
+        border: checked ? 'none' : '1.5px solid #999',
+        cursor: 'pointer',
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute',
+          top: checked ? 3 : 6,
+          left: checked ? 27 : 7,
+          width: checked ? 22 : 14,
+          height: checked ? 22 : 14,
+          borderRadius: '50%',
+          background: checked
+            ? 'var(--color-surface-lowest)'
+            : 'var(--color-on-surface)',
+        }}
+      />
+    </button>
+  );
+
   return (
-    <div>
-      <div
-        className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}
-      >
-        <button type="button" onClick={loadFile} className="app-button">
-          Load File
-        </button>
-        <span>OR</span>
-        <button type="button" onClick={loadLibrary} className="app-button">
-          Load Library
-        </button>
-        <span>OR</span>
-        <form onSubmit={loadLink}>
-          <input
-            className="app-input"
-            placeholder="Enter link..."
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-          />
-          <button
-            type="submit"
-            disabled={!linkRegex.test(link)}
-            className="app-button"
-          >
-            Animate!
+    <>
+      <div style={{ marginTop: 5 }}>
+        <div
+          className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}
+        >
+          <button type="button" onClick={loadFile} className="app-button">
+            Load File
           </button>
-        </form>
+          <span>OR</span>
+          <button type="button" onClick={loadLibrary} className="app-button">
+            Load Library
+          </button>
+          <span>OR</span>
+          <form onSubmit={loadLink}>
+            <input
+              className="app-input"
+              placeholder="Enter link..."
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+            />
+            <button
+              type="submit"
+              disabled={!linkRegex.test(link)}
+              className="app-button"
+            >
+              Animate!
+            </button>
+          </form>
+        </div>
+        {!!svgList.length && (
+          <div className="toolbar">
+            <button
+              type="button"
+              onClick={togglePausedAnimations}
+              className="app-button"
+            >
+              {paused ? 'Play (P)' : 'Pause (P)'}
+            </button>
+            <button
+              type="button"
+              onClick={stepForwardAnimations}
+              className="app-button"
+            >
+              Step (S)
+            </button>
+            <button
+              type="button"
+              onClick={resetAnimations}
+              className="app-button"
+            >
+              Reset (R)
+            </button>
+            <button type="button" onClick={hideToolbar} className="app-button">
+              Hide Toolbar (Q)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setExportTheme(theme);
+                setShowExport(true);
+              }}
+              className="app-button"
+            >
+              Export to SVG
+            </button>
+            <button
+              type="button"
+              onClick={exportToWebm}
+              disabled={processing}
+              className="app-button"
+            >
+              {processing
+                ? 'Processing...'
+                : webmData
+                  ? 'Export to WebM'
+                  : 'Prepare WebM'}
+            </button>
+          </div>
+        )}
+        <GitHubCorner
+          link="https://github.com/dai-shi/excalidraw-animate"
+          size={40}
+        />
       </div>
-      {!!svgList.length && (
-        <div className="toolbar">
-          <button
-            type="button"
-            onClick={togglePausedAnimations}
-            className="app-button"
-          >
-            {paused ? 'Play (P)' : 'Pause (P)'}
-          </button>
-          <button
-            type="button"
-            onClick={stepForwardAnimations}
-            className="app-button"
-          >
-            Step (S)
-          </button>
-          <button
-            type="button"
-            onClick={resetAnimations}
-            className="app-button"
-          >
-            Reset (R)
-          </button>
-          <button type="button" onClick={hideToolbar} className="app-button">
-            Hide Toolbar (Q)
-          </button>
-          <button type="button" onClick={exportToSvg} className="app-button">
-            Export to SVG
-          </button>
-          <button
-            type="button"
-            onClick={exportToWebm}
-            disabled={processing}
-            className="app-button"
-          >
-            {processing
-              ? 'Processing...'
-              : webmData
-                ? 'Export to WebM'
-                : 'Prepare WebM'}
-          </button>
+      {showExport && (
+        <div
+          role="presentation"
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowExport(false);
+          }}
+        >
+          <div role="dialog" className="modal-panel">
+            <h3
+              style={{
+                margin: 0,
+                marginBottom: '0.75rem',
+                fontWeight: 800,
+                fontSize: '1.1rem',
+                textAlign: 'left',
+              }}
+            >
+              Export to SVG
+            </h3>
+            <div className="modal-row">
+              <div style={{ fontWeight: 600 }}>Background</div>
+              <Toggle
+                checked={exportBackground}
+                onChange={() => setExportBackground(!exportBackground)}
+                ariaLabel="Toggle background"
+              />
+            </div>
+            <div className="modal-row">
+              <div style={{ fontWeight: 600 }}>Dark mode</div>
+              <Toggle
+                checked={exportTheme === 'dark'}
+                onChange={() =>
+                  setExportTheme(exportTheme === 'dark' ? 'light' : 'dark')
+                }
+                ariaLabel="Toggle dark mode"
+              />
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="app-button app-button--primary"
+                onClick={exportToSvg}
+                onClickCapture={() => {
+                  exportToSvg();
+                  setShowExport(false);
+                }}
+              >
+                Export
+              </button>
+            </div>
+          </div>
         </div>
       )}
-      <GitHubCorner
-        link="https://github.com/dai-shi/excalidraw-animate"
-        size={40}
-      />
-    </div>
+    </>
   );
 };
 

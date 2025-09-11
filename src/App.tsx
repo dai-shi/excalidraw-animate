@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AnimateApp from './AnimateApp';
 import ExcalidrawApp from './ExcalidrawApp';
 
@@ -33,25 +33,54 @@ const saveToStorage = (data: {
 };
 
 type ViewMode = 'animate' | 'excalidraw';
+type Theme = 'light' | 'dark';
 
 const App = () => {
   const [mode, setMode] = useState<ViewMode>('animate');
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem('theme') as Theme | null) ?? 'light',
+  );
+
+  useEffect(() => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleMode = () => {
     setMode((prev) => (prev === 'animate' ? 'excalidraw' : 'animate'));
   };
 
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   return (
     <div>
-      <button className="app-button app-button-compact" onClick={toggleMode}>
-        {mode === 'animate' ? 'Edit' : 'Animate'}
-      </button>
+      <div
+        style={{
+          position: 'absolute',
+          zIndex: 10,
+          top: 0,
+          left: 0,
+          display: 'flex',
+          gap: 5,
+        }}
+      >
+        <button className="app-button app-button-compact" onClick={toggleMode}>
+          {mode === 'animate' ? 'Edit' : 'Animate'}
+        </button>
+        <button className="app-button app-button-compact" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+      </div>
       {mode === 'animate' ? (
-        <AnimateApp initialData={loadFromStorage()} />
+        <AnimateApp initialData={loadFromStorage()} theme={theme} />
       ) : (
         <ExcalidrawApp
           initialData={loadFromStorage()}
           onChangeData={(data) => saveToStorage(data)}
+          theme={theme}
         />
       )}
     </div>
