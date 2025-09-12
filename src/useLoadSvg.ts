@@ -24,7 +24,7 @@ export const applyThemeToSvg = (
 
   const cloned = svg.cloneNode(true) as SVGSVGElement;
 
-  // Global filter (sourced from Excalidraw's THEME_FILTER in
+  // Global filter (from Excalidraw's THEME_FILTER in
   // packages/common/src/constants.ts; planned to mirror CSS --theme-filter)
   cloned.style.filter = THEME_FILTER;
 
