@@ -172,6 +172,7 @@ export const AnimateConfig = ({
             }
             onChange={onChangeAnimateOrder}
             style={{ width: 50, minWidth: 50 }}
+            title="Set animation order"
           />
         )}
       </div>
@@ -193,6 +194,7 @@ export const AnimateConfig = ({
               onChange={onChangeAnimateDuration}
               placeholder="Default"
               style={{ width: 50, minWidth: 50 }}
+              title="Set animation duration in milliseconds"
             />{' '}
             ms
           </>
@@ -210,6 +212,7 @@ export const AnimateConfig = ({
           defaultValue={defaultAnimateOptions.pointerImg || ''}
           onChange={onChangeAnimatePointerText}
           placeholder="Enter URL or choose a File..."
+          title="Enter an image URL or choose a file for the pointer"
         />
         <input
           id="pointerFile"
@@ -225,6 +228,7 @@ export const AnimateConfig = ({
             display: 'inline-flex',
             alignItems: 'center',
           }}
+          title="Upload an image file for the pointer"
         >
           File...
         </label>
@@ -238,6 +242,7 @@ export const AnimateConfig = ({
           onChange={onChangeAnimatePointerWidth}
           placeholder="Default"
           style={{ width: 50, minWidth: 50 }}
+          title="Enter pointer width in pixels"
         />{' '}
         px
       </div>

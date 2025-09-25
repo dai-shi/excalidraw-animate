@@ -67,10 +67,24 @@ const App = () => {
           gap: 5,
         }}
       >
-        <button className="app-button app-button-compact" onClick={toggleMode}>
+        <button
+          className="app-button app-button-compact"
+          onClick={toggleMode}
+          title={
+            mode === 'animate'
+              ? 'Switch to edit mode'
+              : 'Switch to animate mode'
+          }
+        >
           {mode === 'animate' ? 'Edit' : 'Animate'}
         </button>
-        <button className="app-button app-button-compact" onClick={toggleTheme}>
+        <button
+          className="app-button app-button-compact"
+          onClick={toggleTheme}
+          title={
+            theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
+          }
+        >
           {theme === 'light' ? '🌙' : '☀️'}
         </button>
       </div>

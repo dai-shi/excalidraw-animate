@@ -13,6 +13,7 @@ const GitHubCorner = ({ link, size, fill, color }: Props) => (
     aria-label="View source on GitHub"
     target="_blank"
     rel="noopener noreferrer"
+    title="View source on GitHub"
   >
     <svg
       width={size || 80}
