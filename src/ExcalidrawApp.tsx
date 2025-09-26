@@ -66,6 +66,7 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
             style={{
               marginLeft: '0.5rem',
             }}
+            title="Show or hide the Animate panel"
           >
             Toggle Animate Panel
           </Sidebar.Trigger>

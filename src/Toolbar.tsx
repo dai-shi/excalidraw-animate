@@ -254,14 +254,19 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const Toggle = ({
     checked,
     onChange,
+    ariaLabel,
+    title,
   }: {
     checked: boolean;
     onChange: () => void;
     ariaLabel: string;
+    title: string;
   }) => (
     <button
       type="button"
       onClick={onChange}
+      aria-label={ariaLabel}
+      title={title}
       style={{
         position: 'relative',
         width: 52,
@@ -296,11 +301,21 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
         <div
           className={`toolbar ${showToolbar === true ? '' : 'toolbar--hidden'}`}
         >
-          <button type="button" onClick={loadFile} className="app-button">
+          <button
+            type="button"
+            onClick={loadFile}
+            className="app-button"
+            title="Load Excalidraw file (.json)"
+          >
             Load File
           </button>
           <span>OR</span>
-          <button type="button" onClick={loadLibrary} className="app-button">
+          <button
+            type="button"
+            onClick={loadLibrary}
+            className="app-button"
+            title="Load Excalidraw library file (.excalidrawlib)"
+          >
             Load Library
           </button>
           <span>OR</span>
@@ -309,11 +324,13 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
               className="app-input"
               placeholder="Enter link..."
               value={link}
+              title="Enter #json= link or .excalidrawlib URL"
               onChange={(e) => setLink(e.target.value)}
             />
             <button
               type="submit"
               disabled={!linkRegex.test(link)}
+              title="Animate the loaded SVG"
               className="app-button"
             >
               Animate!
@@ -326,6 +343,11 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
               type="button"
               onClick={togglePausedAnimations}
               className="app-button"
+              title={
+                paused
+                  ? 'Play animation (shortcut: P)'
+                  : 'Pause animation (shortcut: P)'
+              }
             >
               {paused ? 'Play (P)' : 'Pause (P)'}
             </button>
@@ -333,6 +355,7 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
               type="button"
               onClick={stepForwardAnimations}
               className="app-button"
+              title="Advance animation to next step (shortcut: S)"
             >
               Step (S)
             </button>
@@ -340,10 +363,16 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
               type="button"
               onClick={resetAnimations}
               className="app-button"
+              title="Restart animation from beginning (shortcut: R)"
             >
               Reset (R)
             </button>
-            <button type="button" onClick={hideToolbar} className="app-button">
+            <button
+              type="button"
+              onClick={hideToolbar}
+              className="app-button"
+              title="Hide toolbar (shortcut: Q)"
+            >
               Hide Toolbar (Q)
             </button>
             <button
@@ -353,6 +382,7 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
                 setShowExport(true);
               }}
               className="app-button"
+              title="Export current animation as SVG file"
             >
               Export to SVG
             </button>
@@ -361,6 +391,11 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
               onClick={exportToWebm}
               disabled={processing}
               className="app-button"
+              title={
+                webmData
+                  ? 'Export animation as WebM video file'
+                  : 'Prepare animation for WebM export'
+              }
             >
               {processing
                 ? 'Processing...'
@@ -401,6 +436,11 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
                 checked={exportBackground}
                 onChange={() => setExportBackground(!exportBackground)}
                 ariaLabel="Toggle background"
+                title={
+                  exportBackground
+                    ? 'Background enabled'
+                    : 'Background disabled'
+                }
               />
             </div>
             <div className="modal-row">
@@ -411,6 +451,7 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
                   setExportTheme(exportTheme === 'dark' ? 'light' : 'dark')
                 }
                 ariaLabel="Toggle dark mode"
+                title={exportTheme === 'dark' ? 'Dark mode' : 'Light mode'}
               />
             </div>
             <div className="modal-footer">
@@ -422,6 +463,7 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
                   exportToSvg();
                   setShowExport(false);
                 }}
+                title="Export with current settings to SVG"
               >
                 Export
               </button>
