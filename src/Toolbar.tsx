@@ -21,6 +21,7 @@ import GitHubCorner from './GitHubCorner';
 import { getBeginTimeList } from './animate';
 import { exportToSvgFile, exportToWebmFile, prepareWebmData } from './export';
 import { applyThemeToSvg } from './useLoadSvg';
+import { Modal } from './Modal';
 
 const loadFromJSON = async () => {
   const blob = await fileOpen({
@@ -74,6 +75,7 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const [showExport, setShowExport] = useState(false);
   const [exportTheme, setExportTheme] = useState<'light' | 'dark'>(theme);
   const [exportBackground, setExportBackground] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setWebmData(undefined);
@@ -100,8 +102,13 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   }, []);
 
   const loadFile = async () => {
-    const data = await loadFromJSON();
-    loadDataList([data]);
+    try {
+      const data = await loadFromJSON();
+      loadDataList([data]);
+    } catch (e) {
+      console.error('Failed to load file:', e);
+      setError('Failed to load file');
+    }
   };
 
   useEffect(() => {
@@ -116,18 +123,23 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   }, [showExport]);
 
   const loadLibrary = async () => {
-    const blob = await fileOpen({
-      description: 'Excalidraw library files',
-      extensions: ['.json', '.excalidrawlib'],
-      mimeTypes: ['application/json'],
-    });
-    const libraryItems = await loadLibraryFromBlob(blob);
-    const dataList = libraryItems.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem.elements, null)),
-    );
-    loadDataList(
-      dataList.map((elements) => ({ elements, appState: {}, files: {} })),
-    );
+    try {
+      const blob = await fileOpen({
+        description: 'Excalidraw library files',
+        extensions: ['.json', '.excalidrawlib'],
+        mimeTypes: ['application/json'],
+      });
+      const libraryItems = await loadLibraryFromBlob(blob);
+      const dataList = libraryItems.map((libraryItem) =>
+        getNonDeletedElements(restoreElements(libraryItem.elements, null)),
+      );
+      loadDataList(
+        dataList.map((elements) => ({ elements, appState: {}, files: {} })),
+      );
+    } catch (e) {
+      console.error('Failed to load library:', e);
+      setError('Failed to load library');
+    }
   };
 
   const loadLink = (event: FormEvent<HTMLFormElement>) => {
@@ -411,65 +423,45 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
         />
       </div>
       {showExport && (
-        <div
-          role="presentation"
-          className="modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowExport(false);
+        <Modal
+          title="Export to SVG"
+          onClose={() => setShowExport(false)}
+          footerLabel="Export"
+          footerTitle="Export with current settings to SVG"
+          onFooterClick={() => {
+            exportToSvg();
+            setShowExport(false);
           }}
         >
-          <div role="dialog" className="modal-panel">
-            <h3
-              style={{
-                margin: 0,
-                marginBottom: '0.75rem',
-                fontWeight: 800,
-                fontSize: '1.1rem',
-                textAlign: 'left',
-              }}
-            >
-              Export to SVG
-            </h3>
-            <div className="modal-row">
-              <div style={{ fontWeight: 600 }}>Background</div>
-              <Toggle
-                checked={exportBackground}
-                onChange={() => setExportBackground(!exportBackground)}
-                ariaLabel="Toggle background"
-                title={
-                  exportBackground
-                    ? 'Background enabled'
-                    : 'Background disabled'
-                }
-              />
-            </div>
-            <div className="modal-row">
-              <div style={{ fontWeight: 600 }}>Dark mode</div>
-              <Toggle
-                checked={exportTheme === 'dark'}
-                onChange={() =>
-                  setExportTheme(exportTheme === 'dark' ? 'light' : 'dark')
-                }
-                ariaLabel="Toggle dark mode"
-                title={exportTheme === 'dark' ? 'Dark mode' : 'Light mode'}
-              />
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="app-button app-button--primary"
-                onClick={exportToSvg}
-                onClickCapture={() => {
-                  exportToSvg();
-                  setShowExport(false);
-                }}
-                title="Export with current settings to SVG"
-              >
-                Export
-              </button>
-            </div>
+          <div className="modal-row">
+            <div style={{ fontWeight: 600 }}>Background</div>
+            <Toggle
+              checked={exportBackground}
+              onChange={() => setExportBackground(!exportBackground)}
+              ariaLabel="Toggle background"
+              title={
+                exportBackground ? 'Background enabled' : 'Background disabled'
+              }
+            />
           </div>
-        </div>
+          <div className="modal-row">
+            <div style={{ fontWeight: 600 }}>Dark mode</div>
+            <Toggle
+              checked={exportTheme === 'dark'}
+              onChange={() =>
+                setExportTheme(exportTheme === 'dark' ? 'light' : 'dark')
+              }
+              ariaLabel="Toggle dark mode"
+              title={exportTheme === 'dark' ? 'Dark mode' : 'Light mode'}
+            />
+          </div>
+        </Modal>
+      )}
+
+      {error && (
+        <Modal title="Error" onClose={() => setError(null)}>
+          <p>{error}</p>
+        </Modal>
       )}
     </>
   );
