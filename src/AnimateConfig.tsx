@@ -221,10 +221,6 @@ export const AnimateConfig = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor:"#0080ffff",
-            color:"white",
-            fontWeight:"normal",
           }}
           title="Upload an image file for the pointer"
         >
