@@ -154,59 +154,112 @@ export const AnimateConfig = ({
       }}
     >
       {/* Animation Section */}
-      <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Animation</div>
-
-      <div style={{ opacity: animateOrderDisabled ? 0.3 : 1.0 }}>
-        Order:{' '}
-        {animateOrderSet.size > 1 ? (
-          <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
-        ) : (
-          <input
-            className="app-input"
-            type="number"
-            disabled={animateOrderDisabled}
-            value={
-              (animateOrderSet.size === 1 &&
-                animateOrderSet.values().next().value) ||
-              0
-            }
-            onChange={onChangeAnimateOrder}
-            style={{ width: 50, minWidth: 50 }}
-            title="Set animation order"
-          />
-        )}
+      <div
+        style={{
+          fontWeight: 'bold',
+          marginBottom: 4,
+          borderBottom: '1px solid gray',
+          paddingBottom: '5px',
+        }}
+      >
+        Animation
       </div>
 
-      <div style={{ opacity: animateDurationDisabled ? 0.3 : 1.0 }}>
-        Duration:{' '}
-        {animateDurationSet.size > 1 ? (
-          <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
-        ) : (
-          <>
+      <div
+        style={{
+          opacity: animateOrderDisabled ? 0.3 : 1.0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+        }}
+      >
+        <div>Order: </div>
+        <div>
+          {animateOrderSet.size > 1 ? (
+            <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
+          ) : (
             <input
               className="app-input"
-              disabled={animateDurationDisabled}
+              type="number"
+              disabled={animateOrderDisabled}
               value={
-                (animateDurationSet.size === 1 &&
-                  animateDurationSet.values().next().value) ||
-                ''
+                (animateOrderSet.size === 1 &&
+                  animateOrderSet.values().next().value) ||
+                0
               }
-              onChange={onChangeAnimateDuration}
-              placeholder="Default"
-              style={{ width: 50, minWidth: 50 }}
-              title="Set animation duration in milliseconds"
-            />{' '}
-            ms
-          </>
-        )}
+              onChange={onChangeAnimateOrder}
+              style={{ width: 80, minWidth: 50 }}
+              title="Set animation order"
+            />
+          )}
+        </div>
+      </div>
+
+      <div
+        style={{
+          opacity: animateDurationDisabled ? 0.3 : 1.0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+        }}
+      >
+        <div>Duration: </div>
+        <div>
+          {animateDurationSet.size > 1 ? (
+            <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
+          ) : (
+            <>
+              <input
+                className="app-input"
+                disabled={animateDurationDisabled}
+                value={
+                  (animateDurationSet.size === 1 &&
+                    animateDurationSet.values().next().value) ||
+                  ''
+                }
+                onChange={onChangeAnimateDuration}
+                placeholder="ms"
+                style={{ width: 80, minWidth: 50 }}
+                title="Set animation duration in milliseconds"
+              />{' '}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Pointer Section */}
-      <div style={{ fontWeight: 'bold', margin: '8px 0 4px' }}>Pointer</div>
+      <div
+        style={{
+          fontWeight: 'bold',
+          margin: '8px 0 4px',
+          borderBottom: '1px solid gray',
+          paddingBottom: '5px',
+        }}
+      >
+        Pointer
+      </div>
 
       <div
-        style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
       >
+        <label
+          htmlFor="pointerFile"
+          className="app-button"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+          title="Upload an image file for the pointer"
+        >
+          File...
+        </label>
         <input
           className="app-input"
           defaultValue={defaultAnimateOptions.pointerImg || ''}
@@ -221,30 +274,31 @@ export const AnimateConfig = ({
           onChange={onChangeAnimatePointerFile}
           style={{ display: 'none' }}
         />
-        <label
-          htmlFor="pointerFile"
-          className="app-button"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-          }}
-          title="Upload an image file for the pointer"
-        >
-          File...
-        </label>
       </div>
 
-      <div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
+      >
         Width:{' '}
         <input
           className="app-input"
           defaultValue={defaultAnimateOptions.pointerWidth || ''}
           onChange={onChangeAnimatePointerWidth}
-          placeholder="Default"
-          style={{ width: 50, minWidth: 50 }}
+          placeholder="px"
+          style={{ width: 80, minWidth: 50 }}
           title="Enter pointer width in pixels"
         />{' '}
-        px
+      </div>
+
+      <div>
+        <p style={{ fontWeight: 'lighter', color: 'gray', fontSize: '12px' }}>
+          * Values are set to the app’s default settings unless you change them.
+        </p>
       </div>
     </div>
   );
