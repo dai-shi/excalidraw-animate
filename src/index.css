@@ -179,6 +179,12 @@ code {
   background: var(--button-active-bg);
 }
 
+/* Dark mode: brighten only the 'File...' button in AnimateConfig for better contrast */
+:root.dark .excalidraw .animate-config label[for='pointerFile'].app-button {
+  background: hsl(240 8% 20%);
+  box-shadow: 0 0 0 1px hsl(240 8% 25%);
+}
+
 .app-input {
   height: var(--lg-button-size);
   box-sizing: border-box;
