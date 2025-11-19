@@ -83,6 +83,211 @@
   --animate-config-input-bg-color: #31303b;
 }
 
+/* Animate panel background: vibrant cyan as requested. Keep inputs readable. */
+.excalidraw .animate-config {
+  background-color: #efcfd9 !important;
+  color: #0b0f12 !important;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+/* Inputs inside the animate panel should remain light for contrast */
+.excalidraw .animate-config .app-input {
+  background: #ffffff !important;
+  color: #0b0f12 !important;
+}
+
+/* Make small buttons inside the panel slightly translucent so they are visible
+   against the cyan background while keeping global button styles intact. */
+.excalidraw .animate-config .app-button {
+  background: rgba(255,255,255,0.12) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.excalidraw .animate-config .app-button:hover {
+  background: rgba(255,255,255,0.18) !important;
+}
+
+/* Style the Footer / Sidebar trigger button ("Toggle Animate Panel") inside Excalidraw */
+.excalidraw footer button,
+.excalidraw .Sidebar__trigger,
+.excalidraw .sidebar-trigger,
+.excalidraw .Sidebar-Trigger {
+  background-color: #ffffff !important;
+  color: #0b0f12 !important;
+  border: none !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+.excalidraw footer button:hover,
+.excalidraw .Sidebar__trigger:hover,
+.excalidraw .sidebar-trigger:hover,
+.excalidraw .Sidebar-Trigger:hover {
+  background-color: #3ac8db !important;
+}
+
+/* Make the animate panel scrollable vertically with a visible scrollbar
+   that appears inside the panel on the right. Keep the scrollbar narrow
+   and styled for WebKit and Firefox. */
+.excalidraw .animate-config {
+  max-height: calc(100vh - 160px); /* leave room for header/toolbars */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* WebKit scrollbar styling */
+.excalidraw .animate-config::-webkit-scrollbar {
+  width: 10px;
+}
+.excalidraw .animate-config::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+}
+.excalidraw .animate-config::-webkit-scrollbar-thumb {
+  background-color: rgba(11,15,18,0.2);
+  border-radius: 6px;
+  border: 2px solid rgba(255,255,255,0.0);
+}
+
+/* Firefox scrollbar */
+.excalidraw .animate-config {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(11,15,18,0.2) rgba(0,0,0,0.04);
+}
+
+/* Style dropdowns / menus / popovers inside Excalidraw to match requested
+   vibrant background. This affects UI panels such as the main menu, export
+   menu, and other popovers, not the drawing canvas. */
+.excalidraw [role="menu"],
+.excalidraw [role="menuitem"],
+.excalidraw .dropdown,
+.excalidraw .menu,
+.excalidraw .popover,
+.excalidraw .context-menu,
+.excalidraw .menu-panel,
+.excalidraw .menu-item,
+.excalidraw .dropdown-panel {
+  background-color: #f2c7d4 !important;
+  color: #0b0f12 !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
+}
+
+.excalidraw .menu-item:hover,
+.excalidraw [role="menuitem"]:hover,
+.excalidraw .dropdown-panel button:hover {
+  background-color: #3ac8db !important;
+  color: #0b0f12 !important;
+}
+
+/* Ensure links/icons inside menus inherit readable color */
+.excalidraw .menu a,
+.excalidraw .menu button,
+.excalidraw .menu-item svg,
+.excalidraw .dropdown-panel svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+/* Right-side inspector / properties panel styling
+   Target common Excalidraw panel/sidebar selectors so the element
+   properties panel (shown when an element is selected) uses the
+   requested vibrant background while keeping inputs legible. */
+.excalidraw .sidebar,
+.excalidraw .Sidebar,
+.excalidraw .sidebar-right,
+.excalidraw .sidebarPanel,
+.excalidraw .right-sidebar,
+.excalidraw .panel,
+.excalidraw .panel-content,
+.excalidraw .properties-panel,
+.excalidraw .inspector,
+.excalidraw .app-sidebar {
+  background-color: #ffffff !important;
+  color: #0b0f12 !important;
+}
+
+/* Keep input controls and sliders readable inside the panel */
+.excalidraw .sidebar input,
+.excalidraw .sidebar select,
+.excalidraw .sidebar textarea,
+.excalidraw .panel input,
+.excalidraw .panel select,
+.excalidraw .panel textarea,
+.excalidraw .properties-panel .app-input {
+  background: #ffffff !important;
+  color: #0b0f12 !important;
+}
+
+/* Buttons inside the right panel */
+.excalidraw .sidebar .app-button,
+.excalidraw .panel .app-button,
+.excalidraw .properties-panel .app-button {
+  background: rgba(255,255,255,0.12) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+.excalidraw .sidebar .app-button:hover,
+.excalidraw .panel .app-button:hover,
+.excalidraw .properties-panel .app-button:hover {
+  background: rgba(255,255,255,0.18) !important;
+}
+
+/* Ensure divider lines and small UI accents remain visible */
+.excalidraw .sidebar hr,
+.excalidraw .panel hr,
+.excalidraw .properties-panel hr {
+  border-color: rgba(11,15,18,0.08) !important;
+}
+
+/* Left-side element properties / tools panel
+   Target common left-panel class names so the panel shown when an
+   element is clicked uses the requested vibrant background. Keep
+   controls readable like inputs, buttons and sliders. */
+.excalidraw .left-sidebar,
+.excalidraw .left-panel,
+.excalidraw .sidebar-left,
+.excalidraw .leftbar,
+.excalidraw .left-panel-content,
+.excalidraw .panel-left,
+.excalidraw .tools-panel {
+  background-color: #ffffff !important;
+  color: #0b0f12 !important;
+}
+
+.excalidraw .left-sidebar input,
+.excalidraw .left-panel input,
+.excalidraw .left-sidebar select,
+.excalidraw .left-panel select,
+.excalidraw .left-sidebar textarea,
+.excalidraw .left-panel textarea,
+.excalidraw .left-panel .app-input {
+  background: #ffffff !important;
+  color: #0b0f12 !important;
+}
+
+.excalidraw .left-sidebar .app-button,
+.excalidraw .left-panel .app-button,
+.excalidraw .left-panel .app-button {
+  background: rgba(255,255,255,0.12) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+.excalidraw .left-sidebar .app-button:hover,
+.excalidraw .left-panel .app-button:hover,
+.excalidraw .left-panel .app-button:hover {
+  background: rgba(255,255,255,0.18) !important;
+}
+
+/* scrollbar for left panel (if present) */
+.excalidraw .left-panel,
+.excalidraw .left-sidebar {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
 html,
 body,
 #root {
@@ -309,8 +514,8 @@ button,
 input[type="button"],
 input[type="submit"],
 .app-button--primary {
-  background-color: #51E2F5 !important;
-  color: #0b0f12 !important; /* dark text for contrast on bright cyan */
+  background-color: #f1dbe2 !important;
+  color: #080404 !important;
   border: none !important;
   box-shadow: none !important;
 }
@@ -329,13 +534,13 @@ button i,
 button:hover,
 .app-button:hover,
 .app-button--primary:hover {
-  background-color: #3ac8db !important;
+  background-color: #f1cada !important;
 }
 
 /* Focus outline for accessibility */
 button:focus,
 .app-button:focus {
-  outline: 3px solid rgba(81,226,245,0.18);
+  outline: 3px solid rgba(255,190,211,0.18);
   outline-offset: 2px;
 }
 
@@ -347,5 +552,37 @@ button:focus,
   color: initial !important;
   box-shadow: initial !important;
   border: none !important;
+}
+
+/* Ensure panel and sidebar buttons inside the Excalidraw UI use the
+   requested accent color. This override comes after the generic
+   Excalidraw reset above so it takes precedence for UI panels. */
+.excalidraw .sidebar .app-button,
+.excalidraw .panel .app-button,
+.excalidraw .properties-panel .app-button,
+.excalidraw .left-sidebar .app-button,
+.excalidraw .left-panel .app-button,
+.excalidraw .left-panel .app-button,
+.excalidraw .panel .app-button,
+.excalidraw .Sidebar__trigger,
+.excalidraw .sidebar-trigger,
+.excalidraw .Sidebar-Trigger,
+.excalidraw footer button {
+  background-color: #edd4dc !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.excalidraw .sidebar .app-button:hover,
+.excalidraw .panel .app-button:hover,
+.excalidraw .properties-panel .app-button:hover,
+.excalidraw .left-sidebar .app-button:hover,
+.excalidraw .left-panel .app-button:hover,
+.excalidraw .Sidebar__trigger:hover,
+.excalidraw .sidebar-trigger:hover,
+.excalidraw .Sidebar-Trigger:hover,
+.excalidraw footer button:hover {
+  background-color: #ff9fc6 !important;
+  color: #ffffff !important;
 }
 
