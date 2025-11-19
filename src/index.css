@@ -293,3 +293,59 @@ code {
 :root.dark .app-button--primary:active {
   color: #000000;
 }
+
+/* ------------------------------------------------------------------
+   Global UI button theme override
+   - Make button text/notations (labels, numbers, icons) light for contrast
+   - Make button surfaces use the vibrant brand color `#161B7F`
+   - Do NOT affect the whiteboard/drawn SVG elements inside the
+     Excalidraw canvas: Excalidraw-specific buttons will be preserved
+     by the `.excalidraw` selector below.
+   ------------------------------------------------------------------ */
+
+/* Apply to standard buttons and Excalidraw-styled `.app-button` variants */
+button,
+.app-button,
+input[type="button"],
+input[type="submit"],
+.app-button--primary {
+  background-color: #51E2F5 !important;
+  color: #0b0f12 !important; /* dark text for contrast on bright cyan */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure icons inside buttons inherit the text color */
+button svg,
+.app-button svg,
+button i,
+.app-button i {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  color: inherit !important;
+}
+
+/* Hover / active states: slightly darker variant for affordance */
+button:hover,
+.app-button:hover,
+.app-button--primary:hover {
+  background-color: #3ac8db !important;
+}
+
+/* Focus outline for accessibility */
+button:focus,
+.app-button:focus {
+  outline: 3px solid rgba(81,226,245,0.18);
+  outline-offset: 2px;
+}
+
+/* Preserve any buttons rendered inside the Excalidraw whiteboard container
+   so drawn elements and in-canvas controls are not restyled by this rule. */
+.excalidraw button,
+.excalidraw .app-button {
+  background: initial !important;
+  color: initial !important;
+  box-shadow: initial !important;
+  border: none !important;
+}
+

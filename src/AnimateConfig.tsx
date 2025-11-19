@@ -148,22 +148,27 @@ export const AnimateConfig = ({
   const [emojiAnnotation, setEmojiAnnotation] = useState('');
   const [emojiRotation, setEmojiRotation] = useState<number>(0);
 
-  // generate emoji list (approx 250) - common emoji characters repeated/varied
+  // generate emoji list (~850) - common emoji characters repeated/varied
   const emojiList = useMemo(() => {
     const base = (
       '😀😁😂🤣😃😄😅😊😇🙂🙃😉😍😘😗😙😚😋😜🤪😝🤩' +
       '🤔🤨😐😑😶😏😒🙄😬🤥😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴' +
       '😵‍💫🤯🤠🥳😎🤓🧐😕😟🙁☹️😮😯😲😳🥺😦😧😨😰😥😢😭' +
-      '😤😠😡🤬🤯🤫🤭🗣️👋🤝👏🙌👐👍👎✊👏👏🖐️✋🤚🙏'
+      '😤😠😡🤬🤯🤫🤭🗣️👋🤝👏🙌👐👍👎✊👏👏🖐️✋🤚🙏' +
+      '💪🦾🦿🤲✍️🤳💅🧠🫀🫁👀👁️👅👄💋👂🦻👃' +
+      '🐶🐱🐭🐹🐰🦊🐻🐼🐨🐯🦁🐮🐷🐸🐵🐔🐧🐦🐤🐣🦆' +
+      '🌞🌝🌛🌜⭐🌟🔥💧🌊🍏🍎🍐🍊🍋🍌🍉🍇🍓🍒🥝' +
+      '⚽🏀🏈🎾🎲🎯🎳🎮🎸🎹🎺🎻🥁🎬🎤🎧📷📱💻⌚'
     );
     const arr: string[] = [];
-    while (arr.length < 250) {
+    const TARGET = 850;
+    while (arr.length < TARGET) {
       for (const ch of base) {
-        if (arr.length >= 250) break;
+        if (arr.length >= TARGET) break;
         arr.push(ch);
       }
     }
-    return arr.slice(0, 250);
+    return arr.slice(0, TARGET);
   }, []);
 
   const makeId = () => `emoji-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -234,7 +239,6 @@ export const AnimateConfig = ({
 
       <div
         style={{
-          opacity: animateOrderDisabled ? 0.3 : 1.0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -243,29 +247,24 @@ export const AnimateConfig = ({
       >
         <div>Order: </div>
         <div>
-          {animateOrderSet.size > 1 ? (
-            <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
-          ) : (
-            <input
-              className="app-input"
-              type="number"
-              disabled={animateOrderDisabled}
-              value={
-                (animateOrderSet.size === 1 &&
-                  animateOrderSet.values().next().value) ||
-                0
-              }
-              onChange={onChangeAnimateOrder}
-              style={{ width: 80, minWidth: 50 }}
-              title="Set animation order"
-            />
-          )}
+          <input
+            className="app-input"
+            type="number"
+            value={
+              (animateOrderSet.size === 1 &&
+                animateOrderSet.values().next().value) ||
+              ''
+            }
+            onChange={onChangeAnimateOrder}
+            placeholder={animateOrderSet.size > 1 ? 'Mixed values' : '0'}
+            style={{ width: 80, minWidth: 50 }}
+            title="Set animation order"
+          />
         </div>
       </div>
 
       <div
         style={{
-          opacity: animateDurationDisabled ? 0.3 : 1.0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -274,25 +273,19 @@ export const AnimateConfig = ({
       >
         <div>Duration: </div>
         <div>
-          {animateDurationSet.size > 1 ? (
-            <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
-          ) : (
-            <>
-              <input
-                className="app-input"
-                disabled={animateDurationDisabled}
-                value={
-                  (animateDurationSet.size === 1 &&
-                    animateDurationSet.values().next().value) ||
-                  ''
-                }
-                onChange={onChangeAnimateDuration}
-                placeholder="ms"
-                style={{ width: 80, minWidth: 50 }}
-                title="Set animation duration in milliseconds"
-              />{' '}
-            </>
-          )}
+          <input
+            className="app-input"
+            type="number"
+            value={
+              (animateDurationSet.size === 1 &&
+                animateDurationSet.values().next().value) ||
+              ''
+            }
+            onChange={onChangeAnimateDuration}
+            placeholder="ms"
+            style={{ width: 80, minWidth: 50 }}
+            title="Set animation duration in milliseconds"
+          />{' '}
         </div>
       </div>
 
