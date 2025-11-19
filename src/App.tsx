@@ -55,6 +55,21 @@ const App = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
+  useEffect(() => {
+    const onKeydown = (e: KeyboardEvent) => {
+      // Ctrl+E -> switch to animate (from edit)
+      if (e.ctrlKey && e.key.toLowerCase() === 'e') {
+        setMode('animate');
+      }
+      // Escape -> switch to edit (from animate)
+      if (e.key === 'Escape') {
+        setMode('excalidraw');
+      }
+    };
+    window.addEventListener('keydown', onKeydown);
+    return () => window.removeEventListener('keydown', onKeydown);
+  }, []);
+
   return (
     <div>
       <div

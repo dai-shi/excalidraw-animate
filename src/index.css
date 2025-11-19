@@ -208,11 +208,22 @@ code {
   min-height: var(--lg-button-size);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
   row-gap: 0.5rem;
   padding-block: 1rem 0; /* top and bottom */
-  padding-inline: 3rem 0; /* left and right */
+  padding-inline: 3rem;
   transition: opacity 0.2s ease;
+}
+
+.kbd-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.06);
+  color: var(--color-on-surface);
+  font-size: 11px;
+  vertical-align: middle;
 }
 
 .toolbar form {

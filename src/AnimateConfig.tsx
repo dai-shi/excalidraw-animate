@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { useState, useMemo } from 'react';
 import type {
   AppState,
   BinaryFiles,
@@ -141,6 +142,72 @@ export const AnimateConfig = ({
 
   const onChangeAnimatePointerWidth = (e: ChangeEvent<HTMLInputElement>) => {
     saveAnimateOption('pointerWidth', e.target.value);
+  };
+
+  // Emoji palette state
+  const [emojiAnnotation, setEmojiAnnotation] = useState('');
+  const [emojiRotation, setEmojiRotation] = useState<number>(0);
+
+  // generate emoji list (approx 250) - common emoji characters repeated/varied
+  const emojiList = useMemo(() => {
+    const base = (
+      '😀😁😂🤣😃😄😅😊😇🙂🙃😉😍😘😗😙😚😋😜🤪😝🤩' +
+      '🤔🤨😐😑😶😏😒🙄😬🤥😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴' +
+      '😵‍💫🤯🤠🥳😎🤓🧐😕😟🙁☹️😮😯😲😳🥺😦😧😨😰😥😢😭' +
+      '😤😠😡🤬🤯🤫🤭🗣️👋🤝👏🙌👐👍👎✊👏👏🖐️✋🤚🙏'
+    );
+    const arr: string[] = [];
+    while (arr.length < 250) {
+      for (const ch of base) {
+        if (arr.length >= 250) break;
+        arr.push(ch);
+      }
+    }
+    return arr.slice(0, 250);
+  }, []);
+
+  const makeId = () => `emoji-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  const insertEmoji = (emoji: string) => {
+    // create a basic text element representing emoji
+    const id = makeId();
+    const angle = emojiRotation || 0;
+    const element: any = {
+      id,
+      type: 'text',
+      x: drawing.appState?.cursorX ?? 50,
+      y: drawing.appState?.cursorY ?? 50,
+      width: 100,
+      height: 100,
+      angle,
+      strokeColor: '#000000',
+      backgroundColor: 'transparent',
+      fillStyle: 'solid',
+      strokeWidth: 1,
+      opacity: 100,
+      text: (emojiAnnotation ? `${emoji} ${emojiAnnotation}` : emoji),
+      fontSize: 48,
+      fontFamily: 1,
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      strokeStyle: 'solid',
+      roughness: 0,
+      seed: Math.floor(Math.random() * 1000000),
+      version: 1,
+      versionNonce: Math.floor(Math.random() * 1000000),
+      isDeleted: false,
+      groupIds: [],
+    };
+    try {
+      api.updateScene({
+        elements: [...drawing.elements, element],
+        appState: drawing.appState,
+        files: drawing.files,
+      });
+    } catch (err) {
+      // fallback: try to append via updateScene with existing elements copy
+      console.error('Failed to insert emoji element', err);
+    }
   };
 
   return (
@@ -299,6 +366,75 @@ export const AnimateConfig = ({
         <p style={{ fontWeight: 'lighter', color: 'gray', fontSize: '12px' }}>
           * Values are set to the app’s default settings unless you change them.
         </p>
+      </div>
+
+      {/* Emoji Palette Section */}
+      <div
+        style={{
+          fontWeight: 'bold',
+          margin: '8px 0 4px',
+          borderBottom: '1px solid gray',
+          paddingBottom: '5px',
+        }}
+      >
+        Emoji Palette
+      </div>
+
+      <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input
+              className="app-input"
+              placeholder="Annotation (optional)"
+              value={emojiAnnotation}
+              onChange={(e) => setEmojiAnnotation(e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <input
+              className="app-input"
+              type="number"
+              value={emojiRotation}
+              onChange={(e) => setEmojiRotation(Math.floor(Number(e.target.value) || 0))}
+              title="Rotation in degrees"
+              style={{ width: 80 }}
+            />
+          </div>
+
+          <div
+            style={{
+              height: 240,
+              overflowY: 'auto',
+              border: '1px solid var(--input-border-color)',
+              padding: 8,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, 40px)',
+              gap: 8,
+              alignContent: 'start',
+            }}
+            aria-label="Emoji palette"
+          >
+            {emojiList.map((em, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => insertEmoji(em)}
+                title={`Insert ${em}`}
+                style={{
+                  width: 40,
+                  height: 40,
+                  fontSize: 20,
+                  lineHeight: '40px',
+                  textAlign: 'center',
+                  background: 'transparent',
+                  border: '1px solid transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                {em}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
