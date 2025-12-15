@@ -12,7 +12,7 @@ into animation.
 
 ## How to use it
 
-Visit: <https://dai-shi.github.io/excalidraw-animate>
+Visit the web app: <https://dai-shi.github.io/excalidraw-animate>
 
 ### Using a local file
 
@@ -43,6 +43,23 @@ Visit: <https://dai-shi.github.io/excalidraw-animate>
 </td></tr></table>
 
 This also works for Excalidraw Library links.
+
+## Running locally
+
+If you want to run Excalidraw Animate locally for development:
+
+1. Clone the repository.
+2. Install dependencies with your preferred package manager (the project uses pnpm in CI):
+   - `pnpm install`
+3. Start the dev server:
+   - `pnpm dev`
+4. Open the printed local URL in your browser.
+
+You can run the tests and checks with:
+
+- `pnpm test:spec` – run the test suite
+- `pnpm test:lint` – run ESLint
+- `pnpm test:type` – run TypeScript type checking
 
 ## Known issues
 
