@@ -143,6 +143,7 @@ export const AnimateConfig = ({
     saveAnimateOption('pointerWidth', e.target.value);
   };
 
+
   return (
     <div
       className="animate-config"
@@ -294,6 +295,7 @@ export const AnimateConfig = ({
           title="Enter pointer width in pixels"
         />{' '}
       </div>
+
 
       <div>
         <p style={{ fontWeight: 'lighter', color: 'gray', fontSize: '12px' }}>

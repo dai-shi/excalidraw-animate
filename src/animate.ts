@@ -11,6 +11,7 @@ type AnimateOptions = {
   pointerImg?: string;
   pointerWidth?: string;
   pointerHeight?: string;
+  speedMultiplier?: number;
 };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -648,8 +649,13 @@ export const animateSvg = (
   const groups = createGroups(svg, elements);
   const finished = new Map();
   let current = options.startMs ?? 1000; // 1 sec margin
-  const groupDur = 5000;
-  const individualDur = 500;
+  const speed = Number.isFinite(options.speedMultiplier || NaN)
+    ? (options.speedMultiplier as number)
+    : 1;
+  const baseGroupDur = 5000;
+  const baseIndividualDur = 500;
+  const groupDur = baseGroupDur / speed;
+  const individualDur = baseIndividualDur / speed;
   const groupNodes = filterGroupNodes(svg.childNodes as NodeListOf<SVGElement>);
   if (groupNodes.length !== elements.length) {
     throw new Error('element length mismatch');

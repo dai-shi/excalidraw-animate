@@ -75,6 +75,10 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const [showExport, setShowExport] = useState(false);
   const [exportTheme, setExportTheme] = useState<'light' | 'dark'>(theme);
   const [exportBackground, setExportBackground] = useState(false);
+  const [exportBackgroundColor, setExportBackgroundColor] =
+    useState('#ffffff');
+  const [autoLoop, setAutoLoop] = useState(false);
+  const [speed, setSpeed] = useState<'0.5' | '1' | '1.5'>('1');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,6 +102,10 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
       setShowToolbar(true);
     } else {
       setShowToolbar('never');
+    }
+    const speedParam = searchParams.get('speed');
+    if (speedParam === '0.5' || speedParam === '1' || speedParam === '1.5') {
+      setSpeed(speedParam);
     }
   }, []);
 
@@ -165,6 +173,7 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   }, [svgList]);
 
   const timer = useRef<NodeJS.Timeout>(undefined);
+  const autoLoopTimer = useRef<NodeJS.Timeout | undefined>(undefined);
   const stepForwardAnimations = useCallback(() => {
     if (!svgList.length) {
       return;
@@ -197,6 +206,39 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   }, [svgList]);
 
   useEffect(() => {
+    if (!autoLoop || !svgList.length) {
+      if (autoLoopTimer.current) {
+        clearTimeout(autoLoopTimer.current);
+        autoLoopTimer.current = undefined;
+      }
+      return;
+    }
+
+    const totalDuration = Math.max(
+      ...svgList.map(({ finishedMs }) => finishedMs),
+    );
+
+    const scheduleLoop = () => {
+      autoLoopTimer.current = setTimeout(() => {
+        svgList.forEach(({ svg }) => {
+          svg.setCurrentTime(0);
+          svg.unpauseAnimations();
+        });
+        scheduleLoop();
+      }, totalDuration);
+    };
+
+    scheduleLoop();
+
+    return () => {
+      if (autoLoopTimer.current) {
+        clearTimeout(autoLoopTimer.current);
+        autoLoopTimer.current = undefined;
+      }
+    };
+  }, [autoLoop, svgList]);
+
+  useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'p') {
         togglePausedAnimations();
@@ -222,19 +264,52 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
     setShowToolbar((s) => (typeof s === 'boolean' ? false : s));
   };
 
+  const updateSpeed = (value: '0.5' | '1' | '1.5') => {
+    setSpeed(value);
+    const hash = window.location.hash.slice(1);
+    const searchParams = new URLSearchParams(hash);
+    if (value === '1') {
+      searchParams.delete('speed');
+    } else {
+      searchParams.set('speed', value);
+    }
+    window.location.hash = searchParams.toString();
+    window.location.reload();
+  };
+
+  const applyBackgroundColor = (
+    svg: SVGSVGElement,
+    color: string,
+  ): SVGSVGElement => {
+    const cloned = svg.cloneNode(true) as SVGSVGElement;
+    const firstRect = cloned.querySelector('rect');
+    if (firstRect) {
+      firstRect.setAttribute('fill', color);
+    }
+    return cloned;
+  };
+
   const exportToSvg = () => {
     if (!svgList.length) {
       return;
     }
     svgList.forEach(({ svg }) => {
-      if (exportTheme === 'light' && exportBackground) {
-        exportToSvgFile(svg);
-      } else if (exportTheme === 'light' && !exportBackground) {
-        exportToSvgFile(removeBackgroundRect(svg));
-      } else if (exportTheme === 'dark' && exportBackground) {
-        exportToSvgFile(applyThemeToSvg(svg, 'dark'));
-      } else if (exportTheme === 'dark' && !exportBackground) {
-        exportToSvgFile(applyThemeToSvg(removeBackgroundRect(svg), 'dark'));
+      if (!exportBackground) {
+        if (exportTheme === 'dark') {
+          exportToSvgFile(
+            applyThemeToSvg(removeBackgroundRect(svg), 'dark'),
+          );
+        } else {
+          exportToSvgFile(removeBackgroundRect(svg));
+        }
+        return;
+      }
+
+      if (exportTheme === 'dark') {
+        const themed = applyThemeToSvg(svg, 'dark');
+        exportToSvgFile(applyBackgroundColor(themed, exportBackgroundColor));
+      } else {
+        exportToSvgFile(applyBackgroundColor(svg, exportBackgroundColor));
       }
     });
   };
@@ -381,6 +456,58 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
             </button>
             <button
               type="button"
+              onClick={() => setAutoLoop((value) => !value)}
+              className="app-button"
+              title={
+                autoLoop
+                  ? 'Disable auto loop playback'
+                  : 'Enable auto loop playback'
+              }
+            >
+              {autoLoop ? 'Auto loop: On' : 'Auto loop: Off'}
+            </button>
+            <span style={{ marginLeft: 8, fontSize: 12 }}>Speed:</span>
+            <button
+              type="button"
+              className="app-button app-button-compact"
+              onClick={() => updateSpeed('0.5')}
+              title="Play animation at 0.5x speed"
+              aria-pressed={speed === '0.5'}
+              style={{
+                fontWeight: speed === '0.5' ? 600 : 400,
+                textDecoration: speed === '0.5' ? 'underline' : 'none',
+              }}
+            >
+              Slow
+            </button>
+            <button
+              type="button"
+              className="app-button app-button-compact"
+              onClick={() => updateSpeed('1')}
+              title="Play animation at normal speed"
+              aria-pressed={speed === '1'}
+              style={{
+                fontWeight: speed === '1' ? 600 : 400,
+                textDecoration: speed === '1' ? 'underline' : 'none',
+              }}
+            >
+              Normal
+            </button>
+            <button
+              type="button"
+              className="app-button app-button-compact"
+              onClick={() => updateSpeed('1.5')}
+              title="Play animation at 1.5x speed"
+              aria-pressed={speed === '1.5'}
+              style={{
+                fontWeight: speed === '1.5' ? 600 : 400,
+                textDecoration: speed === '1.5' ? 'underline' : 'none',
+              }}
+            >
+              Fast
+            </button>
+            <button
+              type="button"
               onClick={hideToolbar}
               className="app-button"
               title="Hide toolbar (shortcut: Q)"
@@ -442,6 +569,32 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
               title={
                 exportBackground ? 'Background enabled' : 'Background disabled'
               }
+            />
+          </div>
+          <div className="modal-row">
+            <div
+              style={{
+                fontWeight: 600,
+                opacity: exportBackground ? 1 : 0.5,
+              }}
+            >
+              Background color
+            </div>
+            <input
+              type="color"
+              value={exportBackgroundColor}
+              onChange={(e) => setExportBackgroundColor(e.target.value)}
+              disabled={!exportBackground}
+              aria-label="Pick background color"
+              title="Pick background color for exported SVG"
+              style={{
+                width: 40,
+                height: 24,
+                borderRadius: 4,
+                border: '1px solid var(--input-border-color)',
+                cursor: exportBackground ? 'pointer' : 'not-allowed',
+                backgroundColor: 'transparent',
+              }}
             />
           </div>
           <div className="modal-row">
