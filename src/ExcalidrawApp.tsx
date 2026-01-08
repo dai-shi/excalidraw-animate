@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Excalidraw, Footer, Sidebar } from '@excalidraw/excalidraw';
 import type {
   AppState,
@@ -32,6 +32,21 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
 
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
   const saveTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().includes('MAC');
+      const modifierKey = isMac ? event.metaKey : event.ctrlKey;
+
+      if (modifierKey && event.shiftKey && event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        excalidrawAPI?.toggleSidebar?.('custom');
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [excalidrawAPI]);
 
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
@@ -110,7 +125,7 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
           <Sidebar.Trigger
             name="custom"
             style={{ marginLeft: '0.5rem' }}
-            title="Show or hide the Animate panel"
+            title="Show or hide the Animate panel (Ctrl/Cmd + Shift + A)"
           >
             Toggle Animate Panel
           </Sidebar.Trigger>
