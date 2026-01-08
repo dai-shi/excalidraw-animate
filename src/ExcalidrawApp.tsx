@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import { useState, useRef, useEffect } from 'react';
+=======
+>>>>>>> parent of 555a719 (feat: add autosave status indicator for drawing changes)
 import { Excalidraw, Footer, Sidebar } from '@excalidraw/excalidraw';
 import type {
   AppState,
@@ -29,9 +32,8 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
   const [drawing, setDrawing] = useState<Drawing | undefined>(initialData);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
+<<<<<<< HEAD
 
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
-  const saveTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -48,6 +50,8 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
     return () => window.removeEventListener('keydown', handler);
   }, [excalidrawAPI]);
 
+=======
+>>>>>>> parent of 555a719 (feat: add autosave status indicator for drawing changes)
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <Excalidraw
@@ -64,54 +68,13 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
             ) {
               return prev;
             }
-
-            setSaveStatus('saving');
-
-            if (saveTimeoutRef.current) {
-              window.clearTimeout(saveTimeoutRef.current);
-            }
-
-            saveTimeoutRef.current = window.setTimeout(() => {
-              setSaveStatus('saved');
-            }, 500);
-
             return { elements, appState, files };
           });
-
           onChangeData({ elements, appState, files });
         }}
       >
         <Sidebar name="custom" docked={true}>
           <Sidebar.Header />
-
-          <div
-            style={{
-              padding: '0.5rem 1rem',
-              fontSize: '0.85rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              color: saveStatus === 'saved' ? '#16a34a' : '#d97706',
-            }}
-            title={
-              saveStatus === 'saved'
-                ? 'All changes are saved'
-                : 'Saving changes…'
-            }
-          >
-            <span
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                backgroundColor:
-                  saveStatus === 'saved' ? '#16a34a' : '#f59e0b',
-                display: 'inline-block',
-              }}
-            />
-            {saveStatus === 'saved' ? 'All changes saved' : 'Saving…'}
-          </div>
-
           <div style={{ padding: '1rem' }}>
             {drawing && excalidrawAPI ? (
               <AnimateConfig drawing={drawing} api={excalidrawAPI} />
@@ -120,12 +83,18 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
             )}
           </div>
         </Sidebar>
-
         <Footer>
           <Sidebar.Trigger
             name="custom"
+<<<<<<< HEAD
             style={{ marginLeft: '0.5rem' }}
             title="Show or hide the Animate panel (Ctrl/Cmd + Shift + A)"
+=======
+            style={{
+              marginLeft: '0.5rem',
+            }}
+            title="Show or hide the Animate panel"
+>>>>>>> parent of 555a719 (feat: add autosave status indicator for drawing changes)
           >
             Toggle Animate Panel
           </Sidebar.Trigger>
