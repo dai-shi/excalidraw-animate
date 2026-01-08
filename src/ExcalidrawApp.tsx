@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 import { useState, useRef, useEffect } from 'react';
-=======
->>>>>>> parent of 555a719 (feat: add autosave status indicator for drawing changes)
 import { Excalidraw, Footer, Sidebar } from '@excalidraw/excalidraw';
 import type {
   AppState,
@@ -32,8 +29,6 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
   const [drawing, setDrawing] = useState<Drawing | undefined>(initialData);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
-<<<<<<< HEAD
-
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -50,8 +45,6 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
     return () => window.removeEventListener('keydown', handler);
   }, [excalidrawAPI]);
 
-=======
->>>>>>> parent of 555a719 (feat: add autosave status indicator for drawing changes)
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <Excalidraw
@@ -86,15 +79,8 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
         <Footer>
           <Sidebar.Trigger
             name="custom"
-<<<<<<< HEAD
             style={{ marginLeft: '0.5rem' }}
             title="Show or hide the Animate panel (Ctrl/Cmd + Shift + A)"
-=======
-            style={{
-              marginLeft: '0.5rem',
-            }}
-            title="Show or hide the Animate panel"
->>>>>>> parent of 555a719 (feat: add autosave status indicator for drawing changes)
           >
             Toggle Animate Panel
           </Sidebar.Trigger>
