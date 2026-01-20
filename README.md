@@ -14,35 +14,38 @@ into animation.
 
 Visit: <https://dai-shi.github.io/excalidraw-animate>
 
-### Using a local file
+There are three ways to load content:
 
-1. Save as a file in Excalidraw
+### Load File
 
-<table><tr><td>
-<img alt="Save icon image" src="https://user-images.githubusercontent.com/490574/85708882-9f239580-b71f-11ea-8faa-4aed086fd490.png" width="50%" />
-</td></tr></table>
+Load a single Excalidraw drawing (`.excalidraw` or `.json` file).
 
-2. Load the file in Excalidraw Animate
+1. Save your drawing as a file in Excalidraw
+2. Click **Load File** and select the file
 
-<table><tr><td>
-<img alt="Load icon image" src="https://user-images.githubusercontent.com/490574/85709345-1fe29180-b720-11ea-84dc-aca7267f3a98.png" width="50%" />
-</td></tr></table>
+### Load Library
 
-### Using a shareable link
+Load an Excalidraw library file (`.excalidrawlib`) containing multiple items. Each library item will be animated separately.
 
-1. Create a shareable link in Excalidraw
+1. Export a library from Excalidraw
+2. Click **Load Library** and select the `.excalidrawlib` file
 
-<table><tr><td>
-<img alt="Shareable link image" src="https://pbs.twimg.com/media/EYsiegqUwAAmmfE?format=png&name=small" width="50%" />
-</td></tr></table>
+### Enter link + Animate!
 
-2. Enter the link in the field and click "Animate!"
+Paste a URL into the text field and click **Animate!**
 
-<table><tr><td>
-<img alt="Text field image" src="https://pbs.twimg.com/media/EY0ZbMjUcAAcBSh?format=png&name=900x900" width="50%" />
-</td></tr></table>
+Supported formats:
 
-This also works for Excalidraw Library links.
+- Excalidraw shareable link: `https://excalidraw.com/#json=xxxxx,yyyyy`
+- Direct link to a library file: `https://example.com/file.excalidrawlib`
+
+## Tips
+
+### Edit mode and Animate mode maintain separate data
+
+To keep the ability to edit later, export from **Edit** mode with **"Embed scene"** enabled, then load the file in **Edit** mode.
+
+Note: Files loaded in **Animate** mode are only available in **Animate**. Switching to **Edit** mode shows your previous Edit data, not the imported file. Also, SVG files exported from **Animate** mode can be loaded back into **Animate**, but cannot be edited in **Edit** mode (the exported SVG does not contain the original scene data).
 
 ## Known issues
 
