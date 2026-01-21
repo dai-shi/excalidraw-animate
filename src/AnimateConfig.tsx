@@ -176,23 +176,18 @@ export const AnimateConfig = ({
       >
         <div>Order: </div>
         <div>
-          {animateOrderSet.size > 1 ? (
-            <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
-          ) : (
-            <input
-              className="app-input"
-              type="number"
-              disabled={animateOrderDisabled}
-              value={
-                (animateOrderSet.size === 1 &&
-                  animateOrderSet.values().next().value) ||
-                0
-              }
-              onChange={onChangeAnimateOrder}
-              style={{ width: 80, minWidth: 50 }}
-              title="Set animation order"
-            />
-          )}
+          <input
+            className="app-input"
+            type="number"
+            disabled={animateOrderDisabled}
+            value={
+              animateOrderSet.size === 1 ? ([...animateOrderSet][0] ?? 0) : ''
+            }
+            onChange={onChangeAnimateOrder}
+            placeholder={animateOrderSet.size > 1 ? 'Mixed' : undefined}
+            style={{ width: 80, minWidth: 50 }}
+            title="Set animation order"
+          />
         </div>
       </div>
 
@@ -207,25 +202,19 @@ export const AnimateConfig = ({
       >
         <div>Duration: </div>
         <div>
-          {animateDurationSet.size > 1 ? (
-            <span style={{ opacity: 0.5 }}>(Mixed values – cannot edit)</span>
-          ) : (
-            <>
-              <input
-                className="app-input"
-                disabled={animateDurationDisabled}
-                value={
-                  (animateDurationSet.size === 1 &&
-                    animateDurationSet.values().next().value) ||
-                  ''
-                }
-                onChange={onChangeAnimateDuration}
-                placeholder="ms"
-                style={{ width: 80, minWidth: 50 }}
-                title="Set animation duration in milliseconds"
-              />{' '}
-            </>
-          )}
+          <input
+            className="app-input"
+            disabled={animateDurationDisabled}
+            value={
+              animateDurationSet.size === 1
+                ? ([...animateDurationSet][0] ?? '')
+                : ''
+            }
+            onChange={onChangeAnimateDuration}
+            placeholder={animateDurationSet.size > 1 ? 'Mixed' : 'ms'}
+            style={{ width: 80, minWidth: 50 }}
+            title="Set animation duration in milliseconds"
+          />
         </div>
       </div>
 
