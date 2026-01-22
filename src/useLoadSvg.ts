@@ -107,7 +107,6 @@ export const useLoadSvg = (
           });
           const themedSvg = applyThemeToSvg(svg, theme);
           const result = animateSvg(themedSvg, elements, options);
-          console.log(svg);
           if (inSequence) {
             options.startMs = result.finishedMs;
           }
@@ -122,39 +121,45 @@ export const useLoadSvg = (
 
   useEffect(() => {
     (async () => {
-      const hash = window.location.hash.slice(1);
-      const searchParams = new URLSearchParams(hash);
-      const matchIdKey = /([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)/.exec(
-        searchParams.get('json') || '',
-      );
-      if (matchIdKey) {
-        const [, id, key] = matchIdKey;
-        const data = await loadScene(id, key, null);
-        const [{ svg, finishedMs }] = await loadDataList([data]);
-        if (searchParams.get('autoplay') === 'no') {
-          svg.setCurrentTime(finishedMs);
-        }
-      }
-      const matchLibrary = /(.*\.excalidrawlib)/.exec(
-        searchParams.get('library') || '',
-      );
-      if (matchLibrary) {
-        const [, url] = matchLibrary;
-        const dataList = await importLibraryFromUrl(url);
-        const svgList = await loadDataList(
-          dataList.map((elements) => ({ elements, appState: {}, files: {} })),
-          searchParams.has('sequence'),
+      try {
+        const hash = window.location.hash.slice(1);
+        const searchParams = new URLSearchParams(hash);
+        const matchIdKey = /([a-zA-Z0-9_-]+),?([a-zA-Z0-9_-]*)/.exec(
+          searchParams.get('json') || '',
         );
-        if (searchParams.get('autoplay') === 'no') {
-          svgList.forEach(({ svg, finishedMs }) => {
+        if (matchIdKey) {
+          const [, id, key] = matchIdKey;
+          const data = await loadScene(id, key, null);
+          const [{ svg, finishedMs }] = await loadDataList([data]);
+          if (searchParams.get('autoplay') === 'no') {
             svg.setCurrentTime(finishedMs);
-          });
+          }
         }
+        const matchLibrary = /(.*\.excalidrawlib)/.exec(
+          searchParams.get('library') || '',
+        );
+        if (matchLibrary) {
+          const [, url] = matchLibrary;
+          const dataList = await importLibraryFromUrl(url);
+          const svgList = await loadDataList(
+            dataList.map((elements) => ({ elements, appState: {}, files: {} })),
+            searchParams.has('sequence'),
+          );
+          if (searchParams.get('autoplay') === 'no') {
+            svgList.forEach(({ svg, finishedMs }) => {
+              svg.setCurrentTime(finishedMs);
+            });
+          }
+        }
+        if (!matchIdKey && !matchLibrary && initialData) {
+          await loadDataList([initialData]);
+        }
+      } catch (e) {
+        console.error('Failed to load SVG:', e);
+        throw e;
+      } finally {
+        setLoading(false);
       }
-      if (!matchIdKey && !matchLibrary && initialData) {
-        await loadDataList([initialData]);
-      }
-      setLoading(false);
     })();
   }, [loadDataList, initialData]);
 
