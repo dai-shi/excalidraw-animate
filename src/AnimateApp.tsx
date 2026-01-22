@@ -18,7 +18,18 @@ const AnimateApp = ({ initialData, theme }: Props) => {
     theme,
   );
   if (loading) {
-    return <div style={{ margin: '3px 3px 3px 40px' }}>Loading...</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
   return (
     <div className="App">
