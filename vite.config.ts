@@ -15,7 +15,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./test/setupTests.ts'],
-    exclude: [...configDefaults.exclude],
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     deps: {
       interopDefault: true,
       inline: ['open-color', '@excalidraw/excalidraw'],

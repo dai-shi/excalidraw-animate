@@ -4,3 +4,7 @@ node_modules
 /build
 /dist
 package-lock.json
+
+# Playwright
+/test-results/
+/playwright-report/
