@@ -13,7 +13,7 @@ export default tseslint.config(
   jsxA11y.flatConfigs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
-  reactHooks.configs.recommended,
+  reactHooks.configs.flat.recommended,
   {
     settings: {
       'import/resolver': { typescript: true },
@@ -24,7 +24,6 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'react-hooks/react-compiler': 'error',
     },
   },
 );
