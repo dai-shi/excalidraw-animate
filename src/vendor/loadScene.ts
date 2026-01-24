@@ -109,8 +109,8 @@ const getCryptoKey = (key: string, usage: KeyUsage) =>
   );
 
 const decryptData = async (
-  iv: Uint8Array,
-  encrypted: Uint8Array | ArrayBuffer,
+  iv: Uint8Array<ArrayBuffer>,
+  encrypted: Uint8Array<ArrayBuffer> | ArrayBuffer,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
   const key = await getCryptoKey(privateKey, 'decrypt');
@@ -125,8 +125,8 @@ const decryptData = async (
 };
 
 const _decryptAndDecompress = async (
-  iv: Uint8Array,
-  decryptedBuffer: Uint8Array,
+  iv: Uint8Array<ArrayBuffer>,
+  decryptedBuffer: Uint8Array<ArrayBuffer>,
   decryptionKey: string,
   isCompressed: boolean,
 ) => {

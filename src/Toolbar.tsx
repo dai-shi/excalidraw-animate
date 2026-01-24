@@ -66,6 +66,50 @@ type Props = {
   theme: 'light' | 'dark';
 };
 
+const Toggle = ({
+  checked,
+  onChange,
+  ariaLabel,
+  title,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  ariaLabel: string;
+  title: string;
+}) => (
+  <button
+    type="button"
+    onClick={onChange}
+    aria-label={ariaLabel}
+    title={title}
+    style={{
+      position: 'relative',
+      width: 52,
+      height: 28,
+      borderRadius: 999,
+      background: checked
+        ? 'var(--color-primary)'
+        : 'var(--color-surface-lowest)',
+      border: checked ? 'none' : '1.5px solid #999',
+      cursor: 'pointer',
+    }}
+  >
+    <span
+      style={{
+        position: 'absolute',
+        top: checked ? 3 : 6,
+        left: checked ? 27 : 7,
+        width: checked ? 22 : 14,
+        height: checked ? 22 : 14,
+        borderRadius: '50%',
+        background: checked
+          ? 'var(--color-surface-lowest)'
+          : 'var(--color-on-surface)',
+      }}
+    />
+  </button>
+);
+
 const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const [showToolbar, setShowToolbar] = useState<boolean | 'never'>(false);
   const [paused, setPaused] = useState(false);
@@ -78,6 +122,8 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // FIXME
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setWebmData(undefined);
   }, [svgList]);
 
@@ -95,6 +141,8 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
     const hash = window.location.hash.slice(1);
     const searchParams = new URLSearchParams(hash);
     if (searchParams.get('toolbar') !== 'no') {
+      // FIXME
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowToolbar(true);
     } else {
       setShowToolbar('never');
@@ -262,50 +310,6 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
   if (showToolbar !== true) {
     return null;
   }
-
-  const Toggle = ({
-    checked,
-    onChange,
-    ariaLabel,
-    title,
-  }: {
-    checked: boolean;
-    onChange: () => void;
-    ariaLabel: string;
-    title: string;
-  }) => (
-    <button
-      type="button"
-      onClick={onChange}
-      aria-label={ariaLabel}
-      title={title}
-      style={{
-        position: 'relative',
-        width: 52,
-        height: 28,
-        borderRadius: 999,
-        background: checked
-          ? 'var(--color-primary)'
-          : 'var(--color-surface-lowest)',
-        border: checked ? 'none' : '1.5px solid #999',
-        cursor: 'pointer',
-      }}
-    >
-      <span
-        style={{
-          position: 'absolute',
-          top: checked ? 3 : 6,
-          left: checked ? 27 : 7,
-          width: checked ? 22 : 14,
-          height: checked ? 22 : 14,
-          borderRadius: '50%',
-          background: checked
-            ? 'var(--color-surface-lowest)'
-            : 'var(--color-on-surface)',
-        }}
-      />
-    </button>
-  );
 
   return (
     <>
