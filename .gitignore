@@ -8,3 +8,9 @@ package-lock.json
 # Playwright
 /test-results/
 /playwright-report/
+
+# Playwright Test Agents / MCP
+.mcp.json
+.vscode/agents/
+.claude/
+.opencode/
