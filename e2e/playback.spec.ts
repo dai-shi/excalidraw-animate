@@ -1,8 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-  STORAGE_KEY,
-  createDrawing,
-} from '../src/__testHelpers/creationForTests';
+import { STORAGE_KEY, createDrawing } from './testHelpers';
 
 test.describe('Playback Controls', () => {
   test.beforeEach(async ({ page }) => {

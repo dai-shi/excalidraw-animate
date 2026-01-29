@@ -1,8 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import {
-  STORAGE_KEY,
-  createDrawing,
-} from '../src/__testHelpers/creationForTests';
+import { STORAGE_KEY, createDrawing } from './testHelpers';
 
 async function openAnimatePanel(page: Page) {
   // Open the Animate Panel sidebar if not already open
