@@ -98,7 +98,11 @@ export const useLoadSvg = (
       };
       const svgList = await Promise.all(
         dataList.map(async (data) => {
-          const elements = getNonDeletedElements(data.elements);
+          const elements = getNonDeletedElements(data.elements).filter((el) => {
+            if (el.type !== 'image') return true;
+            const fileId = (el as { fileId?: string | null }).fileId;
+            return fileId != null && data.files[fileId] != null;
+          });
           const svg = await exportToSvg({
             elements,
             files: data.files,
