@@ -3,6 +3,10 @@
   "version": "0.7.2",
   "type": "module",
   "packageManager": "pnpm@10.18.3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dai-shi/excalidraw-animate.git"
+  },
   "homepage": "./",
   "source": "./src/library.ts",
   "module": "./dist/library.js",
