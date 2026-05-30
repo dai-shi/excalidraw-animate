@@ -90,11 +90,16 @@ export const useLoadSvg = (
     ) => {
       const hash = window.location.hash.slice(1);
       const searchParams = new URLSearchParams(hash);
+      const speedParam = searchParams.get('speed');
+      const speedMultiplier = Number(speedParam);
       const options = {
         startMs: undefined as number | undefined,
         pointerImg: searchParams.get('pointerImg') || undefined,
         pointerWidth: searchParams.get('pointerWidth') || undefined,
         pointerHeight: searchParams.get('pointerHeight') || undefined,
+        speedMultiplier: Number.isFinite(speedMultiplier)
+          ? speedMultiplier
+          : undefined,
       };
       const svgList = await Promise.all(
         dataList.map(async (data) => {

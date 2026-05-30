@@ -12,7 +12,7 @@ into animation.
 
 ## How to use it
 
-Visit: <https://dai-shi.github.io/excalidraw-animate>
+Visit the web app: <https://dai-shi.github.io/excalidraw-animate>
 
 There are three ways to load content:
 
@@ -58,6 +58,23 @@ When you group elements with different Order/Duration values, the input field sh
 To keep the ability to edit later, export from **Edit** mode with **"Embed scene"** enabled, then load the file in **Edit** mode.
 
 Note: Files loaded in **Animate** mode are only available in **Animate**. Switching to **Edit** mode shows your previous Edit data, not the imported file. Also, SVG files exported from **Animate** mode can be loaded back into **Animate**, but cannot be edited in **Edit** mode (the exported SVG does not contain the original scene data).
+
+## Running locally
+
+If you want to run Excalidraw Animate locally for development:
+
+1. Clone the repository.
+2. Install dependencies with your preferred package manager (the project uses pnpm in CI):
+   - `pnpm install`
+3. Start the dev server:
+   - `pnpm dev`
+4. Open the printed local URL in your browser.
+
+You can run the tests and checks with:
+
+- `pnpm test:spec` – run the test suite
+- `pnpm test:lint` – run ESLint
+- `pnpm test:type` – run TypeScript type checking
 
 ## Known issues
 
