@@ -78,6 +78,10 @@
   --button-active-border: var(--color-brand-active);
 }
 
+.excalidraw {
+  --right-sidebar-width: 453px !important;
+}
+
 :root.dark .excalidraw .animate-config {
   /* Direct values because var(--input-bg-color) doesn't resolve here */
   --animate-config-input-bg-color: #31303b;

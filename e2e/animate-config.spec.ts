@@ -25,7 +25,7 @@ async function openAnimatePanel(page: Page) {
       const triggers = document.querySelectorAll('.sidebar-trigger');
       triggers.forEach((trigger) => {
         const label = trigger.querySelector('.sidebar-trigger__label');
-        if (label && label.textContent?.includes('Toggle Animate Panel')) {
+        if (label && label.textContent?.trim() === 'Toggle Animate Panel') {
           (trigger as HTMLElement).click();
         }
       });
