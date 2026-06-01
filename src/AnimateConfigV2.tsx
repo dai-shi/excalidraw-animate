@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type {
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types';
@@ -6,9 +6,9 @@ import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 
 import type { Drawing } from './AnimateConfig';
 
-const extractOrder = (id: string): number => {
+const extractOrder = (id: string): number | undefined => {
   const match = id.match(/animateOrder:(-?\d+)/);
-  return match ? Number(match[1]) : 0;
+  return match ? Number(match[1]) : undefined;
 };
 
 const extractDuration = (id: string): number | undefined => {
@@ -46,6 +46,18 @@ const getGroupColor = (groupId: string): string => {
   return GROUP_COLORS[Math.abs(hash) % GROUP_COLORS.length];
 };
 
+const getDefaultDuration = (
+  element: ExcalidrawElement,
+  allElements: ExcalidrawElement[],
+): number => {
+  const primaryGroupId = element.groupIds?.[0];
+  if (!primaryGroupId) return 500;
+  const groupSize = allElements.filter(
+    (el) => !el.isDeleted && el.groupIds?.[0] === primaryGroupId,
+  ).length;
+  return Math.round(5000 / (groupSize + 1));
+};
+
 const getElementLabel = (element: ExcalidrawElement): string => {
   if (element.type === 'text') {
     const text = (element as { text?: string }).text ?? '';
@@ -56,19 +68,23 @@ const getElementLabel = (element: ExcalidrawElement): string => {
   return `${element.type} [${shortId}]`;
 };
 
-// Returns the contiguous block bounds for the element at `index`.
-// Elements sharing the same primary groupId that are adjacent form one block.
-const getBlockContaining = (
-  elems: ExcalidrawElement[],
-  index: number,
-): { start: number; end: number } => {
-  const groupId = elems[index].groupIds?.[0];
-  if (!groupId) return { start: index, end: index };
-  let start = index;
-  while (start > 0 && elems[start - 1].groupIds?.[0] === groupId) start--;
-  let end = index;
-  while (end < elems.length - 1 && elems[end + 1].groupIds?.[0] === groupId) end++;
-  return { start, end };
+// Groups contiguous elements sharing the same primary groupId into blocks.
+const computeBlocks = (elems: ExcalidrawElement[]): { start: number; end: number }[] => {
+  const blocks: { start: number; end: number }[] = [];
+  let i = 0;
+  while (i < elems.length) {
+    const groupId = elems[i].groupIds?.[0] ?? null;
+    if (groupId) {
+      let j = i;
+      while (j < elems.length && elems[j].groupIds?.[0] === groupId) j++;
+      blocks.push({ start: i, end: j - 1 });
+      i = j;
+    } else {
+      blocks.push({ start: i, end: i });
+      i++;
+    }
+  }
+  return blocks;
 };
 
 type Props = {
@@ -80,16 +96,25 @@ export const AnimateConfigV2 = ({ drawing, api }: Props) => {
   const allElements = drawing.elements.filter((el) => !el.isDeleted);
 
   const sorted = [...allElements].sort((a, b) => {
-    const diff = extractOrder(a.id) - extractOrder(b.id);
+    const aOrder = extractOrder(a.id) ?? Infinity;
+    const bOrder = extractOrder(b.id) ?? Infinity;
+    const diff = aOrder - bOrder;
     if (diff !== 0) return diff;
     return drawing.elements.indexOf(a) - drawing.elements.indexOf(b);
   });
+
+  const blocks = computeBlocks(sorted);
 
   const selectedIds = drawing.appState.selectedElementIds ?? {};
 
   const rowRefMap = useRef<Map<string, HTMLDivElement>>(new Map());
   const sortedRef = useRef(sorted);
   sortedRef.current = sorted;
+
+  // dragBlockIdx: index in `blocks` of the block being dragged
+  // dropBlockIdx: insert dragged block BEFORE this block index (0..blocks.length)
+  const [dragBlockIdx, setDragBlockIdx] = useState<number | null>(null);
+  const [dropBlockIdx, setDropBlockIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const firstSelected = sortedRef.current.find((el) => selectedIds[el.id]);
@@ -131,27 +156,60 @@ export const AnimateConfigV2 = ({ drawing, api }: Props) => {
     });
   };
 
-  // Moves the entire block containing `fromIndex` up or down one block.
-  const moveBlock = (fromIndex: number, direction: 'up' | 'down') => {
-    const block = getBlockContaining(sorted, fromIndex);
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, blockIdx: number) => {
+    e.dataTransfer.effectAllowed = 'move';
+    setDragBlockIdx(blockIdx);
+  };
 
-    if (direction === 'up') {
-      if (block.start === 0) return;
-      const above = getBlockContaining(sorted, block.start - 1);
-      const newOrder = [...sorted];
-      const moved = newOrder.splice(block.start, block.end - block.start + 1);
-      newOrder.splice(above.start, 0, ...moved);
-      applyNewOrder(newOrder);
-    } else {
-      if (block.end >= sorted.length - 1) return;
-      const below = getBlockContaining(sorted, block.end + 1);
-      const blockSize = block.end - block.start + 1;
-      const newOrder = [...sorted];
-      const moved = newOrder.splice(block.start, blockSize);
-      // After removing the block, below.end shifts left by blockSize
-      newOrder.splice(below.end - blockSize + 1, 0, ...moved);
-      applyNewOrder(newOrder);
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, rowIdx: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const blockIdx = blocks.findIndex((b) => rowIdx >= b.start && rowIdx <= b.end);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const target = e.clientY < rect.top + rect.height / 2 ? blockIdx : blockIdx + 1;
+    setDropBlockIdx(target);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (dragBlockIdx === null || dropBlockIdx === null) {
+      setDragBlockIdx(null);
+      setDropBlockIdx(null);
+      return;
     }
+    // No-op: dropping adjacent to itself
+    if (dropBlockIdx === dragBlockIdx || dropBlockIdx === dragBlockIdx + 1) {
+      setDragBlockIdx(null);
+      setDropBlockIdx(null);
+      return;
+    }
+
+    const draggedElems = sorted.slice(blocks[dragBlockIdx].start, blocks[dragBlockIdx].end + 1);
+    const newOrder: ExcalidrawElement[] = [];
+    let inserted = false;
+
+    blocks.forEach((block, bi) => {
+      if (bi === dropBlockIdx && !inserted) {
+        newOrder.push(...draggedElems);
+        inserted = true;
+      }
+      if (bi !== dragBlockIdx) {
+        newOrder.push(...sorted.slice(block.start, block.end + 1));
+      }
+    });
+
+    if (!inserted) {
+      newOrder.push(...draggedElems);
+    }
+
+    applyNewOrder(newOrder);
+    setDragBlockIdx(null);
+    setDropBlockIdx(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragBlockIdx(null);
+    setDropBlockIdx(null);
   };
 
   const selectElement = (element: ExcalidrawElement) => {
@@ -216,13 +274,28 @@ export const AnimateConfigV2 = ({ drawing, api }: Props) => {
       >
         Animation Order
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+      <div
+        style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}
+        onDragLeave={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDropBlockIdx(null);
+          }
+        }}
+      >
         {sorted.map((element, i) => {
           const duration = extractDuration(element.id);
           const isSelected = !!selectedIds[element.id];
           const primaryGroupId = element.groupIds?.[0];
           const groupColor = primaryGroupId ? getGroupColor(primaryGroupId) : undefined;
-          const block = getBlockContaining(sorted, i);
+          const blockIdx = blocks.findIndex((b) => i >= b.start && i <= b.end);
+          const isDragged = dragBlockIdx !== null && blockIdx === dragBlockIdx;
+          const showIndicatorBefore =
+            dropBlockIdx !== null &&
+            dropBlockIdx < blocks.length &&
+            blocks[dropBlockIdx].start === i;
+          const showIndicatorAfter =
+            dropBlockIdx === blocks.length && i === sorted.length - 1;
+
           return (
             <div
               key={element.id}
@@ -230,6 +303,9 @@ export const AnimateConfigV2 = ({ drawing, api }: Props) => {
                 if (node) rowRefMap.current.set(element.id, node);
                 else rowRefMap.current.delete(element.id);
               }}
+              onDragOver={(e) => handleDragOver(e, i)}
+              onDrop={handleDrop}
+              onDragEnd={handleDragEnd}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -238,9 +314,17 @@ export const AnimateConfigV2 = ({ drawing, api }: Props) => {
                 paddingLeft: groupColor ? 2 : 4,
                 borderRadius: 4,
                 borderLeft: groupColor ? `3px solid ${groupColor}` : '3px solid transparent',
+                borderTop: showIndicatorBefore ? '2px solid #4a90e2' : '2px solid transparent',
+                borderBottom: showIndicatorAfter ? '2px solid #4a90e2' : '2px solid transparent',
                 backgroundColor: isSelected ? 'rgba(100, 130, 255, 0.18)' : 'transparent',
+                opacity: isDragged ? 0.4 : 1,
               }}
             >
+              <div
+                className="drag-handle"
+                draggable
+                onDragStart={(e) => handleDragStart(e, blockIdx)}
+              />
               <span
                 style={{
                   width: 18,
@@ -267,28 +351,10 @@ export const AnimateConfigV2 = ({ drawing, api }: Props) => {
               >
                 {getElementLabel(element)}
               </span>
-              <button
-                className="app-button"
-                style={{ padding: '1px 5px', fontSize: 11, flexShrink: 0 }}
-                disabled={block.start === 0}
-                title="Move up"
-                onClick={() => moveBlock(i, 'up')}
-              >
-                ^
-              </button>
-              <button
-                className="app-button"
-                style={{ padding: '1px 5px', fontSize: 11, flexShrink: 0 }}
-                disabled={block.end === sorted.length - 1}
-                title="Move down"
-                onClick={() => moveBlock(i, 'down')}
-              >
-                v
-              </button>
               <input
                 className="app-input"
                 type="number"
-                defaultValue={duration ?? ''}
+                defaultValue={duration ?? getDefaultDuration(element, allElements)}
                 placeholder="ms"
                 style={{ width: 52, minWidth: 52, flexShrink: 0, fontSize: 11 }}
                 title="Duration in milliseconds"

@@ -14,6 +14,8 @@ import { AnimateConfig } from './AnimateConfig';
 import { AnimateConfigV2 } from './AnimateConfigV2';
 import type { Drawing } from './AnimateConfig';
 
+const PANEL_MODE_KEY = 'animatePanelMode';
+
 type Props = {
   initialData:
     | { elements: ExcalidrawElement[]; appState: AppState; files: BinaryFiles }
@@ -30,19 +32,28 @@ const ExcalidrawApp = ({ initialData, onChangeData, theme }: Props) => {
   const [drawing, setDrawing] = useState<Drawing | undefined>(initialData);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
-  const [panelMode, setPanelMode] = useState<'v1' | 'v2'>('v1');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [panelMode, setPanelMode] = useState<'v1' | 'v2'>(
+    () => (localStorage.getItem(PANEL_MODE_KEY) as 'v1' | 'v2' | null) ?? 'v2',
+  );
+
+  // Sync with Excalidraw's persisted sidebar state so our toggle logic stays correct.
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => !!(initialData?.appState as Record<string, unknown> | undefined)?.openSidebar,
+  );
 
   const handleToggle = (mode: 'v1' | 'v2') => {
     if (!excalidrawAPI) return;
     if (sidebarOpen && panelMode !== mode) {
       setPanelMode(mode);
+      localStorage.setItem(PANEL_MODE_KEY, mode);
       return;
     }
     const isNowOpen = excalidrawAPI.toggleSidebar({ name: 'custom' });
     setSidebarOpen(isNowOpen);
     if (isNowOpen) {
       setPanelMode(mode);
+      localStorage.setItem(PANEL_MODE_KEY, mode);
     }
   };
 
