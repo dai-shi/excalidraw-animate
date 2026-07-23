@@ -12,7 +12,7 @@ into animation.
 
 ## How to use it
 
-Visit: <https://dai-shi.github.io/excalidraw-animate>
+Visit: <https://thelip-bytes.github.io/excalidraw-animate/>
 
 There are three ways to load content:
 
@@ -38,6 +38,22 @@ Supported formats:
 
 - Excalidraw shareable link: `https://excalidraw.com/#json=xxxxx,yyyyy`
 - Direct link to a library file: `https://example.com/file.excalidrawlib`
+
+## Features & Customizations
+
+### Animation Duration & Speed Control
+
+You can specify how long the text, shapes, and drawing animation lasts using human time units (`s` for seconds, `m` for minutes, `ms` for milliseconds):
+
+- **Top Preview Toolbar**: Type into the **Duration:** field (e.g. `10s`, `1.5m`) and press Enter to instantly rescale the entire scene animation.
+- **Editor Animate Panel**:
+  - **Total Scene Duration**: Sets total animation time for all elements combined (e.g., `10s` = 10 seconds, `1.5m` = 1.5 minutes).
+  - **Default Element Duration**: Base duration per element (e.g., `1s`, `500ms`).
+  - **Selected Elements Duration**: Custom animation speed for selected shapes or text.
+
+### Embedded Media Support
+
+Embedded media elements (GIFs, WebP images, videos, and web embeds) are rendered directly in sequence without placeholder link text bleeding through.
 
 ## Tips
 

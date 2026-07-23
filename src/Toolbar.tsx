@@ -178,11 +178,16 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
         mimeTypes: ['application/json'],
       });
       const libraryItems = await loadLibraryFromBlob(blob);
-      const dataList = libraryItems.map((libraryItem) =>
-        getNonDeletedElements(restoreElements(libraryItem.elements, null)),
-      );
+      const dataList = libraryItems.map((libraryItem) => ({
+        elements: getNonDeletedElements(restoreElements(libraryItem.elements, null)),
+        files: (libraryItem as any).files || {},
+      }));
       loadDataList(
-        dataList.map((elements) => ({ elements, appState: {}, files: {} })),
+        dataList.map(({ elements, files }) => ({
+          elements,
+          appState: {},
+          files: files || {},
+        })),
       );
     } catch (e) {
       console.error('Failed to load library:', e);
@@ -307,6 +312,27 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
     setProcessing(false);
   };
 
+  const [durationInput, setDurationInput] = useState(() => {
+    const hash = window.location.hash.slice(1);
+    const searchParams = new URLSearchParams(hash);
+    return searchParams.get('totalDuration') || '';
+  });
+
+  const applyDurationFromToolbar = (val: string) => {
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    if (val.trim()) {
+      params.set('totalDuration', val.trim());
+    } else {
+      params.delete('totalDuration');
+    }
+    const newHash = params.toString();
+    if (newHash !== hash) {
+      window.location.hash = newHash;
+      window.location.reload();
+    }
+  };
+
   if (showToolbar !== true) {
     return null;
   }
@@ -383,6 +409,23 @@ const Toolbar = ({ svgList, loadDataList, theme }: Props) => {
             >
               Reset (R)
             </button>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 4, marginRight: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 500 }}>Duration:</span>
+              <input
+                className="app-input"
+                value={durationInput}
+                onChange={(e) => setDurationInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    applyDurationFromToolbar(durationInput);
+                  }
+                }}
+                onBlur={() => applyDurationFromToolbar(durationInput)}
+                placeholder="e.g. 10s, 1.5m"
+                style={{ width: 95 }}
+                title="Set total animation duration (e.g. 10s = 10 sec, 1.5m = 1.5 min) and press Enter"
+              />
+            </div>
             <button
               type="button"
               onClick={hideToolbar}

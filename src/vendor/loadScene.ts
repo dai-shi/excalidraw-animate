@@ -255,6 +255,102 @@ const importFromBackend = async (
   }
 };
 
+const FIREBASE_FILES_URL =
+  'https://firebasestorage.googleapis.com/v0/b/excalidraw-production.appspot.com/o/files%2F';
+
+const getMimeTypeFromBuffer = (buffer: Uint8Array): string => {
+  if (buffer.length >= 4) {
+    if (
+      buffer[0] === 0x89 &&
+      buffer[1] === 0x50 &&
+      buffer[2] === 0x4e &&
+      buffer[3] === 0x47
+    ) {
+      return 'image/png';
+    }
+    if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+      return 'image/jpeg';
+    }
+    if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) {
+      return 'image/gif';
+    }
+    if (
+      buffer[0] === 0x52 &&
+      buffer[1] === 0x49 &&
+      buffer[2] === 0x46 &&
+      buffer[3] === 0x46
+    ) {
+      return 'image/webp';
+    }
+    if (buffer[0] === 0x3c) {
+      return 'image/svg+xml';
+    }
+  }
+  return 'image/png';
+};
+
+const arrayBufferToDataUrl = (buffer: Uint8Array, mimeType: string) => {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = window.btoa(binary);
+  return `data:${mimeType};base64,${base64}`;
+};
+
+export const fetchAndDecryptFile = async (
+  fileId: string,
+  privateKey: string,
+) => {
+  const urls = [
+    `${FIREBASE_FILES_URL}${fileId}?alt=media`,
+    `${BACKEND_V2_GET}files/${fileId}`,
+  ];
+  for (const url of urls) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const buffer = await response.arrayBuffer();
+      const uint8 = new Uint8Array(buffer);
+
+      try {
+        const { metadata, data } = await decompressData<{
+          mimeType?: string;
+          id?: string;
+          created?: number;
+        }>(uint8, { decryptionKey: privateKey });
+        const mimeType = metadata?.mimeType || getMimeTypeFromBuffer(data);
+        const dataURL = arrayBufferToDataUrl(data, mimeType);
+        return {
+          id: fileId,
+          dataURL,
+          mimeType,
+          created: metadata?.created || Date.now(),
+        };
+      } catch {
+        const iv = uint8.slice(0, IV_LENGTH_BYTES);
+        const encrypted = uint8.slice(IV_LENGTH_BYTES);
+        const decrypted = new Uint8Array(
+          await decryptData(iv, encrypted, privateKey),
+        );
+        const mimeType = getMimeTypeFromBuffer(decrypted);
+        const dataURL = arrayBufferToDataUrl(decrypted, mimeType);
+        return {
+          id: fileId,
+          dataURL,
+          mimeType,
+          created: Date.now(),
+        };
+      }
+    } catch (e) {
+      console.warn(`Failed to fetch/decrypt file ${fileId} from ${url}:`, e);
+    }
+  }
+  return null;
+};
+
 export const loadScene = async (
   id: string | null,
   privateKey: string | null,
@@ -276,13 +372,34 @@ export const loadScene = async (
     data = restore(localDataState || null, null, null);
   }
 
+  const files: Record<string, any> = { ...(data.files || {}) };
+
+  if (id != null && privateKey != null && data.elements) {
+    const fileIds = new Set<string>();
+    data.elements.forEach((el: any) => {
+      if (el.type === 'image' && el.fileId && !files[el.fileId]) {
+        fileIds.add(el.fileId);
+      }
+    });
+
+    if (fileIds.size > 0) {
+      const fetchedFiles = await Promise.all(
+        Array.from(fileIds).map((fileId) =>
+          fetchAndDecryptFile(fileId, privateKey),
+        ),
+      );
+      fetchedFiles.forEach((file) => {
+        if (file) {
+          files[file.id] = file;
+        }
+      });
+    }
+  }
+
   return {
     elements: data.elements,
     appState: data.appState,
-    // note: this will always be empty because we're not storing files
-    // in the scene database/localStorage, and instead fetch them async
-    // from a different database
-    files: data.files,
+    files,
     commitToHistory: false,
   };
 };

@@ -13,6 +13,75 @@ import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import { loadScene } from './vendor/loadScene';
 import { animateSvg } from './animate';
 
+const XHTML_NS = 'http://www.w3.org/1999/xhtml';
+
+/**
+ * Excalidraw's exportToSvg creates <div> inside <foreignObject> using
+ * createElementNS(SVG_NS, "div") — i.e. the SVG namespace. Browsers
+ * require XHTML namespace for HTML elements inside <foreignObject> to
+ * actually render them. This function rebuilds those elements properly
+ * and ensures the iframe src is populated from the parent <a> href.
+ */
+const fixForeignObjects = (svg: SVGSVGElement) => {
+  const foreignObjects = svg.querySelectorAll('foreignObject');
+  foreignObjects.forEach((fo) => {
+    // Get dimensions from the foreignObject
+    const width = fo.style.width || fo.getAttribute('width') || '100%';
+    const height = fo.style.height || fo.getAttribute('height') || '100%';
+
+    // Find the embed URL from the parent <a> tag
+    const parentAnchor = fo.closest('a');
+    const embedUrl = parentAnchor?.getAttribute('href') || '';
+
+    // Check if the existing content is broken (SVG-namespaced div)
+    const existingDiv = fo.querySelector('div');
+    const existingIframe = fo.querySelector('iframe');
+
+    // If there's already a working iframe with a src, skip
+    if (
+      existingIframe &&
+      existingIframe.namespaceURI === XHTML_NS &&
+      existingIframe.src
+    ) {
+      return;
+    }
+
+    // Clear the foreignObject
+    while (fo.firstChild) {
+      fo.removeChild(fo.firstChild);
+    }
+
+    // Set proper width/height as attributes (not just style)
+    const widthNum = parseInt(width, 10);
+    const heightNum = parseInt(height, 10);
+    if (widthNum) fo.setAttribute('width', String(widthNum));
+    if (heightNum) fo.setAttribute('height', String(heightNum));
+
+    // Create proper XHTML-namespaced elements
+    const div = document.createElementNS(XHTML_NS, 'div');
+    div.style.width = '100%';
+    div.style.height = '100%';
+    div.style.overflow = 'hidden';
+
+    if (embedUrl) {
+      const iframe = document.createElementNS(XHTML_NS, 'iframe') as HTMLIFrameElement;
+      iframe.src = embedUrl;
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute(
+        'sandbox',
+        'allow-scripts allow-same-origin allow-popups allow-presentation',
+      );
+      iframe.setAttribute('loading', 'lazy');
+      div.appendChild(iframe);
+    }
+
+    fo.appendChild(div);
+  });
+};
+
 const THEME_FILTER = 'invert(93%) hue-rotate(180deg)';
 const IMAGE_CORRECTION = 'invert(100%) hue-rotate(180deg) saturate(1.25)';
 
@@ -56,13 +125,42 @@ const importLibraryFromUrl = async (url: string) => {
     const request = await fetch(url);
     const blob = await request.blob();
     const libraryItems = await loadLibraryFromBlob(blob);
-    return libraryItems.map((libraryItem) =>
-      getNonDeletedElements(restoreElements(libraryItem.elements, null)),
-    );
+    return libraryItems.map((libraryItem: any) => ({
+      elements: getNonDeletedElements(restoreElements(libraryItem.elements, null)),
+      files: libraryItem.files || {},
+    }));
   } catch {
     window.alert('Unable to load library');
     return [];
   }
+};
+
+export const parseDurationToMs = (val: string | null | undefined): number | undefined => {
+  if (!val || typeof val !== 'string') return undefined;
+  const trimmed = val.trim().toLowerCase();
+  if (!trimmed) return undefined;
+
+  const minMatch = trimmed.match(/^([\d.]+)\s*(m|min|mins|minute|minutes)$/);
+  if (minMatch) {
+    const mins = parseFloat(minMatch[1]);
+    return Number.isFinite(mins) && mins > 0 ? Math.round(mins * 60 * 1000) : undefined;
+  }
+
+  const secMatch = trimmed.match(/^([\d.]+)\s*(s|sec|secs|second|seconds)$/);
+  if (secMatch) {
+    const secs = parseFloat(secMatch[1]);
+    return Number.isFinite(secs) && secs > 0 ? Math.round(secs * 1000) : undefined;
+  }
+
+  const msMatch = trimmed.match(/^([\d.]+)\s*ms$/);
+  if (msMatch) {
+    const ms = parseFloat(msMatch[1]);
+    return Number.isFinite(ms) && ms > 0 ? Math.round(ms) : undefined;
+  }
+
+  const num = parseFloat(trimmed);
+  if (!Number.isFinite(num) || num <= 0) return undefined;
+  return num <= 120 ? Math.round(num * 1000) : Math.round(num);
 };
 
 export const useLoadSvg = (
@@ -95,20 +193,24 @@ export const useLoadSvg = (
         pointerImg: searchParams.get('pointerImg') || undefined,
         pointerWidth: searchParams.get('pointerWidth') || undefined,
         pointerHeight: searchParams.get('pointerHeight') || undefined,
+        defaultDuration: parseDurationToMs(searchParams.get('defaultDuration')),
+        totalDuration: parseDurationToMs(searchParams.get('totalDuration')),
       };
       const svgList = await Promise.all(
         dataList.map(async (data) => {
           const elements = getNonDeletedElements(data.elements).filter((el) => {
             if (el.type !== 'image') return true;
             const fileId = (el as { fileId?: string | null }).fileId;
-            return fileId != null && data.files[fileId] != null;
+            return fileId == null || (data.files && data.files[fileId] != null);
           });
           const svg = await exportToSvg({
             elements,
             files: data.files,
             appState: data.appState,
             exportPadding: 30,
+            renderEmbeddables: true,
           });
+          fixForeignObjects(svg);
           const themedSvg = applyThemeToSvg(svg, theme);
           const result = animateSvg(themedSvg, elements, options);
           if (inSequence) {
@@ -146,7 +248,13 @@ export const useLoadSvg = (
           const [, url] = matchLibrary;
           const dataList = await importLibraryFromUrl(url);
           const svgList = await loadDataList(
-            dataList.map((elements) => ({ elements, appState: {}, files: {} })),
+            dataList.map(
+              ({ elements, files }: { elements: any; files: any }) => ({
+                elements,
+                appState: {},
+                files: files || {},
+              }),
+            ),
             searchParams.has('sequence'),
           );
           if (searchParams.get('autoplay') === 'no') {

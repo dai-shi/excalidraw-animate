@@ -14,6 +14,12 @@ const Viewer = ({ svgList }: Props) => {
     svgList.forEach(({ svg }) => {
       if (ref.current) {
         ref.current.appendChild(svg);
+        try {
+          svg.setCurrentTime(0);
+          svg.unpauseAnimations();
+        } catch (e) {
+          console.warn('Failed to start SVG animation on append:', e);
+        }
       }
     });
     return () => {

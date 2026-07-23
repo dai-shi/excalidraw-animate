@@ -5,6 +5,7 @@ import type {
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
+import { parseDurationToMs } from './useLoadSvg';
 
 export type Drawing = {
   elements: readonly ExcalidrawElement[];
@@ -12,27 +13,33 @@ export type Drawing = {
   files: BinaryFiles | null;
 };
 
-const loadAnimateOptions = (): {
-  pointerImg: string | undefined;
-  pointerWidth: string | undefined;
-  pointerHeight: string | undefined;
-} => {
+type OptionKey =
+  | 'pointerImg'
+  | 'pointerWidth'
+  | 'pointerHeight'
+  | 'defaultDuration'
+  | 'totalDuration';
+
+const loadAnimateOptions = (): Record<OptionKey, string | undefined> => {
   const hash = window.location.hash.slice(1);
   const searchParams = new URLSearchParams(hash);
   return {
     pointerImg: searchParams.get('pointerImg') || undefined,
     pointerWidth: searchParams.get('pointerWidth') || undefined,
     pointerHeight: searchParams.get('pointerHeight') || undefined,
+    defaultDuration: searchParams.get('defaultDuration') || undefined,
+    totalDuration: searchParams.get('totalDuration') || undefined,
   };
 };
 
-const saveAnimateOption = (
-  name: 'pointerImg' | 'pointerWidth' | 'pointerHeight',
-  value: string,
-) => {
+const saveAnimateOption = (name: OptionKey, value: string) => {
   const hash = window.location.hash.slice(1);
   const searchParams = new URLSearchParams(hash);
-  searchParams.set(name, value);
+  if (value.trim()) {
+    searchParams.set(name, value.trim());
+  } else {
+    searchParams.delete(name);
+  }
   window.location.hash = searchParams.toString();
 };
 
@@ -112,14 +119,23 @@ export const AnimateConfig = ({
     animateDurationSet.add(extractNumberFromId(id, 'animateDuration'));
   });
   const onChangeAnimateDuration = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = Math.floor(Number(e.target.value));
-    if (Number.isFinite(value)) {
+    const rawVal = e.target.value;
+    const parsedMs = parseDurationToMs(rawVal);
+    if (parsedMs != null) {
       api.updateScene(
-        applyNumberInId(drawing, selectedIds, 'animateDuration', value),
+        applyNumberInId(drawing, selectedIds, 'animateDuration', parsedMs),
       );
     }
   };
   const animateDurationDisabled = !animateDurationSet.size;
+
+  const onChangeTotalDuration = (e: ChangeEvent<HTMLInputElement>) => {
+    saveAnimateOption('totalDuration', e.target.value);
+  };
+
+  const onChangeDefaultDuration = (e: ChangeEvent<HTMLInputElement>) => {
+    saveAnimateOption('defaultDuration', e.target.value);
+  };
 
   const onChangeAnimatePointerText = (e: ChangeEvent<HTMLInputElement>) => {
     saveAnimateOption('pointerImg', e.target.value);
@@ -162,7 +178,64 @@ export const AnimateConfig = ({
           paddingBottom: '5px',
         }}
       >
-        Animation
+        Animation Timing
+      </div>
+
+      {/* Total Scene Duration (Mins / Secs) */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+        }}
+      >
+        <div style={{ fontWeight: 500 }}>Total Scene Duration:</div>
+        <input
+          className="app-input"
+          defaultValue={defaultAnimateOptions.totalDuration || ''}
+          onChange={onChangeTotalDuration}
+          placeholder="e.g. 10s, 1.5m, 45s"
+          style={{ width: '100%' }}
+          title="Set total duration for the entire animation (e.g. 10s = 10 seconds, 1.5m = 1.5 minutes)"
+        />
+        <span style={{ fontSize: '11px', color: 'gray' }}>
+          Duration for all elements combined (e.g. 10s, 1.5m)
+        </span>
+      </div>
+
+      {/* Default Element Duration */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          marginTop: 4,
+        }}
+      >
+        <div style={{ fontWeight: 500 }}>Default Element Duration:</div>
+        <input
+          className="app-input"
+          defaultValue={defaultAnimateOptions.defaultDuration || ''}
+          onChange={onChangeDefaultDuration}
+          placeholder="e.g. 1s, 500ms, 2s"
+          style={{ width: '100%' }}
+          title="Default duration per element (e.g. 1s = 1 second)"
+        />
+        <span style={{ fontSize: '11px', color: 'gray' }}>
+          Base time to animate each element
+        </span>
+      </div>
+
+      {/* Selected Element Controls */}
+      <div
+        style={{
+          fontWeight: 'bold',
+          margin: '8px 0 4px',
+          borderBottom: '1px solid gray',
+          paddingBottom: '5px',
+        }}
+      >
+        Selected Elements ({selectedIds.length})
       </div>
 
       <div
@@ -185,8 +258,8 @@ export const AnimateConfig = ({
             }
             onChange={onChangeAnimateOrder}
             placeholder={animateOrderSet.size > 1 ? 'Mixed' : undefined}
-            style={{ width: 80, minWidth: 50 }}
-            title="Set animation order"
+            style={{ width: 90, minWidth: 60 }}
+            title="Set animation order for selected elements"
           />
         </div>
       </div>
@@ -207,13 +280,15 @@ export const AnimateConfig = ({
             disabled={animateDurationDisabled}
             value={
               animateDurationSet.size === 1
-                ? ([...animateDurationSet][0] ?? '')
+                ? ([...animateDurationSet][0] != null
+                    ? `${[...animateDurationSet][0]}ms`
+                    : '')
                 : ''
             }
             onChange={onChangeAnimateDuration}
-            placeholder={animateDurationSet.size > 1 ? 'Mixed' : 'ms'}
-            style={{ width: 80, minWidth: 50 }}
-            title="Set animation duration in milliseconds"
+            placeholder={animateDurationSet.size > 1 ? 'Mixed' : 'e.g. 2s'}
+            style={{ width: 90, minWidth: 60 }}
+            title="Set duration for selected elements (e.g. 2s, 500ms)"
           />
         </div>
       </div>
@@ -286,7 +361,7 @@ export const AnimateConfig = ({
 
       <div>
         <p style={{ fontWeight: 'lighter', color: 'gray', fontSize: '12px' }}>
-          * Values are set to the app’s default settings unless you change them.
+          * Supports seconds (s), minutes (m), or milliseconds (ms).
         </p>
       </div>
     </div>
